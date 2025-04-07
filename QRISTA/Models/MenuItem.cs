@@ -91,8 +91,7 @@ namespace QRB.Models
         public string MaLoai { get; set; } = string.Empty;
 
         [Required]
-        [Column(TypeName = "decimal(10,2)")]
-        public decimal DonGia { get; set; }
+        public string DonGia { get; set; } = string.Empty;
 
         public bool IsDelete { get; set; } = false;
 
@@ -128,8 +127,7 @@ namespace QRB.Models
         [StringLength(50)]
         public string SDT { get; set; } = string.Empty;
 
-        [Column(TypeName = "decimal(15,2)")]
-        public decimal? GiaTriDonHang { get; set; }
+        public string? GiaTriDonHang { get; set; }
 
         public bool IsDelete { get; set; } = false;
 
@@ -184,8 +182,7 @@ namespace QRB.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid ID { get; set; }
 
-        [Required]
-        public Guid IDKhachHang { get; set; }
+        public Guid? IDKhachHang { get; set; }
 
         [Required]
         public Guid IDNhanVien { get; set; }
@@ -198,18 +195,18 @@ namespace QRB.Models
         public string MaDonHang { get; set; } = string.Empty;
 
         [Required]
-        [Column(TypeName = "decimal(15,2)")]
-        public decimal DonGia { get; set; }
+        [StringLength(255)]
+        public string DonGia { get; set; } = string.Empty;
 
         [StringLength(255)]
         public string? MaUuDai { get; set; }
 
-        [Column(TypeName = "decimal(15,2)")]
-        public decimal? TienUuDai { get; set; }
+        [StringLength(255)]
+        public string? TienUuDai { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(15,2)")]
-        public decimal TongTien { get; set; }
+        [StringLength(255)]
+        public string TongTien { get; set; } = string.Empty;
 
         public bool IsDelete { get; set; } = false;
 
@@ -217,9 +214,15 @@ namespace QRB.Models
 
         public DateTime? UpdateTime { get; set; }
 
+        public bool TrangThaiThanhToan { get; set; } = false;
+
+        public DateTime? NgayThanhToan { get; set; }
+
+        public int? SoBan { get; set; } // Thêm trường số bàn
+
         // Navigation properties
         [ForeignKey("IDKhachHang")]
-        public virtual KhachHang KhachHang { get; set; } = null!;
+        public virtual KhachHang? KhachHang { get; set; }
 
         [ForeignKey("IDNhanVien")]
         public virtual NguoiDung NhanVien { get; set; } = null!;
@@ -249,12 +252,10 @@ namespace QRB.Models
         public int SoLuong { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(10,2)")]
-        public decimal DonGia { get; set; }
+        public string DonGia { get; set; } = string.Empty; // Đổi từ decimal sang string, thêm giá trị mặc định
 
         [Required]
-        [Column(TypeName = "decimal(15,2)")]
-        public decimal ThanhTien { get; set; }
+        public string ThanhTien { get; set; } = string.Empty; // Đổi từ decimal sang string, thêm giá trị mặc định
 
         public bool IsDelete { get; set; } = false;
 
@@ -288,8 +289,7 @@ namespace QRB.Models
         public string MaGiamGia { get; set; } = string.Empty;
 
         [Required]
-        [Column(TypeName = "decimal(15,2)")]
-        public decimal TienGiam { get; set; }
+        public string TienGiam { get; set; } = string.Empty;
 
         public bool TrangThaiSuDung { get; set; } = false;
 
