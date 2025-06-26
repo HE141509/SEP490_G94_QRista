@@ -1,0 +1,60 @@
+@page
+@model QRB.Pages.MenuModel
+@{
+    ViewData["Title"] = "QRB - Menu";
+}
+
+<div class="menu-wrapper">
+    <div class="menu-header">
+        <div class="menu-logo">
+            <img src="/images/Logo_FPT.png" alt="QRB logo" style="height:40px;vertical-align:middle;" />
+            <span class="menu-title">QRista<br /><span style="font-size:1rem;font-weight:400;">Quán cafe thông minh</span></span>
+        </div>
+        <button class="btn btn-primary" style="float:right;">Đăng nhập</button>
+    </div>
+    <div class="menu-content d-flex">
+        <aside class="menu-sidebar">
+            <select class="menu-dropdown">
+                <option value="all">Tất cả</option>
+                <option value="main">Món chính</option>
+                <option value="drink">Đồ uống</option>
+                <option value="dessert">Tráng miệng</option>
+                <option value="combo">Combo</option>
+                <option value="other">Khác</option>
+            </select>
+            <ul>
+                <li class="active">Tất cả</li>
+                <li>Món chính</li>
+                <li>Đồ uống</li>
+                <li>Tráng miệng</li>
+                <li>Combo</li>
+                <li>Khác</li>
+            </ul>
+        </aside>
+        <section class="menu-items flex-grow-1 d-flex flex-wrap">
+            <!-- Demo items -->
+            @for (int i = 0; i < 8; i++) {
+                <div class="menu-item">
+                    <div class="menu-item-img"><img src="/images/cafe.png" alt="item" style="height:60px;" /></div>
+                    <div class="menu-item-title">Tên món @(i+1)</div>
+                    <div class="menu-item-desc">Mô tả món ăn/thức uống</div>
+                    <div class="menu-item-price">
+                        <span class="badge bg-warning text-dark">S</span> <span class="text-primary fw-bold">30,000<sup>đ</sup></span>
+                        <button class="btn btn-sm btn-light">-</button>
+                        <span>0</span>
+                        <button class="btn btn-sm btn-light">+</button>
+                    </div>
+                    <div class="menu-item-price">
+                        <span class="badge bg-warning text-dark">L</span> <span class="text-primary fw-bold">40,000<sup>đ</sup></span>
+                        <button class="btn btn-sm btn-light">-</button>
+                        <span>0</span>
+                        <button class="btn btn-sm btn-light">+</button>
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+@section Styles {
+    <link rel="stylesheet" href="~/css/menu.css" />
+}
