@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\salam\\Downloads\\qrb-5472321dba83ba64bd3bab258f293e5b817dccec\\qrb-5472321dba83ba64bd3bab258f293e5b817dccec\\C#\\QRB.csproj": {}
+    "C:\\Users\\Admin\\Desktop\\DuAn\\qrb\\C#\\QRB.csproj": {}
   },
   "projects": {
-    "C:\\Users\\salam\\Downloads\\qrb-5472321dba83ba64bd3bab258f293e5b817dccec\\qrb-5472321dba83ba64bd3bab258f293e5b817dccec\\C#\\QRB.csproj": {
+    "C:\\Users\\Admin\\Desktop\\DuAn\\qrb\\C#\\QRB.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\salam\\Downloads\\qrb-5472321dba83ba64bd3bab258f293e5b817dccec\\qrb-5472321dba83ba64bd3bab258f293e5b817dccec\\C#\\QRB.csproj",
+        "projectUniqueName": "C:\\Users\\Admin\\Desktop\\DuAn\\qrb\\C#\\QRB.csproj",
         "projectName": "QRB",
-        "projectPath": "C:\\Users\\salam\\Downloads\\qrb-5472321dba83ba64bd3bab258f293e5b817dccec\\qrb-5472321dba83ba64bd3bab258f293e5b817dccec\\C#\\QRB.csproj",
-        "packagesPath": "C:\\Users\\salam\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\salam\\Downloads\\qrb-5472321dba83ba64bd3bab258f293e5b817dccec\\qrb-5472321dba83ba64bd3bab258f293e5b817dccec\\C#\\obj\\",
+        "projectPath": "C:\\Users\\Admin\\Desktop\\DuAn\\qrb\\C#\\QRB.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Admin\\Desktop\\DuAn\\qrb\\C#\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\salam\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -69,7 +69,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.301/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
