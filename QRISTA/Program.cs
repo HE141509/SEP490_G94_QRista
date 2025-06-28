@@ -1,8 +1,27 @@
+using Microsoft.EntityFrameworkCore;
+using QRB.Data;
+using QRB.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddSession();
+
+// Configure session
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = "QRB.Session";
+});
+
+// Add Entity Framework
+builder.Services.AddDbContext<QRBDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Add custom services
+builder.Services.AddScoped<IMenuService, MenuService>();
 
 var app = builder.Build();
 
@@ -19,5 +38,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
+
+app.UseStaticFiles();
+app.MapRazorPages();
 
 app.Run();

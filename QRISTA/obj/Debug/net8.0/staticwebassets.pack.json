@@ -5,12 +5,40 @@
       "PackagePath": "staticwebassets\\QRISTA.bundle.scp.css"
     },
     {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\dashboard.css",
+      "PackagePath": "staticwebassets\\css\\dashboard.css"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\menu.css",
+      "PackagePath": "staticwebassets\\css\\menu.css"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\qrb-login.css",
+      "PackagePath": "staticwebassets\\css\\qrb-login.css"
+    },
+    {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
     {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\images\\Logo_FPT.png",
+      "PackagePath": "staticwebassets\\images\\Logo_FPT.png"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\images\\background.jpg",
+      "PackagePath": "staticwebassets\\images\\background.jpg"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\images\\cafe.png",
+      "PackagePath": "staticwebassets\\images\\cafe.png"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\js\\dashboard.js",
+      "PackagePath": "staticwebassets\\js\\dashboard.js"
     },
     {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\js\\site.js",
@@ -201,6 +229,14 @@
       "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\LICENSE.txt"
     },
     {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\lib\\jquery-validation-unobtrusive\\dist\\jquery.validate.unobtrusive.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\dist\\jquery.validate.unobtrusive.js"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\lib\\jquery-validation-unobtrusive\\dist\\jquery.validate.unobtrusive.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\dist\\jquery.validate.unobtrusive.min.js"
+    },
+    {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js",
       "PackagePath": "staticwebassets\\lib\\jquery-validation-unobtrusive\\jquery.validate.unobtrusive.js"
     },
@@ -243,6 +279,18 @@
     {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\lib\\jquery\\dist\\jquery.slim.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.slim.js"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\lib\\jquery\\dist\\jquery.slim.min.js",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.slim.min.js"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\lib\\jquery\\dist\\jquery.slim.min.map",
+      "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.slim.min.map"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.QRISTA.Microsoft.AspNetCore.StaticWebAssets.props",

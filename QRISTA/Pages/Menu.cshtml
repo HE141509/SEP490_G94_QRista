@@ -10,11 +10,24 @@
             <img src="/images/Logo_FPT.png" alt="QRB logo" style="height:40px;vertical-align:middle;" />
             <span class="menu-title">QRista<br /><span style="font-size:1rem;font-weight:400;">Quán cafe thông minh</span></span>
         </div>
-        <button class="btn btn-primary" style="float:right;">Đăng nhập</button>
+        <div class="menu-user-info">
+            @if (Model.IsLoggedIn)
+            {
+                <div class="user-welcome">
+                    <span class="welcome-text">Xin chào, <strong>@Model.DisplayName</strong></span>
+                    <small class="branch-info">@Model.ChiNhanhName</small>
+                </div>
+                <a href="/Logout" class="btn btn-secondary">Đăng xuất</a>
+            }
+            else
+            {
+                <a href="/Login" class="btn btn-primary">Đăng nhập</a>
+            }
+        </div>
     </div>
     <div class="menu-content d-flex">
         <aside class="menu-sidebar">
-            <select class="menu-dropdown">
+            <select class="menu-dropdown" onchange="filterMenu(this.value)">
                 <option value="all">Tất cả</option>
                 <option value="main">Món chính</option>
                 <option value="drink">Đồ uống</option>
@@ -23,38 +36,300 @@
                 <option value="other">Khác</option>
             </select>
             <ul>
-                <li class="active">Tất cả</li>
-                <li>Món chính</li>
-                <li>Đồ uống</li>
-                <li>Tráng miệng</li>
-                <li>Combo</li>
-                <li>Khác</li>
+                <li class="active" onclick="filterMenu('all')">Tất cả</li>
+                <li onclick="filterMenu('main')">Món chính</li>
+                <li onclick="filterMenu('drink')">Đồ uống</li>
+                <li onclick="filterMenu('dessert')">Tráng miệng</li>
+                <li onclick="filterMenu('combo')">Combo</li>
+                <li onclick="filterMenu('other')">Khác</li>
             </ul>
         </aside>
-        <section class="menu-items flex-grow-1 d-flex flex-wrap">
-            <!-- Demo items -->
-            @for (int i = 0; i < 8; i++) {
-                <div class="menu-item">
-                    <div class="menu-item-img"><img src="/images/cafe.png" alt="item" style="height:60px;" /></div>
-                    <div class="menu-item-title">Tên món @(i+1)</div>
-                    <div class="menu-item-desc">Mô tả món ăn/thức uống</div>
-                    <div class="menu-item-price">
-                        <span class="badge bg-warning text-dark">S</span> <span class="text-primary fw-bold">30,000<sup>đ</sup></span>
-                        <button class="btn btn-sm btn-light">-</button>
-                        <span>0</span>
-                        <button class="btn btn-sm btn-light">+</button>
+        <div class="menu-main flex-grow-1">
+            <section class="menu-items">
+                <!-- Demo items -->
+                @{
+                    var menuItems = new[] {
+                        // Đồ uống
+                        new { Name = "Cà phê đen", Category = "drink", Description = "Cà phê truyền thống đậm đà" },
+                        new { Name = "Cà phê sữa", Category = "drink", Description = "Cà phê pha phin với sữa đặc" },
+                        new { Name = "Trà sữa", Category = "drink", Description = "Trà sữa trân châu thơm ngon" },
+                        new { Name = "Nước ép cam", Category = "drink", Description = "Nước cam tươi nguyên chất" },
+                        new { Name = "Trà đào", Category = "drink", Description = "Trà đào cam sả thơm mát" },
+                        new { Name = "Cappuccino", Category = "drink", Description = "Cà phê Cappuccino Ý" },
+                        new { Name = "Sinh tố bơ", Category = "drink", Description = "Sinh tố bơ béo ngậy" },
+                        new { Name = "Nước dừa", Category = "drink", Description = "Nước dừa tươi mát lạnh" },
+                        
+                        // Món chính
+                        new { Name = "Bánh mì", Category = "main", Description = "Bánh mì thịt nướng đặc biệt" },
+                        new { Name = "Cơm gà", Category = "main", Description = "Cơm gà Hải Nam thơm ngon" },
+                        new { Name = "Phở bò", Category = "main", Description = "Phở bò tái chín truyền thống" },
+                        new { Name = "Bún bò Huế", Category = "main", Description = "Bún bò Huế cay nồng" },
+                        new { Name = "Mì Quảng", Category = "main", Description = "Mì Quảng đặc sản miền Trung" },
+                        new { Name = "Bánh cuốn", Category = "main", Description = "Bánh cuốn nóng hổi" },
+                        new { Name = "Xôi gà", Category = "main", Description = "Xôi gà thơm ngon bổ dưỡng" },
+                        new { Name = "Bánh bao", Category = "main", Description = "Bánh bao nhân thịt hấp" },
+                        
+                        // Tráng miệng
+                        new { Name = "Bánh flan", Category = "dessert", Description = "Bánh flan caramel mềm mịn" },
+                        new { Name = "Kem", Category = "dessert", Description = "Kem vani thơm ngon" },
+                        new { Name = "Chè đậu đỏ", Category = "dessert", Description = "Chè đậu đỏ nước cốt dừa" },
+                        new { Name = "Bánh tiramisu", Category = "dessert", Description = "Bánh tiramisu Ý nguyên bản" },
+                        new { Name = "Sữa chua", Category = "dessert", Description = "Sữa chua dẻo mát lạnh" },
+                        new { Name = "Bánh mousse", Category = "dessert", Description = "Bánh mousse chocolate" },
+                        new { Name = "Chè ba màu", Category = "dessert", Description = "Chè ba màu truyền thống" },
+                        new { Name = "Táo tàu", Category = "dessert", Description = "Táo tàu hầm đường phèn" },
+                        
+                        // Combo
+                        new { Name = "Combo sáng", Category = "combo", Description = "Cà phê + bánh mì" },
+                        new { Name = "Combo trưa", Category = "combo", Description = "Cơm gà + nước ngọt" },
+                        new { Name = "Combo chiều", Category = "combo", Description = "Trà sữa + bánh ngọt" },
+                        new { Name = "Combo tối", Category = "combo", Description = "Phở + nước cam" },
+                        new { Name = "Combo gia đình", Category = "combo", Description = "Combo 4 người ăn" },
+                        new { Name = "Combo sinh viên", Category = "combo", Description = "Ưu đãi cho sinh viên" },
+                        
+                        // Khác
+                        new { Name = "Snack", Category = "other", Description = "Đồ ăn vặt ngon miệng" },
+                        new { Name = "Kẹo", Category = "other", Description = "Kẹo các loại" },
+                        new { Name = "Bánh quy", Category = "other", Description = "Bánh quy giòn tan" },
+                        new { Name = "Mứt", Category = "other", Description = "Mứt trái cây tự nhiên" },
+                        new { Name = "Hạt điều", Category = "other", Description = "Hạt điều rang muối" },
+                        new { Name = "Khô gà", Category = "other", Description = "Khô gà lá chanh" }
+                    };
+                    
+                    var itemsPerPage = 15;
+                    var totalPages = (int)Math.Ceiling((double)menuItems.Length / itemsPerPage);
+                    var itemsToShow = menuItems; // Hiển thị tất cả, JavaScript sẽ xử lý phân trang
+                }
+                @for (int i = 0; i < itemsToShow.Count(); i++) {
+                    var item = itemsToShow.ElementAt(i);
+                    <div class="menu-item" data-category="@item.Category">
+                        <div class="menu-item-img"><img src="/images/cafe.png" alt="item" style="height:60px;" /></div>
+                        <div class="menu-item-title">@item.Name</div>
+                        <div class="menu-item-desc">@item.Description</div>
+                        <div class="menu-item-price">
+                            <span class="badge bg-warning text-dark">S</span> 
+                            <span class="text-primary fw-bold">30,000<sup>đ</sup></span>
+                            <div class="quantity-controls">
+                                <button class="btn btn-sm btn-light" onclick="changeQuantity(this, -1)">-</button>
+                                <span class="quantity">0</span>
+                                <button class="btn btn-sm btn-light" onclick="changeQuantity(this, 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="menu-item-price">
+                            <span class="badge bg-warning text-dark">L</span> 
+                            <span class="text-primary fw-bold">40,000<sup>đ</sup></span>
+                            <div class="quantity-controls">
+                                <button class="btn btn-sm btn-light" onclick="changeQuantity(this, -1)">-</button>
+                                <span class="quantity">0</span>
+                                <button class="btn btn-sm btn-light" onclick="changeQuantity(this, 1)">+</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="menu-item-price">
-                        <span class="badge bg-warning text-dark">L</span> <span class="text-primary fw-bold">40,000<sup>đ</sup></span>
-                        <button class="btn btn-sm btn-light">-</button>
-                        <span>0</span>
-                        <button class="btn btn-sm btn-light">+</button>
+                }
+            </section>
+            
+            <!-- Pagination -->
+            <div class="pagination-wrapper">
+                <nav aria-label="Menu pagination">
+                    <ul class="pagination">
+                        <li class="page-item" id="prevPage">
+                            <a class="page-link" href="#" onclick="changePage(-1)">Trước</a>
+                        </li>
+                        <li class="page-item active">
+                            <span class="page-link" id="currentPageNum">1</span>
+                        </li>
+                        <li class="page-item" id="nextPage">
+                            <a class="page-link" href="#" onclick="changePage(1)">Sau</a>
+                        </li>
+                    </ul>
+                    <div class="page-info">
+                        Trang <span id="pageInfo">1</span> / <span id="totalPagesSpan">@totalPages</span>
                     </div>
-                </div>
-            }
-        </section>
+                </nav>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+let currentPage = 1;
+const itemsPerPage = 15;
+// Temporary hardcoded data for testing - commented out
+
+let allItems = [
+    // Đồ uống (10 items)
+    { Name: "Cà phê đen", Category: "drink", Description: "Cà phê truyền thống đậm đà" },
+    { Name: "Cà phê sữa", Category: "drink", Description: "Cà phê pha phin với sữa đặc" },
+    { Name: "Trà sữa", Category: "drink", Description: "Trà sữa trân châu thơm ngon" },
+    { Name: "Nước ép cam", Category: "drink", Description: "Nước cam tươi nguyên chất" },
+    { Name: "Trà đào", Category: "drink", Description: "Trà đào cam sả thơm mát" },
+    { Name: "Cappuccino", Category: "drink", Description: "Cà phê Cappuccino Ý" },
+    { Name: "Sinh tố bơ", Category: "drink", Description: "Sinh tố bơ béo ngậy" },
+    { Name: "Nước dừa", Category: "drink", Description: "Nước dừa tươi mát lạnh" },
+    { Name: "Trà xanh", Category: "drink", Description: "Trà xanh thơm mát" },
+    { Name: "Nước chanh", Category: "drink", Description: "Nước chanh tươi" },
+    
+    // Món chính (12 items)
+    { Name: "Bánh mì", Category: "main", Description: "Bánh mì thịt nướng đặc biệt" },
+    { Name: "Cơm gà", Category: "main", Description: "Cơm gà Hải Nam thơm ngon" },
+    { Name: "Phở bò", Category: "main", Description: "Phở bò tái chín truyền thống" },
+    { Name: "Bún bò Huế", Category: "main", Description: "Bún bò Huế cay nồng" },
+    { Name: "Mì Quảng", Category: "main", Description: "Mì Quảng đặc sản miền Trung" },
+    { Name: "Bánh cuốn", Category: "main", Description: "Bánh cuốn nóng hổi" },
+    { Name: "Xôi gà", Category: "main", Description: "Xôi gà thơm ngon bổ dưỡng" },
+    { Name: "Bánh bao", Category: "main", Description: "Bánh bao nhân thịt hấp" },
+    { Name: "Cơm tấm", Category: "main", Description: "Cơm tấm sườn nướng" },
+    { Name: "Bún chả", Category: "main", Description: "Bún chả Hà Nội" },
+    { Name: "Bánh xèo", Category: "main", Description: "Bánh xèo miền Tây" },
+    { Name: "Hủ tiếu", Category: "main", Description: "Hủ tiếu Nam Vang" },
+    
+    // Tráng miệng (8 items)
+    { Name: "Bánh flan", Category: "dessert", Description: "Bánh flan caramel mềm mịn" },
+    { Name: "Kem", Category: "dessert", Description: "Kem vani thơm ngon" },
+    { Name: "Chè đậu đỏ", Category: "dessert", Description: "Chè đậu đỏ nước cốt dừa" },
+    { Name: "Bánh tiramisu", Category: "dessert", Description: "Bánh tiramisu Ý nguyên bản" },
+    { Name: "Sữa chua", Category: "dessert", Description: "Sữa chua dẻo mát lạnh" },
+    { Name: "Bánh mousse", Category: "dessert", Description: "Bánh mousse chocolate" },
+    { Name: "Chè ba màu", Category: "dessert", Description: "Chè ba màu truyền thống" },
+    { Name: "Táo tàu", Category: "dessert", Description: "Táo tàu hầm đường phèn" },
+    
+    // Combo (6 items)
+    { Name: "Combo sáng", Category: "combo", Description: "Cà phê + bánh mì" },
+    { Name: "Combo trưa", Category: "combo", Description: "Cơm gà + nước ngọt" },
+    { Name: "Combo chiều", Category: "combo", Description: "Trà sữa + bánh ngọt" },
+    { Name: "Combo tối", Category: "combo", Description: "Phở + nước cam" },
+    { Name: "Combo gia đình", Category: "combo", Description: "Combo 4 người ăn" },
+    { Name: "Combo sinh viên", Category: "combo", Description: "Ưu đãi cho sinh viên" },
+    
+    // Khác (4 items)
+    { Name: "Snack", Category: "other", Description: "Đồ ăn vặt ngon miệng" },
+    { Name: "Kẹo", Category: "other", Description: "Kẹo các loại" },
+    { Name: "Bánh quy", Category: "other", Description: "Bánh quy giòn tan" },
+    { Name: "Mứt", Category: "other", Description: "Mứt trái cây tự nhiên" }
+];
+
+// Real data from server
+/* let allItems = @Html.Raw(Json.Serialize(menuItems.Select(x => new { x.Name, x.Category, x.Description }))); */
+let filteredItems = allItems;
+let totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+
+function updatePagination() {
+    document.getElementById('currentPageNum').textContent = currentPage;
+    document.getElementById('pageInfo').textContent = currentPage;
+    document.getElementById('totalPagesSpan').textContent = totalPages;
+    
+    document.getElementById('prevPage').classList.toggle('disabled', currentPage === 1);
+    document.getElementById('nextPage').classList.toggle('disabled', currentPage === totalPages);
+}
+
+function changePage(direction) {
+    const newPage = currentPage + direction;
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        showPage();
+        updatePagination();
+    }
+}
+
+function showPage() {
+    const items = document.querySelectorAll('.menu-item');
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    
+    // Ẩn tất cả item trước
+    items.forEach(item => {
+        item.style.display = 'none';
+    });
+    
+    // Tạo danh sách các item thuộc filter hiện tại theo thứ tự
+    let visibleItemsCount = 0;
+    items.forEach((item) => {
+        const itemCategory = item.dataset.category;
+        
+        // Kiểm tra xem item có thuộc filter hiện tại không
+        const belongsToFilter = filteredItems.some(f => {
+            if (!f || !f.Category || typeof f.Category !== 'string') {
+                return false;
+            }
+            const filterCategory = f.Category.toLowerCase();
+            return filterCategory === itemCategory;
+        });
+        
+        if (belongsToFilter) {
+            // Kiểm tra xem item này có nằm trong khoảng hiển thị của trang hiện tại không
+            if (visibleItemsCount >= startIndex && visibleItemsCount < endIndex) {
+                item.style.display = 'flex';
+            }
+            visibleItemsCount++;
+        }
+    });
+}
+
+function filterMenu(category) {
+    const tabs = document.querySelectorAll('.menu-sidebar li');
+    
+    // Update active tab
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Filter items
+    if (category === 'all') {
+        filteredItems = allItems;
+    } else {
+        filteredItems = allItems.filter(item => item.Category === category);
+    }
+    
+    // Reset to page 1 and update pagination
+    currentPage = 1;
+    totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    
+    // Show items for current page
+    showPage();
+    
+    // Update active tab for desktop
+    const activeTab = Array.from(tabs).find(tab => 
+        (category === 'all' && tab.textContent.trim() === 'Tất cả') ||
+        (category === 'main' && tab.textContent.trim() === 'Món chính') ||
+        (category === 'drink' && tab.textContent.trim() === 'Đồ uống') ||
+        (category === 'dessert' && tab.textContent.trim() === 'Tráng miệng') ||
+        (category === 'combo' && tab.textContent.trim() === 'Combo') ||
+        (category === 'other' && tab.textContent.trim() === 'Khác')
+    );
+    if (activeTab) activeTab.classList.add('active');
+    
+    // Update dropdown value
+    const dropdown = document.querySelector('.menu-dropdown');
+    if (dropdown) dropdown.value = category;
+    
+    updatePagination();
+}
+
+function changeQuantity(button, change) {
+    const quantitySpan = button.parentElement.querySelector('.quantity');
+    let quantity = parseInt(quantitySpan.textContent);
+    quantity = Math.max(0, quantity + change);
+    quantitySpan.textContent = quantity;
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up initial state
+    filteredItems = allItems;
+    totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    
+    // Show first page
+    showPage();
+    updatePagination();
+});
+
+// Also initialize immediately if DOM is already loaded
+if (document.readyState !== 'loading') {
+    filteredItems = allItems;
+    totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    showPage();
+    updatePagination();
+}
+</script>
+
 @section Styles {
     <link rel="stylesheet" href="~/css/menu.css" />
 }

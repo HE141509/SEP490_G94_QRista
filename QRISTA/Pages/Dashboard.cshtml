@@ -1,0 +1,218 @@
+@page
+@model QRB.Pages.DashboardModel
+@{
+    ViewData["Title"] = "QRB - Dashboard";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-section">
+                <div class="fpt-logo">
+                    <img src="/images/Logo_FPT.png" alt="FPT Education" />
+                </div>
+                <div class="system-info">
+                    <div class="qrb-badge">QRB</div>
+                    <span class="system-title">QRB - Hệ thống quán cafe thông minh</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-actions">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button class="help-btn">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Quản trị viên</span>
+                </button>
+                <div class="user-profile">
+                    <span class="user-name">Trần Tăng Dương</span>
+                    <div class="user-avatar">T</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-content">
+                <ul class="nav-menu">
+                    <li class="nav-item active">
+                        <a href="/Dashboard" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Thống kê hệ thống</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/UserManagement" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Quản lý người dùng</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/Authorization" class="nav-link">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Phân quyền</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header">
+                <h1 class="page-title">Thống kê hệ thống</h1>
+                <div class="date-filter">
+                    <div class="date-input-group">
+                        <label>Từ:</label>
+                        <input type="date" value="2025-01-06" />
+                    </div>
+                    <div class="date-input-group">
+                        <label>Đến:</label>
+                        <input type="date" value="2025-01-07" />
+                    </div>
+                    <button class="update-btn">
+                        <i class="fas fa-sync-alt"></i>
+                        Cập nhật
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <h3>Tổng người dùng</h3>
+                            <div class="stat-number">59</div>
+                            <div class="stat-change">+0 trong tháng này</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card green">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <h3>Người dùng trực tuyến</h3>
+                            <div class="stat-number">0</div>
+                            <div class="stat-change">0% tổng số</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card orange">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <h3>Tổng khóa học</h3>
+                            <div class="stat-number">1</div>
+                            <div class="stat-change">46% hoàn thành trung bình</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card purple">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <h3>Tăng giờ học</h3>
+                            <div class="stat-number">2 giờ</div>
+                            <div class="stat-change">41 phiên học tập (0.3 giờ/người dùng)</div>
+                        </div>
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Tabs -->
+            <div class="chart-tabs">
+                <button class="tab-btn active" data-tab="overview">
+                    <i class="fas fa-clock"></i>
+                    Tổng quan
+                </button>
+                <button class="tab-btn" data-tab="users">
+                    <i class="fas fa-users"></i>
+                    Người dùng
+                </button>
+                <button class="tab-btn" data-tab="courses">
+                    <i class="fas fa-book"></i>
+                    Khóa học
+                </button>
+                <button class="tab-btn" data-tab="activities">
+                    <i class="fas fa-chart-line"></i>
+                    Hoạt động
+                </button>
+            </div>
+
+            <!-- Charts Container -->
+            <div class="charts-container">
+                <div class="chart-section">
+                    <div class="chart-card">
+                        <h3>Người dùng theo vai trò</h3>
+                        <p class="chart-subtitle">Phân bố người dùng theo vai trò trong hệ thống</p>
+                        <div class="chart-wrapper">
+                            <canvas id="userRoleChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #4285f4;"></span>
+                                <span>Quản trị viên</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #34a853;"></span>
+                                <span>Người dùng</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #fbbc05;"></span>
+                                <span>Điều hành viên</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-section">
+                    <div class="chart-card">
+                        <h3>Khóa học phổ biến</h3>
+                        <p class="chart-subtitle">Khóa học được nhiều người học nhất</p>
+                        <div class="chart-wrapper">
+                            <canvas id="popularCoursesChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <span class="legend-color" style="background-color: #4285f4;"></span>
+                                <span>Số người học</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="~/js/dashboard.js"></script>
+</body>
+</html>
