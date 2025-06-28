@@ -1,0 +1,98 @@
+/* QRB custom styles for phone input page */
+html, body {
+    height: 100%;
+    min-height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+.qrb-bg {
+    background: url('/images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    overflow: hidden;
+}
+.qrb-main-wrapper {
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+.qrb-login-box {
+    background: rgba(255,255,255,0.95);
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.15);
+    padding: 32px 24px 24px 24px;
+    max-width: 350px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    top: 0;
+    left: 0;
+    transform: none;
+}
+@media (min-width: 1200px) {
+    .qrb-login-box {
+        max-width: 400px;
+        padding: 40px 32px 32px 32px;
+    }
+}
+@media (max-width: 600px) {
+    .qrb-login-box {
+        max-width: 98vw;
+        padding: 18px 6vw 18px 6vw;
+        border-radius: 10px;
+    }
+    .qrb-main-wrapper {
+        padding: 0;
+    }
+}
+.qrb-logo {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+}
+.qrb-fpt {
+    font-weight: bold;
+    color: #ff8000;
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+}
+.qrb-desc {
+    font-size: 0.95rem;
+    color: #444;
+    margin-bottom: 18px;
+}
+.qrb-btn-skip {
+    background: #e0e0e0;
+    color: #222;
+    border: none;
+}
+.qrb-btn-skip:hover {
+    background: #d0d0d0;
+}
+.qrb-footer {
+    color: #fff;
+    text-shadow: 0 1px 4px #0008;
+    position: fixed;
+    width: 100vw;
+    bottom: 12px;
+    left: 0;
+    text-align: center;
+    font-size: 0.95rem;
+}
