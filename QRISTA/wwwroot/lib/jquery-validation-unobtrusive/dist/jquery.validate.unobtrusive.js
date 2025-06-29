@@ -6,18 +6,17 @@
  * @version v4.0.0
  */
 
-/*jslint white: true, browser: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: false */
-/*global document: false, jQuery: false */
+// ...existing code...
 
 (function (factory) {
     if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
+        
         define("jquery.validate.unobtrusive", ['jquery-validation'], factory);
     } else if (typeof module === 'object' && module.exports) {
-        // CommonJS-like environments that support module.exports     
+        
         module.exports = factory(require('jquery-validation'));
     } else {
-        // Browser global
+        
         jQuery.validator.unobtrusive = factory(jQuery);
     }
 }(function ($) {
@@ -37,7 +36,7 @@
     }
 
     function escapeAttributeValue(value) {
-        // As mentioned on http://api.jquery.com/category/selectors/
+        
         return value.replace(/([!"#$%&'()*+,./:;<=>?@\[\\\]^`{|}~])/g, "\\$1");
     }
 
@@ -52,7 +51,7 @@
         return value;
     }
 
-    function onError(error, inputElement) {  // 'this' is the form element
+    function onError(error, inputElement) {
         var container = $(this).find("[data-valmsg-for='" + escapeAttributeValue(inputElement[0].name) + "']"),
             replaceAttrValue = container.attr("data-valmsg-replace"),
             replace = replaceAttrValue ? $.parseJSON(replaceAttrValue) !== false : null;
@@ -69,7 +68,7 @@
         }
     }
 
-    function onErrors(event, validator) {  // 'this' is the form element
+    function onErrors(event, validator) {
         var container = $(this).find("[data-valmsg-summary=true]"),
             list = container.find("ul");
 
@@ -83,7 +82,7 @@
         }
     }
 
-    function onSuccess(error) {  // 'this' is the form element
+    function onSuccess(error) {
         var container = error.data("unobtrusiveContainer");
 
         if (container) {
@@ -99,13 +98,13 @@
         }
     }
 
-    function onReset(event) {  // 'this' is the form element
+    function onReset(event) {
         var $form = $(this),
             key = '__jquery_unobtrusive_validation_form_reset';
         if ($form.data(key)) {
             return;
         }
-        // Set a flag that indicates we're currently resetting the form.
+        
         $form.data(key, true);
         try {
             $form.data("validator").resetForm();
@@ -120,7 +119,7 @@
             .addClass("field-validation-valid")
             .removeClass("field-validation-error")
             .removeData("unobtrusiveContainer")
-            .find(">*")  // If we were using valmsg-replace, get the underlying error
+            .find(">*")
             .removeData("unobtrusiveContainer");
     }
 
@@ -136,7 +135,7 @@
 
         if (!result) {
             result = {
-                options: {  // options structure passed to jQuery Validate's validate() method
+                options: {
                     errorClass: defaultOptions.errorClass || "input-validation-error",
                     errorElement: defaultOptions.errorElement || "span",
                     errorPlacement: function () {

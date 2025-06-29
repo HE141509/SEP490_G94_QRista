@@ -1,3 +1,29 @@
+footer {
+    width: 100%;
+    background: #fff;
+    border-top: 1px solid #e0e6ed;
+    padding: 16px 0 10px 0;
+    position: relative;
+    left: 0;
+    z-index: 10;
+}
+.footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #888;
+    font-size: 15px;
+    font-weight: 500;
+    width: 100%;
+    min-height: 32px;
+}
+@media (max-width: 600px) {
+    .footer-content {
+        font-size: 13px;
+        padding: 0 8px;
+    }
+}
 /* UserList page custom styles */
 .dashboard-header.userlist-header-flex {
     display: flex;

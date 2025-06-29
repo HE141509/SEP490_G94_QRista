@@ -16,7 +16,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Header -->
+    
     <header class="header">
         <div class="header-left">
             <div class="logo-section">
@@ -60,14 +60,14 @@
         document.querySelectorAll('.user-dropdown').forEach(function(el) { el.style.display = 'none'; });
     });
 </script>
-    <!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
+    
                 </div>
             </div>
         </div>
     </header>
 
     <div class="main-container">
-        <!-- Sidebar -->
+        
         <nav class="sidebar">
             <div class="sidebar-content">
                 <ul class="nav-menu">
@@ -93,14 +93,14 @@
             </div>
         </nav>
 
-        <!-- Main Content -->
+        
         <main class="main-content">
             <div class="dashboard-header userlist-header-flex">
                 <h1 class="page-title">Danh sách người dùng</h1>
                 <button class="userlist-add-btn" type="button">
                     <i class="fas fa-plus"></i> Thêm mới
                 </button>
-                <!-- Popup Thêm mới User -->
+                
                 <div id="addUserModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
                     <div class="modal-content userlist-add-modal-content">
                         <div class="userlist-add-modal-title"><i class="fas fa-user-plus"></i> Thêm người dùng mới</div>
@@ -141,7 +141,7 @@
                         </form>
                     </div>
                 </div>
-<!-- Đã chuyển toàn bộ CSS popup thêm mới user sang userlist.css -->
+
             </div>
             <div class="userlist-card userlist-modern">
                 <div class="userlist-toolbar">
@@ -189,7 +189,7 @@
                                         <div class="userlist-avatar-group">
                                             <div class="userlist-avatar userlist-avatar-img">@user.TenHienThi.Substring(0,1).ToUpper()</div>
                                             <div class="userlist-info">
-                                                <div class="userlist-name">@user.TenHienThi</div>
+                                                <div class="userlist-name" style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditUserModal('@user.ID')">@user.TenHienThi</div>
                                                 <div class="userlist-username">@user.TenNguoiDung</div>
                                             </div>
                                         </div>
@@ -197,9 +197,9 @@
                                     <td class="userlist-email">@user.TenNguoiDung.ToLower()@("@gmail.com")</td>
                                     <td class="userlist-role">Team member</td>
                                     <td class="userlist-permission">@((!user.IsDelete) ? "Owner" : "Viewer")</td>
-<td class="userlist-action">
-    <button class="userlist-delete-btn" title="Xóa" onclick="showDeleteConfirm('@user.ID')"><i class="fas fa-trash"></i></button>
-</td>
+                                    <td class="userlist-action">
+                                        <button class="userlist-delete-btn" title="Xóa" onclick="showDeleteConfirm('@user.ID')"><i class="fas fa-trash"></i></button>
+                                    </td>
                                 </tr>
                                 stt++;
                             }
@@ -215,11 +215,11 @@
                 </div>
             </div>
 
-<!-- Anti-forgery token cho AJAX -->
+
 <form id="antiForgeryForm" style="display:none;">
     @Html.AntiForgeryToken()
 </form>
-<!-- Modal xác nhận xóa user -->
+
 <div id="deleteUserModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
     <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:320px;max-width:90vw;text-align:center;">
         <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa người dùng</div>
@@ -232,6 +232,103 @@
 </div>
 
 </main>
+
+<div id="editUserModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+    <div class="modal-content userlist-add-modal-content">
+        <div class="userlist-add-modal-title"><i class="fas fa-user-edit"></i> Sửa thông tin người dùng</div>
+        <form id="editUserForm" autocomplete="off">
+            <input type="hidden" id="editUserId" name="ID" />
+            <div class="userlist-add-form-group">
+                <label for="editTenHienThi">Tên hiển thị</label>
+                <input type="text" id="editTenHienThi" name="TenHienThi" class="userlist-input" required />
+            </div>
+            <div class="userlist-add-form-group">
+                <label for="editTenNguoiDung">Tên đăng nhập</label>
+                <input type="text" id="editTenNguoiDung" name="TenNguoiDung" class="userlist-input" required readonly />
+            </div>
+            <div class="userlist-add-form-group">
+                <label for="editMatKhau">Mật khẩu mới (để trống nếu không đổi)</label>
+                <input type="password" id="editMatKhau" name="MatKhau" class="userlist-input" />
+            </div>
+            <div class="userlist-add-form-group">
+                <label for="editIDChiNhanh">Chi nhánh</label>
+                <select id="editIDChiNhanh" name="IDChiNhanh" class="userlist-input" required>
+                    <option value="">-- Chọn chi nhánh --</option>
+                    @foreach (var cn in Model.ChiNhanhs)
+                    {
+                        <option value="@cn.ID">@cn.TenChiNhanh</option>
+                    }
+                </select>
+            </div>
+            <div class="userlist-add-form-group">
+                <label for="editTrangThai">Trạng thái</label>
+                <select id="editTrangThai" name="TrangThai" class="userlist-input">
+                    <option value="active">Đang hoạt động</option>
+                    <option value="inactive">Đã khóa</option>
+                </select>
+            </div>
+            <div class="userlist-add-modal-actions">
+                <button type="button" onclick="closeEditUserModal()" class="userlist-add-cancel-btn">Hủy</button>
+                <button type="submit" class="userlist-add-submit-btn">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+
+function showEditUserModal(userId) {
+    fetch(`/User/GetUserById?id=${userId}`)
+        .then(res => res.json())
+        .then(user => {
+            if (!user || !user.id) { alert('Không tìm thấy user!'); return; }
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editTenHienThi').value = user.tenHienThi;
+            document.getElementById('editTenNguoiDung').value = user.tenNguoiDung;
+            document.getElementById('editIDChiNhanh').value = user.idChiNhanh;
+            document.getElementById('editTrangThai').value = user.isDelete ? 'inactive' : 'active';
+            document.getElementById('editMatKhau').value = '';
+            document.getElementById('editUserModal').style.display = 'flex';
+        })
+        .catch(() => alert('Lỗi khi lấy thông tin user!'));
+}
+function closeEditUserModal() {
+    document.getElementById('editUserModal').style.display = 'none';
+    document.getElementById('editUserForm').reset();
+}
+
+
+document.getElementById('editUserForm').onsubmit = function(e) {
+    e.preventDefault();
+    const token = document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]')?.value || '';
+    const data = {
+        ID: document.getElementById('editUserId').value,
+        TenHienThi: document.getElementById('editTenHienThi').value.trim(),
+        TenNguoiDung: document.getElementById('editTenNguoiDung').value.trim(),
+        MatKhau: document.getElementById('editMatKhau').value, // Có thể rỗng nếu không đổi
+        IDChiNhanh: document.getElementById('editIDChiNhanh').value,
+        TrangThai: document.getElementById('editTrangThai').value
+    };
+    fetch('/User/UpdateUser', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': token
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(resp => {
+        if (resp.success) {
+            closeEditUserModal();
+            location.reload();
+        } else {
+            alert(resp.message || 'Cập nhật thất bại!');
+        }
+    })
+    .catch(() => alert('Có lỗi xảy ra!'));
+};
+</script>
 
 <!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
 
@@ -427,15 +524,11 @@
         setTimeout(updatePagination, 0);
     });
 </script>
-<!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
-<!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
     </div>
-
     <footer class="footer">
         <div class="footer-content">
             <span>© 2025 QRB - Hệ thống quán cafe thông minh. All rights reserved.</span>
         </div>
     </footer>
-<!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
 </body>
 </html>
