@@ -24,12 +24,6 @@ namespace QRB.Pages.User
             public Guid ID { get; set; }
             public string TenChiNhanh { get; set; } = string.Empty;
         }
-<<<<<<< HEAD
-        public List<ChiNhanhInfo> ChiNhanhs { get; set; } = new List<ChiNhanhInfo>();
-
-        public void OnGet()
-        {
-=======
 
         public List<ChiNhanhInfo> ChiNhanhs { get; set; } = new List<ChiNhanhInfo>();
 
@@ -48,7 +42,6 @@ namespace QRB.Pages.User
             // Lấy tên hiển thị user hiện tại từ session
             CurrentUserDisplayName = HttpContext.Session.GetString("DisplayName");
 
->>>>>>> origin/hoangtuan
             string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
             using (var connection = new SqlConnection(connectionString))
             {
@@ -85,10 +78,7 @@ namespace QRB.Pages.User
                     }
                 }
             }
-<<<<<<< HEAD
-=======
             return Page();
->>>>>>> origin/hoangtuan
         }
     }
 }
