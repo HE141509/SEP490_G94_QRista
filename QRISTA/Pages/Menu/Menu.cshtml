@@ -1,0 +1,536 @@
+@page
+@model QRB.Pages.Menu.MenuModel
+@{
+    ViewData["Title"] = "QRB - Menu";
+}
+
+<div class="menu-wrapper">
+    <div class="menu-header">
+        <div class="menu-logo">
+            <img src="/images/Logo_FPT.png" alt="QRB logo" style="height:40px;vertical-align:middle;" />
+            <span class="menu-title">QRista<br /><span style="font-size:1rem;font-weight:400;">Quán cafe thông minh</span></span>
+        </div>
+        <div class="menu-user-info">
+            @if (Model.IsLoggedIn)
+            {
+                <div class="user-welcome">
+                    <span class="welcome-text">Xin chào, <strong>@Model.DisplayName</strong></span>
+                    <small class="branch-info">@Model.ChiNhanhName</small>
+                </div>
+                <a href="/Logout" class="btn btn-secondary">Đăng xuất</a>
+            }
+            else
+            {
+                <a href="/Login" class="btn btn-primary">Đăng nhập</a>
+            }
+        </div>
+    </div>
+    <div class="menu-content d-flex">
+        <aside class="menu-sidebar">
+            <select class="menu-dropdown" onchange="filterMenu(this.value)">
+                <option value="all">Tất cả</option>
+                <option value="main">Món chính</option>
+                <option value="drink">Đồ uống</option>
+                <option value="dessert">Tráng miệng</option>
+                <option value="combo">Combo</option>
+                <option value="other">Khác</option>
+            </select>
+            <ul>
+                <li class="active" onclick="filterMenu('all')">Tất cả</li>
+                <li onclick="filterMenu('main')">Món chính</li>
+                <li onclick="filterMenu('drink')">Đồ uống</li>
+                <li onclick="filterMenu('dessert')">Tráng miệng</li>
+                <li onclick="filterMenu('combo')">Combo</li>
+                <li onclick="filterMenu('other')">Khác</li>
+            </ul>
+        </aside>
+        <div class="menu-main flex-grow-1">
+            <section class="menu-items">
+                <!-- Demo items -->
+                @{
+                    var menuItems = new[] {
+                        // Đồ uống
+                        new { Name = "Cà phê đen", Category = "drink", Description = "Cà phê truyền thống đậm đà" },
+                        new { Name = "Cà phê sữa", Category = "drink", Description = "Cà phê pha phin với sữa đặc" },
+                        new { Name = "Trà sữa", Category = "drink", Description = "Trà sữa trân châu thơm ngon" },
+                        new { Name = "Nước ép cam", Category = "drink", Description = "Nước cam tươi nguyên chất" },
+                        new { Name = "Trà đào", Category = "drink", Description = "Trà đào cam sả thơm mát" },
+                        new { Name = "Cappuccino", Category = "drink", Description = "Cà phê Cappuccino Ý" },
+                        new { Name = "Sinh tố bơ", Category = "drink", Description = "Sinh tố bơ béo ngậy" },
+                        new { Name = "Nước dừa", Category = "drink", Description = "Nước dừa tươi mát lạnh" },
+                        
+                        // Món chính
+                        new { Name = "Bánh mì", Category = "main", Description = "Bánh mì thịt nướng đặc biệt" },
+                        new { Name = "Cơm gà", Category = "main", Description = "Cơm gà Hải Nam thơm ngon" },
+                        new { Name = "Phở bò", Category = "main", Description = "Phở bò tái chín truyền thống" },
+                        new { Name = "Bún bò Huế", Category = "main", Description = "Bún bò Huế cay nồng" },
+                        new { Name = "Mì Quảng", Category = "main", Description = "Mì Quảng đặc sản miền Trung" },
+                        new { Name = "Bánh cuốn", Category = "main", Description = "Bánh cuốn nóng hổi" },
+                        new { Name = "Xôi gà", Category = "main", Description = "Xôi gà thơm ngon bổ dưỡng" },
+                        new { Name = "Bánh bao", Category = "main", Description = "Bánh bao nhân thịt hấp" },
+                        
+                        // Tráng miệng
+                        new { Name = "Bánh flan", Category = "dessert", Description = "Bánh flan caramel mềm mịn" },
+                        new { Name = "Kem", Category = "dessert", Description = "Kem vani thơm ngon" },
+                        new { Name = "Chè đậu đỏ", Category = "dessert", Description = "Chè đậu đỏ nước cốt dừa" },
+                        new { Name = "Bánh tiramisu", Category = "dessert", Description = "Bánh tiramisu Ý nguyên bản" },
+                        new { Name = "Sữa chua", Category = "dessert", Description = "Sữa chua dẻo mát lạnh" },
+                        new { Name = "Bánh mousse", Category = "dessert", Description = "Bánh mousse chocolate" },
+                        new { Name = "Chè ba màu", Category = "dessert", Description = "Chè ba màu truyền thống" },
+                        new { Name = "Táo tàu", Category = "dessert", Description = "Táo tàu hầm đường phèn" },
+                        
+                        // Combo
+                        new { Name = "Combo sáng", Category = "combo", Description = "Cà phê + bánh mì" },
+                        new { Name = "Combo trưa", Category = "combo", Description = "Cơm gà + nước ngọt" },
+                        new { Name = "Combo chiều", Category = "combo", Description = "Trà sữa + bánh ngọt" },
+                        new { Name = "Combo tối", Category = "combo", Description = "Phở + nước cam" },
+                        new { Name = "Combo gia đình", Category = "combo", Description = "Combo 4 người ăn" },
+                        new { Name = "Combo sinh viên", Category = "combo", Description = "Ưu đãi cho sinh viên" },
+                        
+                        // Khác
+                        new { Name = "Snack", Category = "other", Description = "Đồ ăn vặt ngon miệng" },
+                        new { Name = "Kẹo", Category = "other", Description = "Kẹo các loại" },
+                        new { Name = "Bánh quy", Category = "other", Description = "Bánh quy giòn tan" },
+                        new { Name = "Mứt", Category = "other", Description = "Mứt trái cây tự nhiên" },
+                        new { Name = "Hạt điều", Category = "other", Description = "Hạt điều rang muối" },
+                        new { Name = "Khô gà", Category = "other", Description = "Khô gà lá chanh" }
+                    };
+                    
+                    var itemsPerPage = 15;
+                    var totalPages = (int)Math.Ceiling((double)menuItems.Length / itemsPerPage);
+                    var itemsToShow = menuItems; // Hiển thị tất cả, JavaScript sẽ xử lý phân trang
+                }
+                @for (int i = 0; i < itemsToShow.Count(); i++) {
+    var item = itemsToShow.ElementAt(i);
+    <div class="menu-item" data-category="@item.Category" data-name="@item.Name">
+                        <div class="menu-item-img"><img src="/images/cafe.png" alt="item" style="height:60px;" /></div>
+                        <div class="menu-item-title">@item.Name</div>
+                        <div class="menu-item-desc">@item.Description</div>
+                        <div class="menu-item-price">
+                            <span class="badge bg-warning text-dark">S</span> 
+                            <span class="text-primary fw-bold">30,000<sup>đ</sup></span>
+                            <div class="quantity-controls">
+                                <button class="btn btn-sm btn-light" onclick="changeQuantity(this, -1)">-</button>
+                                <span class="quantity">0</span>
+                                <button class="btn btn-sm btn-light" onclick="changeQuantity(this, 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="menu-item-price">
+                            <span class="badge bg-warning text-dark">L</span> 
+                            <span class="text-primary fw-bold">40,000<sup>đ</sup></span>
+                            <div class="quantity-controls">
+                                <button class="btn btn-sm btn-light" onclick="changeQuantity(this, -1)">-</button>
+                                <span class="quantity">0</span>
+                                <button class="btn btn-sm btn-light" onclick="changeQuantity(this, 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </section>
+            
+            <!-- Pagination -->
+            <div class="pagination-wrapper">
+                <nav aria-label="Menu pagination">
+                    <ul class="pagination">
+                        <li class="page-item" id="prevPage">
+                            <a class="page-link" href="#" onclick="changePage(-1)">Trước</a>
+                        </li>
+                        <li class="page-item active">
+                            <span class="page-link" id="currentPageNum">1</span>
+                        </li>
+                        <li class="page-item" id="nextPage">
+                            <a class="page-link" href="#" onclick="changePage(1)">Sau</a>
+                        </li>
+                    </ul>
+                    <div class="page-info">
+                        Trang <span id="pageInfo">1</span> / <span id="totalPagesSpan">@totalPages</span>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+    <!-- Cart Summary Floating Button -->
+    <div id="cart-summary" class="cart-summary" style="display:none;">
+        <div class="cart-summary-content">
+            <span id="cart-count">0</span> món | <span id="cart-total">0</span> đ
+        </div>
+        <button id="cart-checkout-btn" class="cart-checkout-btn">Đặt hàng</button>
+    </div>
+
+    <!-- Order Confirmation Popup -->
+    <div id="order-popup" class="order-popup" style="display:none;">
+        <div class="order-popup-content">
+            <h2 class="order-popup-title">Xác nhận đơn hàng</h2>
+            <div class="order-section order-list-section">
+                <div class="order-section-title">Sản phẩm đã chọn</div>
+                <div id="order-items-list"></div>
+            </div>
+            <div class="order-section order-discount-section">
+                <div class="order-section-title order-section-title-divider">Chọn giảm giá</div>
+                <select id="discount-select" class="order-discount-select">
+                    <option value="0">Không giảm giá</option>
+                    <option value="10000">Giảm 10.000đ</option>
+                    <option value="20000">Giảm 20.000đ</option>
+                    <option value="50000">Giảm 50.000đ</option>
+                </select>
+            </div>
+                <div class="order-section order-total-section">
+                    <div class="order-section-title order-section-title-divider">Tổng thanh toán</div>
+                    <div class="order-popup-total">
+                        <div class="order-total-row">
+                            <span class="order-label-left">Tổng số tiền:</span>
+                            <span class="order-value-right"><span id="order-total-raw">0</span> đ</span>
+                        </div>
+                        <div class="order-total-row">
+                            <span class="order-label-left">Số tiền giảm:</span>
+                            <span class="order-value-right"><span id="order-total-discount">0</span> đ</span>
+                        </div>
+                        <div class="order-total-row order-total-final">
+                            <span class="order-label-left">Số tiền cần thanh toán:</span>
+                            <span class="order-value-right"><span id="order-popup-total">0</span> đ</span>
+                        </div>
+                    </div>
+                </div>
+            <div class="order-section order-action-section">
+                <button id="order-cancel-btn" class="order-cancel-btn">Huỷ</button>
+                <button id="order-confirm-btn" class="order-confirm-btn" type="button">Xác nhận</button>
+<!-- QR Code Payment Popup -->
+<div id="qr-popup" class="qr-popup" style="display:none;">
+    <div class="qr-popup-content">
+        <h2 class="qr-popup-title">Quét mã QR để thanh toán</h2>
+        <div id="qr-image-wrapper" class="qr-image-wrapper">
+            <img id="vietqr-img" src="" alt="QR code thanh toán" style="max-width: 260px; display: block; margin: 0 auto;" />
+        </div>
+        <div id="qr-loading" style="display:none; color:#1976d2; font-weight:500; margin:10px 0;">Đang tạo mã QR...</div>
+        <div class="qr-popup-desc">Vui lòng sử dụng app ngân hàng hoặc ví điện tử hỗ trợ VietQR để thanh toán.</div>
+        <button id="qr-close-btn" class="order-cancel-btn" style="margin: 18px auto 0 auto; display: block;">Đóng</button>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPage = 1;
+const itemsPerPage = 15;
+let allItems = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(menuItems));
+let filteredItems = allItems;
+let totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+
+// Cart logic
+let cart = {};
+
+function updateCartSummary() {
+    let count = 0, total = 0;
+    for (const key in cart) {
+        count += cart[key].qty;
+        total += cart[key].qty * cart[key].price;
+    }
+    document.getElementById('cart-count').innerText = count;
+    document.getElementById('cart-total').innerText = total.toLocaleString();
+    document.getElementById('cart-summary').style.display = count > 0 ? 'flex' : 'none';
+}
+
+function updateMenuItemQtyUI() {
+    // Update all .menu-item quantities from cart
+    document.querySelectorAll('.menu-item').forEach((itemDiv, idx) => {
+        // S: 30k, L: 40k
+        let sKey = itemDiv.querySelector('.menu-item-title').innerText + '_S';
+        let lKey = itemDiv.querySelector('.menu-item-title').innerText + '_L';
+        let sQty = cart[sKey]?.qty || 0;
+        let lQty = cart[lKey]?.qty || 0;
+        let qtySpans = itemDiv.querySelectorAll('.quantity');
+        if (qtySpans[0]) qtySpans[0].innerText = sQty;
+        if (qtySpans[1]) qtySpans[1].innerText = lQty;
+    });
+}
+
+function getPrice(size) {
+    return size === 'S' ? 30000 : 40000;
+}
+
+function changeQuantity(button, change) {
+    const itemDiv = button.closest('.menu-item');
+    const name = itemDiv.querySelector('.menu-item-title').innerText;
+    const priceDiv = button.closest('.menu-item-price');
+    const size = priceDiv.querySelector('.badge').innerText.trim();
+    const key = name + '_' + size;
+    if (!cart[key]) cart[key] = { name, size, qty: 0, price: getPrice(size) };
+    cart[key].qty = Math.max(0, cart[key].qty + change);
+    if (cart[key].qty === 0) delete cart[key];
+    updateCartSummary();
+    updateMenuItemQtyUI();
+}
+
+function updatePagination() {
+    document.getElementById('currentPageNum').textContent = currentPage;
+    document.getElementById('pageInfo').textContent = currentPage;
+    document.getElementById('totalPagesSpan').textContent = totalPages;
+    document.getElementById('prevPage').classList.toggle('disabled', currentPage === 1);
+    document.getElementById('nextPage').classList.toggle('disabled', currentPage === totalPages);
+}
+
+function changePage(direction) {
+    const newPage = currentPage + direction;
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        showPage();
+        updatePagination();
+    }
+}
+
+function showPage() {
+    const items = document.querySelectorAll('.menu-item');
+    // Lấy danh sách index các item thuộc filter hiện tại
+    let filteredIndexes = [];
+    items.forEach((item, idx) => {
+        const itemCategory = item.dataset.category;
+        const itemName = item.dataset.name;
+        const belongsToFilter = filteredItems.some(f => {
+            if (!f || !f.Category || !f.Name) return false;
+            return f.Category.toLowerCase() === itemCategory && f.Name === itemName;
+        });
+        if (belongsToFilter) filteredIndexes.push(idx);
+    });
+    // Ẩn tất cả
+    items.forEach(item => { item.style.display = 'none'; });
+    // Hiện đúng các item thuộc trang hiện tại
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    for (let i = startIndex; i < endIndex && i < filteredIndexes.length; i++) {
+        items[filteredIndexes[i]].style.display = 'flex';
+    }
+    updateMenuItemQtyUI();
+}
+
+function filterMenu(category) {
+    const tabs = document.querySelectorAll('.menu-sidebar li');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    if (category === 'all') {
+        filteredItems = allItems;
+    } else {
+        filteredItems = allItems.filter(item => item.Category === category);
+    }
+    currentPage = 1;
+    totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    showPage();
+    const activeTab = Array.from(tabs).find(tab =>
+        (category === 'all' && tab.textContent.trim() === 'Tất cả') ||
+        (category === 'main' && tab.textContent.trim() === 'Món chính') ||
+        (category === 'drink' && tab.textContent.trim() === 'Đồ uống') ||
+        (category === 'dessert' && tab.textContent.trim() === 'Tráng miệng') ||
+        (category === 'combo' && tab.textContent.trim() === 'Combo') ||
+        (category === 'other' && tab.textContent.trim() === 'Khác')
+    );
+    if (activeTab) activeTab.classList.add('active');
+    const dropdown = document.querySelector('.menu-dropdown');
+    if (dropdown) dropdown.value = category;
+    updatePagination();
+}
+
+// Cart summary & popup logic
+document.addEventListener('DOMContentLoaded', function() {
+    filteredItems = allItems;
+    totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    showPage();
+    updatePagination();
+    updateCartSummary();
+});
+if (document.readyState !== 'loading') {
+    filteredItems = allItems;
+    totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    showPage();
+    updatePagination();
+    updateCartSummary();
+}
+
+let currentOrderTotal = 0;
+function updateOrderPopupTotal() {
+    // Tính lại tổng số tiền các sản phẩm trong cart
+    let total = 0;
+    for (const key in cart) {
+        const item = cart[key];
+        total += item.qty * item.price;
+    }
+    let discount = parseInt(document.getElementById('discount-select').value) || 0;
+    let finalTotal = Math.max(0, total - discount);
+    document.getElementById('order-total-raw').innerText = total.toLocaleString();
+    document.getElementById('order-total-discount').innerText = discount.toLocaleString();
+    document.getElementById('order-popup-total').innerText = finalTotal.toLocaleString();
+    currentOrderTotal = total;
+}
+
+document.getElementById('cart-checkout-btn').addEventListener('click', function() {
+    // Đảm bảo ẩn popup QR nếu đang mở
+    // Chỉ ẩn popup QR nếu đang mở, KHÔNG ẩn popup order
+    if (document.getElementById('qr-popup').style.display !== 'none') {
+        document.getElementById('qr-popup').style.display = 'none';
+    }
+    const list = document.getElementById('order-items-list');
+    list.innerHTML = '';
+    let total = 0;
+    for (const key in cart) {
+        const item = cart[key];
+        total += item.qty * item.price;
+        const div = document.createElement('div');
+        div.className = 'order-item';
+        div.innerHTML = `<span>${item.name} (${item.size})</span> <span>${item.qty} x ${item.price.toLocaleString()} đ</span>`;
+        list.appendChild(div);
+    }
+    currentOrderTotal = total;
+    updateOrderPopupTotal();
+    document.getElementById('order-popup').style.display = 'flex';
+    // Reset discount combobox
+    document.getElementById('discount-select').value = '0';
+});
+
+document.getElementById('discount-select').addEventListener('change', function() {
+    updateOrderPopupTotal();
+});
+
+document.getElementById('order-cancel-btn').addEventListener('click', function() {
+    document.getElementById('order-popup').style.display = 'none';
+});
+
+document.getElementById('order-confirm-btn').addEventListener('click', function() {
+    // Lấy số tiền cần thanh toán
+    let finalPrice = 0;
+    try {
+        finalPrice = parseInt(document.getElementById('order-popup-total').innerText.replace(/\D/g, ''));
+    } catch {}
+    if (!finalPrice || finalPrice < 1000) {
+        alert('Số tiền thanh toán không hợp lệ!');
+        return;
+    }
+    // Ẩn popup xác nhận đơn hàng
+    document.getElementById('order-popup').style.display = 'none';
+    // Chuyển hướng sang trang thanh toán riêng
+    window.location.href = '/Payment/Payment?amount=' + finalPrice;
+    // Reset giỏ hàng phía client
+    cart = {};
+    updateCartSummary();
+    updateMenuItemQtyUI();
+});
+
+document.getElementById('qr-close-btn').addEventListener('click', function() {
+    document.getElementById('qr-popup').style.display = 'none';
+    // Sau khi đóng QR, có thể reset giỏ hàng nếu muốn:
+    cart = {};
+    updateCartSummary();
+    updateMenuItemQtyUI();
+    // Đảm bảo popup order không bị hiện lại ngoài ý muốn
+    document.getElementById('order-popup').style.display = 'none';
+});
+</script>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/menu.css" />
+    <style>
+        .qr-popup {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.25);
+            z-index: 1200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-popup-content {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px 28px 24px 28px;
+            min-width: 320px;
+            max-width: 95vw;
+            box-shadow: 0 4px 32px 0 rgba(25, 118, 210, 0.10);
+            text-align: center;
+        }
+        .qr-popup-title {
+            font-size: 1.18rem;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 18px;
+        }
+        .qr-image-wrapper {
+            margin: 0 auto 16px auto;
+        }
+        .qr-popup-desc {
+            color: #333;
+            font-size: 1rem;
+            margin-top: 8px;
+        }
+        .order-discount-select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 16px;
+            font-size: 1.08rem;
+            margin-top: 8px;
+            border: 1.5px solid #90caf9;
+            border-radius: 8px;
+            background: #f7fbff;
+            color: #1a237e;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            appearance: none;
+            font-weight: 600;
+            box-shadow: 0 1px 4px 0 rgba(25, 118, 210, 0.04);
+        }
+        .order-discount-select:focus {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px #90caf9;
+            background: #e3f2fd;
+        }
+        .order-discount-select option {
+            font-weight: 500;
+            color: #1976d2;
+        }
+        .order-section-title-divider {
+            border-top: 1.5px solid #e0e0e0;
+            padding-top: 10px;
+            margin-top: 18px;
+        }
+        .order-section-title {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 8px;
+            letter-spacing: 0.2px;
+        }
+        .order-popup-title {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .order-popup-total {
+            width: 100%;
+        }
+        .order-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .order-label-left {
+            flex: 1;
+            text-align: left;
+            font-weight: 500;
+        }
+        .order-value-right {
+            flex: 1;
+            text-align: right;
+            font-weight: 600;
+            color: #1a237e;
+        }
+        .order-total-final .order-value-right {
+            color: #d32f2f;
+        }
+        .order-section.order-action-section {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 18px;
+        }
+        .order-cancel-btn, .order-confirm-btn {
+            min-width: 100px;
+        }
+    </style>
+}

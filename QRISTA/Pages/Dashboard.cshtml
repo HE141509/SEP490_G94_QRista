@@ -38,10 +38,57 @@
                     <i class="fas fa-question-circle"></i>
                     <span>Quản trị viên</span>
                 </button>
-                <div class="user-profile">
-                    <span class="user-name">Trần Tăng Dương</span>
-                    <div class="user-avatar">T</div>
-                </div>
+                    <div class="user-profile">
+                        <span class="user-name">Trần Tăng Dương</span>
+                        <div class="user-avatar user-avatar-dropdown" tabindex="0" onclick="toggleUserDropdown(event)">T
+                            <div class="user-dropdown" style="display:none;">
+                                <a href="/Logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                            </div>
+                        </div>
+                    </div>
+</header>
+
+<script>
+    function toggleUserDropdown(event) {
+        event.stopPropagation();
+        var dropdown = event.currentTarget.querySelector('.user-dropdown');
+        var isVisible = dropdown.style.display === 'block';
+        // Ẩn tất cả dropdown khác
+        document.querySelectorAll('.user-dropdown').forEach(function(el) { el.style.display = 'none'; });
+        dropdown.style.display = isVisible ? 'none' : 'block';
+    }
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.user-dropdown').forEach(function(el) { el.style.display = 'none'; });
+    });
+</script>
+<style>
+    .user-avatar.user-avatar-dropdown {
+        position: relative;
+        cursor: pointer;
+    }
+    .user-dropdown {
+        position: absolute;
+        top: 110%;
+        right: 0;
+        background: #fff;
+        border: 1px solid #e0e6ed;
+        border-radius: 6px;
+        min-width: 140px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        z-index: 2000;
+    }
+    .user-dropdown .dropdown-item {
+        display: block;
+        padding: 10px 16px;
+        color: #333;
+        text-decoration: none;
+        font-size: 15px;
+        transition: background 0.2s;
+    }
+    .user-dropdown .dropdown-item:hover {
+        background: #f5f7fa;
+    }
+</style>
             </div>
         </div>
     </header>

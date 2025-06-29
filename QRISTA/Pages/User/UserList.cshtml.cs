@@ -1,0 +1,48 @@
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+
+namespace QRB.Pages.User
+{
+    public class UserListModel : PageModel
+    {
+        public class UserInfo
+        {
+            public Guid ID { get; set; }
+            public string TenNguoiDung { get; set; } = string.Empty;
+            public string TenHienThi { get; set; } = string.Empty;
+            public Guid IDChiNhanh { get; set; }
+            public bool IsDelete { get; set; }
+            public DateTime CreateTime { get; set; }
+            public DateTime? UpdateTime { get; set; }
+        }
+
+        public List<UserInfo> Users { get; set; } = new List<UserInfo>();
+
+        public void OnGet()
+        {
+            string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                var command = new SqlCommand(@"SELECT ID, TenNguoiDung, TenHienThi, IDChiNhanh, IsDelete, CreateTime, UpdateTime FROM NguoiDung", connection);
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        Users.Add(new UserInfo
+                        {
+                            ID = reader.GetGuid(0),
+                            TenNguoiDung = reader.GetString(1),
+                            TenHienThi = reader.GetString(2),
+                            IDChiNhanh = reader.GetGuid(3),
+                            IsDelete = reader.GetBoolean(4),
+                            CreateTime = reader.GetDateTime(5),
+                            UpdateTime = reader.IsDBNull(6) ? null : reader.GetDateTime(6)
+                        });
+                    }
+                }
+            }
+        }
+    }
+}

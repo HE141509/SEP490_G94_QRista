@@ -1,0 +1,429 @@
+@page
+@model QRB.Pages.User.UserListModel
+@{
+    ViewData["Title"] = "Danh sách người dùng";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/userlist.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-section">
+                <div class="fpt-logo">
+                    <img src="/images/Logo_FPT.png" alt="FPT Education" />
+                </div>
+                <div class="system-info">
+                    <div class="qrb-badge">QRB</div>
+                    <span class="system-title">QRB - Hệ thống quán cafe thông minh</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-actions">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button class="help-btn">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Quản trị viên</span>
+                </button>
+                <div class="user-profile">
+                    <span class="user-name">Trần Tăng Dương</span>
+                    <div class="user-avatar user-avatar-dropdown" tabindex="0" onclick="toggleUserDropdown(event)">T
+                        <div class="user-dropdown" style="display:none;">
+                            <a href="/Logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                        </div>
+                    </div>
+</header>
+
+<script>
+    function toggleUserDropdown(event) {
+        event.stopPropagation();
+        var dropdown = event.currentTarget.querySelector('.user-dropdown');
+        var isVisible = dropdown.style.display === 'block';
+        // Ẩn tất cả dropdown khác
+        document.querySelectorAll('.user-dropdown').forEach(function(el) { el.style.display = 'none'; });
+        dropdown.style.display = isVisible ? 'none' : 'block';
+    }
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.user-dropdown').forEach(function(el) { el.style.display = 'none'; });
+    });
+</script>
+    <!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-content">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/Dashboard" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Thống kê hệ thống</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/UserManagement" class="nav-link">
+                            <i class="fas fa-users"></i>
+                            <span>Quản lý người dùng</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/Authorization" class="nav-link">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Phân quyền</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-header userlist-header-flex">
+                <h1 class="page-title">Danh sách người dùng</h1>
+                <button class="userlist-add-btn" onclick="window.location.href='/User/AddUser'">
+                    <i class="fas fa-plus"></i> Thêm mới
+                </button>
+                <!-- Popup Thêm mới User -->
+                <div id="addUserModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                    <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:340px;max-width:95vw;text-align:left;">
+                        <div style="font-size:20px;font-weight:600;color:#4285f4;margin-bottom:18px;"><i class="fas fa-user-plus"></i> Thêm người dùng mới</div>
+                        <form id="addUserForm" autocomplete="off">
+                            <div style="margin-bottom:14px;">
+                                <label for="addTenHienThi" style="font-weight:500;">Tên hiển thị</label>
+                                <input type="text" id="addTenHienThi" name="TenHienThi" class="userlist-input" required style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0e6ed;font-size:15px;" />
+                            </div>
+                            <div style="margin-bottom:14px;">
+                                <label for="addTenNguoiDung" style="font-weight:500;">Tên đăng nhập</label>
+                                <input type="text" id="addTenNguoiDung" name="TenNguoiDung" class="userlist-input" required style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0e6ed;font-size:15px;" />
+                            </div>
+                            <div style="margin-bottom:14px;">
+                                <label for="addMatKhau" style="font-weight:500;">Mật khẩu</label>
+                                <input type="password" id="addMatKhau" name="MatKhau" class="userlist-input" required style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0e6ed;font-size:15px;" />
+                            </div>
+                            <div style="margin-bottom:18px;">
+                                <label for="addTrangThai" style="font-weight:500;">Trạng thái</label>
+                                <select id="addTrangThai" name="TrangThai" class="userlist-input" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0e6ed;font-size:15px;">
+                                    <option value="active">Đang hoạt động</option>
+                                    <option value="inactive">Đã khóa</option>
+                                </select>
+                            </div>
+                            <div style="display:flex;justify-content:flex-end;gap:14px;">
+                                <button type="button" onclick="closeAddUserModal()" style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy</button>
+                                <button type="submit" style="background:#4285f4;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Thêm mới</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="userlist-card userlist-modern">
+                <div class="userlist-toolbar">
+                    <div class="userlist-toolbar-left">
+                        <label for="filterRole">Trạng thái:</label>
+                        <select id="filterRole" class="userlist-filter" onchange="filterByStatus()">
+                            <option value="active">Đang hoạt động</option>
+                            <option value="inactive">Đã khóa</option>
+                        </select>
+                    </div>
+                    <div class="userlist-toolbar-right">
+                        <label for="pageSize" style="font-size:15px;margin-right:8px;color:#555;">Hiển thị:</label>
+                        <select id="pageSize" class="userlist-filter" style="width:auto;min-width:60px;" onchange="changePageSize()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterUserList()" style="margin-left:12px;" />
+                        <button class="userlist-filter-btn"><i class="fas fa-filter"></i></button>
+                    </div>
+                </div>
+                <div class="userlist-table-wrapper">
+                    <table class="userlist-table userlist-table-modern" id="userListTable">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" onclick="toggleAllUserCheckbox(this)" /></th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Permission</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (Model.Users != null && Model.Users.Count > 0)
+                        {
+                            int stt = 1;
+                            for (int i = 0; i < Model.Users.Count; i++)
+                            {
+                                var user = Model.Users[i];
+                                <tr data-index="@i">
+                                    <td><input type="checkbox" class="user-checkbox" /></td>
+                                    <td>
+                                        <div class="userlist-avatar-group">
+                                            <div class="userlist-avatar userlist-avatar-img">@user.TenHienThi.Substring(0,1).ToUpper()</div>
+                                            <div class="userlist-info">
+                                                <div class="userlist-name">@user.TenHienThi</div>
+                                                <div class="userlist-username">@user.TenNguoiDung</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="userlist-email">@user.TenNguoiDung.ToLower()@("@gmail.com")</td>
+                                    <td class="userlist-role">Team member</td>
+                                    <td class="userlist-permission">@((!user.IsDelete) ? "Owner" : "Viewer")</td>
+<td class="userlist-action">
+    <button class="userlist-delete-btn" title="Xóa" onclick="showDeleteConfirm('@user.ID')"><i class="fas fa-trash"></i></button>
+</td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="6">Không có dữ liệu người dùng.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+
+                    <div id="userlist-pagination"></div>
+                </div>
+            </div>
+
+<!-- Anti-forgery token cho AJAX -->
+<form id="antiForgeryForm" style="display:none;">
+    @Html.AntiForgeryToken()
+</form>
+<!-- Modal xác nhận xóa user -->
+<div id="deleteUserModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+    <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:320px;max-width:90vw;text-align:center;">
+        <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa người dùng</div>
+        <div style="font-size:16px;color:#333;margin-bottom:24px;">Bạn có chắc chắn muốn xóa người dùng này không?</div>
+        <div style="display:flex;justify-content:center;gap:18px;">
+            <button onclick="confirmDeleteUser()" style="background:#ea4335;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Xác nhận</button>
+            <button onclick="closeDeleteModal()" style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy</button>
+        </div>
+    </div>
+</div>
+
+</main>
+
+<!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
+
+    <script>
+    // Hiển thị popup thêm mới user
+    document.querySelector('.userlist-add-btn').onclick = function(e) {
+        e.preventDefault();
+        document.getElementById('addUserModal').style.display = 'flex';
+    };
+    function closeAddUserModal() {
+        document.getElementById('addUserModal').style.display = 'none';
+        document.getElementById('addUserForm').reset();
+    }
+    // Submit form thêm mới user qua AJAX
+    document.getElementById('addUserForm').onsubmit = function(e) {
+        e.preventDefault();
+        const token = document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]')?.value || '';
+        const data = {
+            TenHienThi: document.getElementById('addTenHienThi').value.trim(),
+            TenNguoiDung: document.getElementById('addTenNguoiDung').value.trim(),
+            MatKhau: document.getElementById('addMatKhau').value,
+            TrangThai: document.getElementById('addTrangThai').value
+        };
+        fetch('/User/AddUser', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(resp => {
+            if (resp.success) {
+                closeAddUserModal();
+                location.reload();
+            } else {
+                alert(resp.message || 'Thêm mới thất bại!');
+            }
+        })
+        .catch(() => alert('Có lỗi xảy ra!'));
+    };
+    // XÓA USER VỚI POPUP XÁC NHẬN
+    let userIdToDelete = null;
+    function showDeleteConfirm(userId) {
+        userIdToDelete = userId;
+        document.getElementById('deleteUserModal').style.display = 'flex';
+    }
+    function closeDeleteModal() {
+        userIdToDelete = null;
+        document.getElementById('deleteUserModal').style.display = 'none';
+    }
+    function confirmDeleteUser() {
+        if (!userIdToDelete) return;
+        // Gửi request xóa user (set isDelete = true)
+        const token = document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]')?.value || '';
+        fetch('/User/DeleteUser', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'RequestVerificationToken': token
+            },
+            body: JSON.stringify({ id: userIdToDelete })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Reload lại trang hoặc cập nhật UI
+                location.reload();
+            } else {
+                alert('Xóa thất bại!');
+                closeDeleteModal();
+            }
+        })
+        .catch(() => {
+            alert('Có lỗi xảy ra!');
+            closeDeleteModal();
+        });
+    }
+    // PHÂN TRANG + SEARCH + FILTER
+    let currentPage = 1;
+    let pageSize = 10;
+    let currentFilter = 'active';
+    let currentSearch = '';
+
+    function getAllUserRows() {
+        return Array.from(document.querySelectorAll('#userListTable tbody tr')).filter(function(row) {
+            return row.querySelectorAll('td').length > 1;
+        });
+    }
+
+    function getFilteredRows() {
+        let rows = getAllUserRows();
+        // Lọc theo trạng thái
+        rows = rows.filter(function(row) {
+            var permissionCell = row.querySelector('.userlist-permission');
+            var isActive = true;
+            if (permissionCell) {
+                isActive = (permissionCell.textContent.trim() === 'Owner');
+            }
+            if (currentFilter === 'active') return isActive;
+            if (currentFilter === 'inactive') return !isActive;
+        });
+        // Lọc theo search
+        if (currentSearch) {
+            rows = rows.filter(function(row) {
+                var name = row.querySelector('.userlist-name')?.textContent.toLowerCase() || '';
+                var email = row.querySelector('.userlist-email')?.textContent.toLowerCase() || '';
+                return name.includes(currentSearch) || email.includes(currentSearch);
+            });
+        }
+        return rows;
+    }
+
+    function renderPagination() {
+        let rows = getFilteredRows();
+        let total = rows.length;
+        let totalPages = Math.ceil(total / pageSize);
+        let pag = document.getElementById('userlist-pagination');
+        if (!pag) return;
+        if (totalPages <= 1) {
+            pag.innerHTML = '';
+            return;
+        }
+        let html = '';
+        html += `<button onclick="gotoPage(1)" ${currentPage==1?'disabled':''}>&laquo;</button>`;
+        for (let i = 1; i <= totalPages; i++) {
+            if (i === 1 || i === totalPages || Math.abs(i-currentPage)<=2) {
+                html += `<button onclick="gotoPage(${i})" ${i==currentPage?'class="active"':''}>${i}</button>`;
+            } else if (i === currentPage-3 || i === currentPage+3) {
+                html += '<span>...</span>';
+            }
+        }
+        html += `<button onclick="gotoPage(${totalPages})" ${currentPage==totalPages?'disabled':''}>&raquo;</button>`;
+        pag.className = 'userlist-pagination';
+        pag.innerHTML = html;
+    }
+
+    function updatePagination() {
+        let allRows = getAllUserRows();
+        let rows = getFilteredRows();
+        let total = rows.length;
+        let totalPages = Math.ceil(total / pageSize);
+        if (currentPage > totalPages) currentPage = totalPages || 1;
+        // Ẩn tất cả
+        allRows.forEach(function(row) { row.style.display = 'none'; });
+        // Hiện các row thuộc page hiện tại
+        rows.forEach(function(row, idx) {
+            if (idx >= (currentPage-1)*pageSize && idx < currentPage*pageSize) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        // Nếu không có bản ghi nào, ẩn phân trang
+        let pag = document.getElementById('userlist-pagination');
+        if (rows.length === 0) {
+            if (pag) pag.innerHTML = '';
+            return;
+        }
+        renderPagination();
+    }
+
+    function gotoPage(page) {
+        currentPage = page;
+        updatePagination();
+    }
+    function changePageSize() {
+        pageSize = parseInt(document.getElementById('pageSize').value);
+        currentPage = 1;
+        updatePagination();
+    }
+    function filterUserList() {
+        currentSearch = document.querySelector('.userlist-search').value.toLowerCase();
+        currentPage = 1;
+        updatePagination();
+    }
+    function filterByStatus() {
+        currentFilter = document.getElementById('filterRole').value;
+        currentPage = 1;
+        updatePagination();
+    }
+    function toggleAllUserCheckbox(source) {
+        var checkboxes = document.querySelectorAll('.user-checkbox');
+        checkboxes.forEach(function(cb) { cb.checked = source.checked; });
+    }
+
+    // Khởi tạo phân trang khi load trang
+    window.addEventListener('DOMContentLoaded', function() {
+        pageSize = parseInt(document.getElementById('pageSize').value) || 10;
+        // Đảm bảo luôn gọi updatePagination sau 1 tick để DOM đã render xong
+        setTimeout(updatePagination, 0);
+    });
+</script>
+<!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
+<!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <span>© 2025 QRB - Hệ thống quán cafe thông minh. All rights reserved.</span>
+        </div>
+    </footer>
+<!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
+</body>
+</html>

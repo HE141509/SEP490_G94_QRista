@@ -33,12 +33,12 @@ public class IndexModel : PageModel
         {
             Skipped = true;
             // Xử lý khi người dùng bấm Bỏ qua
-            return RedirectToPage("/Menu"); // hoặc trang tiếp theo
+            return RedirectToPage("/Menu/Menu"); // hoặc trang tiếp theo
         }
         if (!string.IsNullOrEmpty(PhoneNumber))
         {
             // Xử lý số điện thoại, ví dụ lưu session hoặc chuyển trang
-            return RedirectToPage("/Menu"); // hoặc trang tiếp theo
+            return RedirectToPage("/Menu/Menu"); // hoặc trang tiếp theo
         }
         return Page();
     }
