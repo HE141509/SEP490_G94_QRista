@@ -17,35 +17,7 @@
 </head>
 <body>
     
-    <header class="header">
-        <div class="header-left">
-            <div class="logo-section">
-                <div class="fpt-logo">
-                    <img src="/images/Logo_FPT.png" alt="FPT Education" />
-                </div>
-                <div class="system-info">
-                    <div class="qrb-badge">QRB</div>
-                    <span class="system-title">QRB - Hệ thống quán cafe thông minh</span>
-                </div>
-            </div>
-        </div>
-        <div class="header-right">
-            <div class="header-actions">
-                <button class="notification-btn">
-                    <i class="fas fa-bell"></i>
-                </button>
-                <button class="help-btn">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Quản trị viên</span>
-                </button>
-                <div class="user-profile">
-                    <span class="user-name">Trần Tăng Dương</span>
-                    <div class="user-avatar user-avatar-dropdown" tabindex="0" onclick="toggleUserDropdown(event)">T
-                        <div class="user-dropdown" style="display:none;">
-                            <a href="/Logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
-                        </div>
-                    </div>
-</header>
+    @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
 
 <script>
     function toggleUserDropdown(event) {

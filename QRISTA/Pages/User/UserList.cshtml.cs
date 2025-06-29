@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
@@ -23,10 +24,31 @@ namespace QRB.Pages.User
             public Guid ID { get; set; }
             public string TenChiNhanh { get; set; } = string.Empty;
         }
+<<<<<<< HEAD
         public List<ChiNhanhInfo> ChiNhanhs { get; set; } = new List<ChiNhanhInfo>();
 
         public void OnGet()
         {
+=======
+
+        public List<ChiNhanhInfo> ChiNhanhs { get; set; } = new List<ChiNhanhInfo>();
+
+        public string? CurrentUserDisplayName { get; set; }
+
+        public IActionResult OnGet()
+        {
+            // Kiểm tra session đăng nhập
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Chưa đăng nhập, chuyển về trang index
+                return Redirect("/Index");
+            }
+
+            // Lấy tên hiển thị user hiện tại từ session
+            CurrentUserDisplayName = HttpContext.Session.GetString("DisplayName");
+
+>>>>>>> origin/hoangtuan
             string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
             using (var connection = new SqlConnection(connectionString))
             {
@@ -63,6 +85,10 @@ namespace QRB.Pages.User
                     }
                 }
             }
+<<<<<<< HEAD
+=======
+            return Page();
+>>>>>>> origin/hoangtuan
         }
     }
 }
