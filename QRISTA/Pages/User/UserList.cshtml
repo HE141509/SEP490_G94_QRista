@@ -97,40 +97,51 @@
         <main class="main-content">
             <div class="dashboard-header userlist-header-flex">
                 <h1 class="page-title">Danh sách người dùng</h1>
-                <button class="userlist-add-btn" onclick="window.location.href='/User/AddUser'">
+                <button class="userlist-add-btn" type="button">
                     <i class="fas fa-plus"></i> Thêm mới
                 </button>
                 <!-- Popup Thêm mới User -->
                 <div id="addUserModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
-                    <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:340px;max-width:95vw;text-align:left;">
-                        <div style="font-size:20px;font-weight:600;color:#4285f4;margin-bottom:18px;"><i class="fas fa-user-plus"></i> Thêm người dùng mới</div>
+                    <div class="modal-content userlist-add-modal-content">
+                        <div class="userlist-add-modal-title"><i class="fas fa-user-plus"></i> Thêm người dùng mới</div>
                         <form id="addUserForm" autocomplete="off">
-                            <div style="margin-bottom:14px;">
-                                <label for="addTenHienThi" style="font-weight:500;">Tên hiển thị</label>
-                                <input type="text" id="addTenHienThi" name="TenHienThi" class="userlist-input" required style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0e6ed;font-size:15px;" />
+                            <div class="userlist-add-form-group">
+                                <label for="addTenHienThi">Tên hiển thị</label>
+                                <input type="text" id="addTenHienThi" name="TenHienThi" class="userlist-input" required />
                             </div>
-                            <div style="margin-bottom:14px;">
-                                <label for="addTenNguoiDung" style="font-weight:500;">Tên đăng nhập</label>
-                                <input type="text" id="addTenNguoiDung" name="TenNguoiDung" class="userlist-input" required style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0e6ed;font-size:15px;" />
+                            <div class="userlist-add-form-group">
+                                <label for="addTenNguoiDung">Tên đăng nhập</label>
+                                <input type="text" id="addTenNguoiDung" name="TenNguoiDung" class="userlist-input" required />
                             </div>
-                            <div style="margin-bottom:14px;">
-                                <label for="addMatKhau" style="font-weight:500;">Mật khẩu</label>
-                                <input type="password" id="addMatKhau" name="MatKhau" class="userlist-input" required style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0e6ed;font-size:15px;" />
+                            <div class="userlist-add-form-group">
+                                <label for="addMatKhau">Mật khẩu</label>
+                                <input type="password" id="addMatKhau" name="MatKhau" class="userlist-input" required />
                             </div>
-                            <div style="margin-bottom:18px;">
-                                <label for="addTrangThai" style="font-weight:500;">Trạng thái</label>
-                                <select id="addTrangThai" name="TrangThai" class="userlist-input" style="width:100%;padding:8px 12px;border-radius:6px;border:1px solid #e0e6ed;font-size:15px;">
+                            <div class="userlist-add-form-group">
+                                <label for="addIDChiNhanh">Chi nhánh</label>
+                                <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required>
+                                    <option value="">-- Chọn chi nhánh --</option>
+                                    @foreach (var cn in Model.ChiNhanhs)
+                                    {
+                                        <option value="@cn.ID">@cn.TenChiNhanh</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addTrangThai">Trạng thái</label>
+                                <select id="addTrangThai" name="TrangThai" class="userlist-input">
                                     <option value="active">Đang hoạt động</option>
                                     <option value="inactive">Đã khóa</option>
                                 </select>
                             </div>
-                            <div style="display:flex;justify-content:flex-end;gap:14px;">
-                                <button type="button" onclick="closeAddUserModal()" style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy</button>
-                                <button type="submit" style="background:#4285f4;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Thêm mới</button>
+                            <div class="userlist-add-modal-actions">
+                                <button type="button" onclick="closeAddUserModal()" class="userlist-add-cancel-btn">Hủy</button>
+                                <button type="submit" class="userlist-add-submit-btn">Thêm mới</button>
                             </div>
                         </form>
                     </div>
                 </div>
+<!-- Đã chuyển toàn bộ CSS popup thêm mới user sang userlist.css -->
             </div>
             <div class="userlist-card userlist-modern">
                 <div class="userlist-toolbar">
@@ -242,6 +253,7 @@
             TenHienThi: document.getElementById('addTenHienThi').value.trim(),
             TenNguoiDung: document.getElementById('addTenNguoiDung').value.trim(),
             MatKhau: document.getElementById('addMatKhau').value,
+            IDChiNhanh: document.getElementById('addIDChiNhanh').value,
             TrangThai: document.getElementById('addTrangThai').value
         };
         fetch('/User/AddUser', {

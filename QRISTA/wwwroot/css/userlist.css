@@ -248,3 +248,101 @@
     color: #888;
     font-size: 15px;
 }
+
+/* Popup thêm mới user đẹp, hiện đại */
+.userlist-add-modal-content {
+    background: #fff;
+    padding: 36px 32px 28px 32px;
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(66,133,244,0.13), 0 1.5px 8px rgba(0,0,0,0.08);
+    min-width: 350px;
+    max-width: 96vw;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    animation: userlistModalFadeIn 0.25s;
+}
+@keyframes userlistModalFadeIn {
+    from { transform: translateY(40px) scale(0.98); opacity: 0; }
+    to { transform: none; opacity: 1; }
+}
+.userlist-add-modal-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #4285f4;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.userlist-add-form-group {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.userlist-add-form-group label {
+    font-weight: 600;
+    color: #333;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+.userlist-add-form-group input,
+.userlist-add-form-group select {
+    padding: 9px 14px;
+    border-radius: 8px;
+    border: 1px solid #e0e6ed;
+    font-size: 15px;
+    background: #f5f7fa;
+    color: #222;
+    outline: none;
+    transition: border 0.2s;
+}
+.userlist-add-form-group input:focus,
+.userlist-add-form-group select:focus {
+    border: 1.5px solid #4285f4;
+    background: #fff;
+}
+.userlist-add-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 10px;
+}
+.userlist-add-cancel-btn {
+    background: #f5f7fa;
+    color: #333;
+    border: none;
+    padding: 9px 26px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.userlist-add-cancel-btn:hover {
+    background: #e0e6ed;
+    color: #222;
+}
+.userlist-add-submit-btn {
+    background: #4285f4;
+    color: #fff;
+    border: none;
+    padding: 9px 26px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(66,133,244,0.08);
+    transition: background 0.2s, color 0.2s;
+}
+.userlist-add-submit-btn:hover {
+    background: #1967d2;
+    color: #fff;
+}
+@media (max-width: 600px) {
+    .userlist-add-modal-content {
+        padding: 18px 6vw 18px 6vw;
+        min-width: 0;
+    }
+}

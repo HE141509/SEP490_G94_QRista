@@ -18,6 +18,12 @@ namespace QRB.Pages.User
         }
 
         public List<UserInfo> Users { get; set; } = new List<UserInfo>();
+        public class ChiNhanhInfo
+        {
+            public Guid ID { get; set; }
+            public string TenChiNhanh { get; set; } = string.Empty;
+        }
+        public List<ChiNhanhInfo> ChiNhanhs { get; set; } = new List<ChiNhanhInfo>();
 
         public void OnGet()
         {
@@ -25,6 +31,7 @@ namespace QRB.Pages.User
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
+                // Lấy danh sách user
                 var command = new SqlCommand(@"SELECT ID, TenNguoiDung, TenHienThi, IDChiNhanh, IsDelete, CreateTime, UpdateTime FROM NguoiDung", connection);
                 using (var reader = command.ExecuteReader())
                 {
@@ -39,6 +46,19 @@ namespace QRB.Pages.User
                             IsDelete = reader.GetBoolean(4),
                             CreateTime = reader.GetDateTime(5),
                             UpdateTime = reader.IsDBNull(6) ? null : reader.GetDateTime(6)
+                        });
+                    }
+                }
+                // Lấy danh sách chi nhánh
+                var cnCommand = new SqlCommand(@"SELECT ID, TenChiNhanh FROM ChiNhanh WHERE IsDelete = 0 OR IsDelete IS NULL", connection);
+                using (var reader = cnCommand.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        ChiNhanhs.Add(new ChiNhanhInfo
+                        {
+                            ID = reader.GetGuid(0),
+                            TenChiNhanh = reader.GetString(1)
                         });
                     }
                 }
