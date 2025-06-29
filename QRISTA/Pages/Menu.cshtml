@@ -103,6 +103,8 @@
                 @for (int i = 0; i < itemsToShow.Count(); i++) {
     var item = itemsToShow.ElementAt(i);
     <div class="menu-item" data-category="@item.Category" data-name="@item.Name">
+    var item = itemsToShow.ElementAt(i);
+    <div class="menu-item" data-category="@item.Category" data-name="@item.Name">
                         <div class="menu-item-img"><img src="/images/cafe.png" alt="item" style="height:60px;" /></div>
                         <div class="menu-item-title">@item.Name</div>
                         <div class="menu-item-desc">@item.Description</div>
@@ -146,54 +148,6 @@
                         Trang <span id="pageInfo">1</span> / <span id="totalPagesSpan">@totalPages</span>
                     </div>
                 </nav>
-            </div>
-        </div>
-
-    <!-- Cart Summary Floating Button -->
-    <div id="cart-summary" class="cart-summary" style="display:none;">
-        <div class="cart-summary-content">
-            <span id="cart-count">0</span> món | <span id="cart-total">0</span> đ
-        </div>
-        <button id="cart-checkout-btn" class="cart-checkout-btn">Đặt hàng</button>
-    </div>
-
-    <!-- Order Confirmation Popup -->
-    <div id="order-popup" class="order-popup" style="display:none;">
-        <div class="order-popup-content">
-            <h2 class="order-popup-title">Xác nhận đơn hàng</h2>
-            <div class="order-section order-list-section">
-                <div class="order-section-title">Sản phẩm đã chọn</div>
-                <div id="order-items-list"></div>
-            </div>
-            <div class="order-section order-discount-section">
-                <div class="order-section-title order-section-title-divider">Chọn giảm giá</div>
-                <select id="discount-select" class="order-discount-select">
-                    <option value="0">Không giảm giá</option>
-                    <option value="10000">Giảm 10.000đ</option>
-                    <option value="20000">Giảm 20.000đ</option>
-                    <option value="50000">Giảm 50.000đ</option>
-                </select>
-            </div>
-                <div class="order-section order-total-section">
-                    <div class="order-section-title">Tổng thanh toán</div>
-                    <div class="order-popup-total">
-                        <div class="order-total-row">
-                            <span class="order-label-left">Tổng số tiền:</span>
-                            <span class="order-value-right"><span id="order-total-raw">0</span> đ</span>
-                        </div>
-                        <div class="order-total-row">
-                            <span class="order-label-left">Số tiền giảm:</span>
-                            <span class="order-value-right"><span id="order-total-discount">0</span> đ</span>
-                        </div>
-                        <div class="order-total-row order-total-final">
-                            <span class="order-label-left">Số tiền cần thanh toán:</span>
-                            <span class="order-value-right"><span id="order-popup-total">0</span> đ</span>
-                        </div>
-                    </div>
-                </div>
-            <div class="order-section order-action-section">
-                <button id="order-cancel-btn" class="order-cancel-btn">Huỷ</button>
-                <button id="order-confirm-btn" class="order-confirm-btn">Xác nhận</button>
             </div>
         </div>
     </div>
@@ -330,59 +284,7 @@ if (document.readyState !== 'loading') {
     totalPages = Math.ceil(filteredItems.length / itemsPerPage);
     showPage();
     updatePagination();
-    updateCartSummary();
 }
-
-let currentOrderTotal = 0;
-function updateOrderPopupTotal() {
-    // Tính lại tổng số tiền các sản phẩm trong cart
-    let total = 0;
-    for (const key in cart) {
-        const item = cart[key];
-        total += item.qty * item.price;
-    }
-    let discount = parseInt(document.getElementById('discount-select').value) || 0;
-    let finalTotal = Math.max(0, total - discount);
-    document.getElementById('order-total-raw').innerText = total.toLocaleString();
-    document.getElementById('order-total-discount').innerText = discount.toLocaleString();
-    document.getElementById('order-popup-total').innerText = finalTotal.toLocaleString();
-    currentOrderTotal = total;
-}
-
-document.getElementById('cart-checkout-btn').addEventListener('click', function() {
-    const list = document.getElementById('order-items-list');
-    list.innerHTML = '';
-    let total = 0;
-    for (const key in cart) {
-        const item = cart[key];
-        total += item.qty * item.price;
-        const div = document.createElement('div');
-        div.className = 'order-item';
-        div.innerHTML = `<span>${item.name} (${item.size})</span> <span>${item.qty} x ${item.price.toLocaleString()} đ</span>`;
-        list.appendChild(div);
-    }
-    currentOrderTotal = total;
-    updateOrderPopupTotal();
-    document.getElementById('order-popup').style.display = 'flex';
-    // Reset discount combobox
-    document.getElementById('discount-select').value = '0';
-});
-
-document.getElementById('discount-select').addEventListener('change', function() {
-    updateOrderPopupTotal();
-});
-
-document.getElementById('order-cancel-btn').addEventListener('click', function() {
-    document.getElementById('order-popup').style.display = 'none';
-});
-
-document.getElementById('order-confirm-btn').addEventListener('click', function() {
-    alert('Đơn hàng đã được gửi!');
-    cart = {};
-    updateCartSummary();
-    updateMenuItemQtyUI();
-    document.getElementById('order-popup').style.display = 'none';
-});
 </script>
 
 @section Styles {

@@ -1,0 +1,125 @@
+/* payment.css - QRista Cafe Payment Page Styles */
+html, body {
+    width: 100vw;
+    min-height: 100vh;
+    background: url('/images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+.payment-bg {
+    min-height: 100vh;
+    width: 100vw;
+    background: url('/images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.payment-center {
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.payment-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 38px 32px 32px 32px;
+    min-width: 340px;
+    max-width: 95vw;
+    box-shadow: 0 6px 32px 0 rgba(25, 118, 210, 0.13);
+    text-align: center;
+    position: relative;
+    margin: 0 12px;
+}
+.payment-logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+.payment-logo {
+    height: 38px;
+    width: auto;
+    vertical-align: middle;
+}
+.payment-brand {
+    font-size: 1.18rem;
+    font-weight: 700;
+    color: #1976d2;
+    letter-spacing: 0.5px;
+}
+.payment-title {
+    font-size: 1.22rem;
+    font-weight: 700;
+    color: #1976d2;
+    margin-bottom: 18px;
+    margin-top: 8px;
+}
+.payment-amount {
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: #1a237e;
+    margin-bottom: 18px;
+}
+.payment-amount span {
+    font-size: 1.32rem;
+    color: #d32f2f;
+    font-weight: 700;
+    display: inline-block;
+    margin-top: 4px;
+}
+.payment-qr-wrapper {
+    margin: 0 auto 16px auto;
+}
+.payment-qr-img {
+    max-width: 260px;
+    width: 100%;
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px 0 rgba(25, 118, 210, 0.08);
+}
+.payment-desc {
+    color: #333;
+    font-size: 1rem;
+    margin-top: 10px;
+    margin-bottom: 8px;
+}
+.payment-back-btn {
+    display: inline-block;
+    margin: 24px auto 0 auto;
+    padding: 10px 32px;
+    background: #1976d2;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 1.08rem;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px 0 rgba(25, 118, 210, 0.08);
+}
+.payment-back-btn:hover {
+    background: #1565c0;
+}
+/* Responsive for mobile */
+@media screen and (max-width: 480px) {
+    .payment-card {
+        padding: 18px 4vw 18px 4vw;
+        min-width: unset;
+    }
+    .payment-logo {
+        height: 28px;
+    }
+    .payment-title {
+        font-size: 1.08rem;
+    }
+    .payment-amount span {
+        font-size: 1.08rem;
+    }
+}

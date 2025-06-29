@@ -17,7 +17,7 @@ namespace QRB.Pages
             }
 
             // Redirect to menu page
-            return RedirectToPage("/Menu");
+            return RedirectToPage("/Menu/Menu");
         }
     }
 }

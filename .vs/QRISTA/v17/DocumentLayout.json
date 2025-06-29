@@ -181,7 +181,11 @@
               "RelativeDocumentMoniker": "QRISTA\\appsettings.json",
               "ToolTip": "E:\\Github\\SEP490_G94_QRista\\QRISTA\\appsettings.json",
               "RelativeToolTip": "QRISTA\\appsettings.json",
+<<<<<<< HEAD
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAACYAAAA",
+=======
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+>>>>>>> origin/hoangtuan
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-07-22T08:53:43.196Z"
             },

@@ -9,10 +9,12 @@ namespace QRB.Pages
     public class LoginModel : PageModel
     {
         private readonly QRBDbContext _context;
+        private readonly IConfiguration _config;
 
-        public LoginModel(QRBDbContext context)
+        public LoginModel(QRBDbContext context, IConfiguration config)
         {
             _context = context;
+            _config = config;
         }
 
         [BindProperty]
@@ -110,10 +112,21 @@ namespace QRB.Pages
             return Page();
         }
 
+        private string HashPassword(string password, string key)
+        {
+            using (var md5 = System.Security.Cryptography.MD5.Create())
+            {
+                var inputBytes = System.Text.Encoding.UTF8.GetBytes(password + key);
+                var hashBytes = md5.ComputeHash(inputBytes);
+                return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+            }
+        }
+
         private bool VerifyPassword(string inputPassword, string hashedPassword)
         {
-            // Simple password verification (in production, use proper hashing like bcrypt)
-            return inputPassword == hashedPassword;
+            var key = _config["PasswordKey"];
+            var hash = HashPassword(inputPassword, key);
+            return hash == hashedPassword;
         }
     }
 }

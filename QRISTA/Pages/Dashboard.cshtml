@@ -17,31 +17,49 @@
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <div class="logo-section">
-                <div class="fpt-logo">
-                    <img src="/images/Logo_FPT.png" alt="FPT Education" />
-                </div>
-                <div class="system-info">
-                    <div class="qrb-badge">QRB</div>
-                    <span class="system-title">QRB - Hệ thống quán cafe thông minh</span>
-                </div>
-            </div>
-        </div>
-        <div class="header-right">
-            <div class="header-actions">
-                <button class="notification-btn">
-                    <i class="fas fa-bell"></i>
-                </button>
-                <button class="help-btn">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Quản trị viên</span>
-                </button>
-                <div class="user-profile">
-                    <span class="user-name">Trần Tăng Dương</span>
-                    <div class="user-avatar">T</div>
-                </div>
+@await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
+
+<script>
+    function toggleUserDropdown(event) {
+        event.stopPropagation();
+        var dropdown = event.currentTarget.querySelector('.user-dropdown');
+        var isVisible = dropdown.style.display === 'block';
+        // Ẩn tất cả dropdown khác
+        document.querySelectorAll('.user-dropdown').forEach(function(el) { el.style.display = 'none'; });
+        dropdown.style.display = isVisible ? 'none' : 'block';
+    }
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.user-dropdown').forEach(function(el) { el.style.display = 'none'; });
+    });
+</script>
+<style>
+    .user-avatar.user-avatar-dropdown {
+        position: relative;
+        cursor: pointer;
+    }
+    .user-dropdown {
+        position: absolute;
+        top: 110%;
+        right: 0;
+        background: #fff;
+        border: 1px solid #e0e6ed;
+        border-radius: 6px;
+        min-width: 140px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        z-index: 2000;
+    }
+    .user-dropdown .dropdown-item {
+        display: block;
+        padding: 10px 16px;
+        color: #333;
+        text-decoration: none;
+        font-size: 15px;
+        transition: background 0.2s;
+    }
+    .user-dropdown .dropdown-item:hover {
+        background: #f5f7fa;
+    }
+</style>
             </div>
         </div>
     </header>
