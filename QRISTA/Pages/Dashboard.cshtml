@@ -17,7 +17,47 @@
 </head>
 <body>
     <!-- Header -->
+<<<<<<< HEAD
 @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
+=======
+    <header class="header">
+        <div class="header-left">
+            <div class="logo-section">
+                <div class="fpt-logo">
+                    <img src="/images/Logo_FPT.png" alt="FPT Education" />
+                </div>
+                <div class="system-info">
+                    <div class="qrb-badge">QRB</div>
+                    <span class="system-title">QRB - Hệ thống quán cafe thông minh</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="header-actions">
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                </button>
+                <button class="help-btn">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Quản trị viên</span>
+                </button>
+                @{
+                    // Lấy tên hiển thị từ session (ưu tiên DisplayName, fallback Username)
+                    var displayName = Model?.UserName as string;
+                    if (string.IsNullOrEmpty(displayName))
+                        displayName = HttpContext.Session.GetString("DisplayName") ?? HttpContext.Session.GetString("Username") ?? "Người dùng";
+                    var avatarChar = !string.IsNullOrEmpty(displayName) ? displayName.Trim().Substring(0,1).ToUpper() : "U";
+                }
+                <div class="user-profile">
+                    <span class="user-name">@displayName</span>
+                    <div class="user-avatar user-avatar-dropdown" tabindex="0" onclick="toggleUserDropdown(event)">@avatarChar
+                        <div class="user-dropdown" style="display:none;">
+                            <a href="/Logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+                        </div>
+                    </div>
+                </div>
+</header>
+>>>>>>> origin/anh0612
 
 <script>
     function toggleUserDropdown(event) {
