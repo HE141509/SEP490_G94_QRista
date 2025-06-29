@@ -84,7 +84,7 @@
               "RelativeDocumentMoniker": "QRISTA\\Pages\\Dashboard.cshtml.cs",
               "ToolTip": "E:\\Github\\SEP490_G94_QRista\\QRISTA\\Pages\\Dashboard.cshtml.cs",
               "RelativeToolTip": "QRISTA\\Pages\\Dashboard.cshtml.cs",
-              "ViewState": "AgIAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-22T09:07:24.218Z",
               "EditorCaption": ""
@@ -99,8 +99,7 @@
               "RelativeToolTip": "QRISTA\\Pages\\Privacy.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-07-22T09:05:05.324Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-22T09:05:05.324Z"
             },
             {
               "$type": "Document",
@@ -112,8 +111,7 @@
               "RelativeToolTip": "QRISTA\\Pages\\Menu.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-07-22T09:05:03.374Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-22T09:05:03.374Z"
             },
             {
               "$type": "Document",
@@ -125,8 +123,7 @@
               "RelativeToolTip": "QRISTA\\Pages\\Logout.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-07-22T09:05:01.622Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-22T09:05:01.622Z"
             },
             {
               "$type": "Document",
@@ -138,8 +135,7 @@
               "RelativeToolTip": "QRISTA\\Pages\\Login.cshtml",
               "ViewState": "AgIAAFMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-07-22T09:04:58.131Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-22T09:04:58.131Z"
             },
             {
               "$type": "Document",
@@ -151,8 +147,7 @@
               "RelativeToolTip": "QRISTA\\Pages\\Error.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-07-22T09:04:56.995Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-22T09:04:56.995Z"
             },
             {
               "$type": "Document",
@@ -164,8 +159,7 @@
               "RelativeToolTip": "QRISTA\\Pages\\Dashboard.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-07-22T09:04:54.448Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-22T09:04:54.448Z"
             },
             {
               "$type": "Document",
@@ -177,8 +171,7 @@
               "RelativeToolTip": "QRISTA\\Models\\MenuItem.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-22T09:04:51.047Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-22T09:04:51.047Z"
             },
             {
               "$type": "Document",
@@ -190,8 +183,7 @@
               "RelativeToolTip": "QRISTA\\appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-07-22T08:53:43.196Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-22T08:53:43.196Z"
             },
             {
               "$type": "Document",
@@ -203,8 +195,7 @@
               "RelativeToolTip": "QRISTA\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-21T04:22:36.496Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-21T04:22:36.496Z"
             },
             {
               "$type": "Document",
@@ -216,8 +207,7 @@
               "RelativeToolTip": "QRISTA\\Data\\QRBDbContext.cs",
               "ViewState": "AgIAAGIAAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-22T09:04:44.402Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-22T09:04:44.402Z"
             }
           ]
         },
