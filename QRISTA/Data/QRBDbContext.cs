@@ -23,9 +23,12 @@ namespace QRB.Data
         public DbSet<QuyenSuDung> QuyenSuDungs { get; set; }
         public DbSet<DeXuatMuaSam> DeXuatMuaSams { get; set; }
         public DbSet<ChiTietDonDeXuat> ChiTietDonDeXuats { get; set; }
+        public DbSet<NhomSanPham> NhomSanPhams { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // NhomSanPham: mapping đúng tên bảng vật lý trong DB
+            modelBuilder.Entity<NhomSanPham>().ToTable("NhomSanPham");
             base.OnModelCreating(modelBuilder);
 
             // Cấu hình các quan hệ và ràng buộc

@@ -1,0 +1,405 @@
+@page
+@model QRB.Pages.Product.ProductListModel
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/userlist.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
+    <div class="main-container">
+        @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml", Model)
+        <main class="main-content">
+            <div class="dashboard-header userlist-header-flex">
+                <h1 class="page-title">Danh sách sản phẩm</h1>
+                <button class="userlist-add-btn" type="button">
+                    <i class="fas fa-plus"></i> Thêm mới
+                </button>
+                <div id="addProductModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                    <div class="modal-content userlist-add-modal-content">
+                        <div class="userlist-add-modal-title"><i class="fas fa-box"></i> Thêm sản phẩm mới</div>
+                        <form id="addProductForm" autocomplete="off">
+                            <div class="userlist-add-form-group">
+                                <label for="addMaSanPham">Mã sản phẩm</label>
+                                <input type="text" id="addMaSanPham" name="MaSanPham" class="userlist-input" required />
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addTenSanPham">Tên sản phẩm</label>
+                                <input type="text" id="addTenSanPham" name="TenSanPham" class="userlist-input" required />
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addIdNhomSanPham">Nhóm sản phẩm</label>
+                                <input type="text" id="addIdNhomSanPham" name="IdNhomSanPham" class="userlist-input" required />
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addIDChiNhanh">Chi nhánh</label>
+                                <input type="text" id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required />
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addIsDelete">Trạng thái</label>
+                                <select id="addIsDelete" name="IsDelete" class="userlist-input">
+                                    <option value="false">Đang kinh doanh</option>
+                                    <option value="true">Ngừng kinh doanh</option>
+                                </select>
+                            </div>
+                            <div class="userlist-add-modal-actions">
+                                <button type="button" onclick="closeAddProductModal()" class="userlist-add-cancel-btn">Hủy</button>
+                                <button type="submit" class="userlist-add-submit-btn">Thêm mới</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="userlist-card userlist-modern">
+                <div class="userlist-toolbar">
+                    <div class="userlist-toolbar-left">
+                        <label for="filterProductStatus">Trạng thái:</label>
+                        <select id="filterProductStatus" class="userlist-filter" onchange="filterProductByStatus()">
+                            <option value="active">Đang kinh doanh</option>
+                            <option value="inactive">Ngừng kinh doanh</option>
+                        </select>
+                    </div>
+                    <div class="userlist-toolbar-right">
+                        <label for="productPageSize" style="font-size:15px;margin-right:8px;color:#555;">Hiển thị:</label>
+                        <select id="productPageSize" class="userlist-filter" style="width:auto;min-width:60px;" onchange="changeProductPageSize()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterProductList()" style="margin-left:12px;" />
+                    </div>
+                </div>
+                <div class="userlist-table-wrapper">
+                    <table class="userlist-table userlist-table-modern" id="productListTable">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Mã sản phẩm</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Nhóm sản phẩm</th>
+                                <th>Chi nhánh</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Ngày cập nhật</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (Model.SanPhams != null && Model.SanPhams.Count > 0)
+                        {
+                            int stt = 1;
+                            foreach (var sp in Model.SanPhams)
+                            {
+                                var status = sp.IsDelete ? "Ngừng kinh doanh" : "Đang kinh doanh";
+                                <tr data-index="@stt" data-status="@(sp.IsDelete ? "inactive" : "active")">
+                                    <td>@stt</td>
+                                    <td>@sp.MaSanPham</td>
+                                    <td>
+                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditProductModal('@sp.ID', '@sp.MaSanPham', '@sp.TenSanPham', '@sp.IdNhomSanPham', '@sp.IDChiNhanh', '@sp.IsDelete')">@sp.TenSanPham</span>
+                                    </td>
+                                    <td>@sp.TenNhom</td>
+                                    <td>@sp.TenChiNhanh</td>
+                                    <td class="product-status">@status</td>
+                                    <td>@sp.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@(sp.UpdateTime?.ToString("dd/MM/yyyy HH:mm") ?? "")</td>
+                                    <td>
+                                        <button class="userlist-delete-btn" title="Xóa" onclick="showDeleteProductConfirm('@sp.ID')"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="9">Không có dữ liệu sản phẩm.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                    <div id="productlist-pagination"></div>
+                </div>
+            </div>
+            <script>
+            // PHÂN TRANG + SEARCH + FILTER SẢN PHẨM
+            let productCurrentPage = 1;
+            let productPageSize = 10;
+            let productCurrentFilter = 'active';
+            let productCurrentSearch = '';
+
+            function getAllProductRows() {
+                return Array.from(document.querySelectorAll('#productListTable tbody tr')).filter(function(row) {
+                    return row.querySelectorAll('td').length > 1;
+                });
+            }
+            function getFilteredProductRows() {
+                let rows = getAllProductRows();
+                // Lọc theo trạng thái
+                rows = rows.filter(function(row) {
+                    var statusCell = row.querySelector('.product-status');
+                    var isActive = true;
+                    if (statusCell) {
+                        isActive = (statusCell.textContent.trim() === 'Đang kinh doanh');
+                    }
+                    if (productCurrentFilter === 'active') return isActive;
+                    if (productCurrentFilter === 'inactive') return !isActive;
+                });
+                // Lọc theo search
+                if (productCurrentSearch) {
+                    rows = rows.filter(function(row) {
+                        var name = row.querySelector('td:nth-child(3) span')?.textContent.toLowerCase() || '';
+                        return name.includes(productCurrentSearch);
+                    });
+                }
+                return rows;
+            }
+            function renderProductPagination() {
+                let rows = getFilteredProductRows();
+                let total = rows.length;
+                let totalPages = Math.ceil(total / productPageSize);
+                let pag = document.getElementById('productlist-pagination');
+                if (!pag) return;
+                if (totalPages <= 1) {
+                    pag.innerHTML = '';
+                    return;
+                }
+                let html = '';
+                html += `<button onclick="gotoProductPage(1)" ${productCurrentPage==1?'disabled':''}>&laquo;</button>`;
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || Math.abs(i-productCurrentPage)<=2) {
+                        html += `<button onclick="gotoProductPage(${i})" ${i==productCurrentPage?'class="active"':''}>${i}</button>`;
+                    } else if (i === productCurrentPage-3 || i === productCurrentPage+3) {
+                        html += '<span>...</span>';
+                    }
+                }
+                html += `<button onclick="gotoProductPage(${totalPages})" ${productCurrentPage==totalPages?'disabled':''}>&raquo;</button>`;
+                pag.className = 'userlist-pagination';
+                pag.innerHTML = html;
+            }
+            function updateProductPagination() {
+                let allRows = getAllProductRows();
+                let rows = getFilteredProductRows();
+                let total = rows.length;
+                let totalPages = Math.ceil(total / productPageSize);
+                if (productCurrentPage > totalPages) productCurrentPage = totalPages || 1;
+                allRows.forEach(function(row) { row.style.display = 'none'; });
+                rows.forEach(function(row, idx) {
+                    if (idx >= (productCurrentPage-1)*productPageSize && idx < productCurrentPage*productPageSize) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                let pag = document.getElementById('productlist-pagination');
+                if (rows.length === 0) {
+                    if (pag) pag.innerHTML = '';
+                    return;
+                }
+                renderProductPagination();
+            }
+            function gotoProductPage(page) {
+                productCurrentPage = page;
+                updateProductPagination();
+            }
+            function changeProductPageSize() {
+                productPageSize = parseInt(document.getElementById('productPageSize').value);
+                productCurrentPage = 1;
+                updateProductPagination();
+            }
+            function filterProductList() {
+                productCurrentSearch = document.querySelector('.userlist-search').value.toLowerCase();
+                productCurrentPage = 1;
+                updateProductPagination();
+            }
+            function filterProductByStatus() {
+                productCurrentFilter = document.getElementById('filterProductStatus').value;
+                productCurrentPage = 1;
+                updateProductPagination();
+            }
+            window.addEventListener('DOMContentLoaded', function() {
+                productPageSize = parseInt(document.getElementById('productPageSize').value) || 10;
+                setTimeout(updateProductPagination, 0);
+            });
+            </script>
+            <form id="antiForgeryForm" style="display:none;">
+                @Html.AntiForgeryToken()
+            </form>
+            <div id="deleteProductModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:320px;max-width:90vw;text-align:center;">
+                    <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa sản phẩm</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:24px;">Bạn có chắc chắn muốn xóa sản phẩm này không?</div>
+                    <div style="display:flex;justify-content:center;gap:18px;">
+                        <button onclick="confirmDeleteProduct()" style="background:#ea4335;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Xác nhận</button>
+                        <button onclick="closeDeleteProductModal()" style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy</button>
+                    </div>
+                </div>
+            </div>
+            <div id="editProductModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content userlist-add-modal-content">
+                    <div class="userlist-add-modal-title"><i class="fas fa-box"></i> Sửa sản phẩm</div>
+                    <form id="editProductForm" autocomplete="off">
+                        <input type="hidden" id="editProductId" name="ID" />
+                        <div class="userlist-add-form-group">
+                            <label for="editMaSanPham">Mã sản phẩm</label>
+                            <input type="text" id="editMaSanPham" name="MaSanPham" class="userlist-input" required readonly style="background:#f5f7fa;cursor:not-allowed;" />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="editTenSanPham">Tên sản phẩm</label>
+                            <input type="text" id="editTenSanPham" name="TenSanPham" class="userlist-input" required />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="editIdNhomSanPham">Nhóm sản phẩm</label>
+                            <input type="text" id="editIdNhomSanPham" name="IdNhomSanPham" class="userlist-input" required />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="editIDChiNhanh">Chi nhánh</label>
+                            <input type="text" id="editIDChiNhanh" name="IDChiNhanh" class="userlist-input" required />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="editIsDelete">Trạng thái</label>
+                            <select id="editIsDelete" name="IsDelete" class="userlist-input">
+                                <option value="false">Đang kinh doanh</option>
+                                <option value="true">Ngừng kinh doanh</option>
+                            </select>
+                        </div>
+                        <div class="userlist-add-modal-actions">
+                            <button type="button" onclick="closeEditProductModal()" class="userlist-add-cancel-btn">Hủy</button>
+                            <button type="submit" class="userlist-add-submit-btn">Lưu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="footer">
+        <div class="footer-content">
+            <span>© 2025 QRB - Hệ thống quán cafe thông minh. All rights reserved.</span>
+        </div>
+    </footer>
+    <script>
+        // Hiển thị popup Thêm sản phẩm
+        document.querySelector('.userlist-add-btn').onclick = function() {
+            document.getElementById('addProductModal').style.display = 'flex';
+        };
+        function closeAddProductModal() {
+            document.getElementById('addProductModal').style.display = 'none';
+            document.getElementById('addProductForm').reset();
+        }
+
+        // Hiển thị popup Sửa sản phẩm
+        function showEditProductModal(id, maSanPham, tenSanPham, idNhomSanPham, idChiNhanh, isDelete) {
+            document.getElementById('editProductId').value = id;
+            document.getElementById('editMaSanPham').value = maSanPham;
+            document.getElementById('editTenSanPham').value = tenSanPham;
+            document.getElementById('editIdNhomSanPham').value = idNhomSanPham;
+            document.getElementById('editIDChiNhanh').value = idChiNhanh;
+            document.getElementById('editIsDelete').value = (isDelete === 'True' || isDelete === 'true' || isDelete === true) ? 'true' : 'false';
+            document.getElementById('editProductModal').style.display = 'flex';
+        }
+        function closeEditProductModal() {
+            document.getElementById('editProductModal').style.display = 'none';
+            document.getElementById('editProductForm').reset();
+        }
+
+        // Hiển thị popup Xóa sản phẩm
+        let deleteProductId = null;
+        function showDeleteProductConfirm(id) {
+            deleteProductId = id;
+            document.getElementById('deleteProductModal').style.display = 'flex';
+        }
+        function closeDeleteProductModal() {
+            deleteProductId = null;
+            document.getElementById('deleteProductModal').style.display = 'none';
+        }
+
+        // Thêm sản phẩm (AJAX)
+        document.getElementById('addProductForm').onsubmit = function(e) {
+            e.preventDefault();
+            var form = e.target;
+            var data = {
+                MaSanPham: form.MaSanPham.value,
+                TenSanPham: form.TenSanPham.value,
+                IdNhomSanPham: form.IdNhomSanPham.value,
+                IDChiNhanh: form.IDChiNhanh.value,
+                IsDelete: form.IsDelete.value === 'true'
+            };
+            fetch('/Product/AddProduct', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.message || 'Thêm sản phẩm thất bại!');
+                }
+            });
+        };
+
+        // Sửa sản phẩm (AJAX)
+        document.getElementById('editProductForm').onsubmit = function(e) {
+            e.preventDefault();
+            var form = e.target;
+            var data = {
+                ID: form.ID.value,
+                MaSanPham: form.MaSanPham.value,
+                TenSanPham: form.TenSanPham.value,
+                IdNhomSanPham: form.IdNhomSanPham.value,
+                IDChiNhanh: form.IDChiNhanh.value,
+                IsDelete: form.IsDelete.value === 'true'
+            };
+            fetch('/Product/UpdateProduct', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.message || 'Cập nhật sản phẩm thất bại!');
+                }
+            });
+        };
+
+        // Xóa sản phẩm (AJAX)
+        function confirmDeleteProduct() {
+            if (!deleteProductId) return;
+            fetch('/Product/DeleteProduct', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+                },
+                body: JSON.stringify({ id: deleteProductId })
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.message || 'Xóa sản phẩm thất bại!');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
