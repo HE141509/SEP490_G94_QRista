@@ -76,6 +76,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVudS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Menu/GetPhoneNumberFromSession.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVudVxHZXRQaG9uZU51bWJlckZyb21TZXNzaW9uLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Menu/Menu.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVudVxNZW51LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -142,6 +146,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/GetKhachHang.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcR2V0S2hhY2hIYW5nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/GetMaUuDaiBySDT.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcR2V0TWFVdURhaUJ5U0RULmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/MaUuDaiList.cshtml]

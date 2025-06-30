@@ -165,13 +165,14 @@
                 <div class="order-section-title">Sản phẩm đã chọn</div>
                 <div id="order-items-list"></div>
             </div>
+            <div class="order-section order-customer-section">
+                <div class="order-section-title order-section-title-divider">Số điện thoại khách hàng</div>
+                <input type="text" id="order-phone-input" class="order-phone-input" placeholder="Nhập số điện thoại khách hàng..." maxlength="15" style="width:100%;padding:10px 16px;font-size:1.08rem;margin-bottom:10px;border:1.5px solid #90caf9;border-radius:8px;background:#f7fbff;color:#1a237e;" readonly />
+            </div>
             <div class="order-section order-discount-section">
                 <div class="order-section-title order-section-title-divider">Chọn giảm giá</div>
-                <select id="discount-select" class="order-discount-select">
-                    <option value="0">Không giảm giá</option>
-                    <option value="10000">Giảm 10.000đ</option>
-                    <option value="20000">Giảm 20.000đ</option>
-                    <option value="50000">Giảm 50.000đ</option>
+                <select id="discount-select" class="order-discount-select" disabled>
+                    <option value="">Vui lòng nhập SĐT khách hàng để xem ưu đãi</option>
                 </select>
             </div>
                 <div class="order-section order-total-section">
@@ -379,6 +380,19 @@ document.getElementById('cart-checkout-btn').addEventListener('click', function(
         list.appendChild(div);
     }
     currentOrderTotal = total;
+    // --- Tự động lấy số điện thoại từ session (nếu có) ---
+    fetch('/Menu/GetPhoneNumberFromSession')
+        .then(res => res.json())
+        .then(data => {
+            if (data && data.phoneNumber) {
+                const phoneInput = document.getElementById('order-phone-input');
+                if (phoneInput) {
+                    phoneInput.value = data.phoneNumber;
+                    loadDiscountOptionsByPhone(data.phoneNumber);
+                }
+            }
+        });
+    // ---
     updateOrderPopupTotal();
     document.getElementById('order-popup').style.display = 'flex';
     // Reset discount combobox
@@ -422,6 +436,58 @@ document.getElementById('qr-close-btn').addEventListener('click', function() {
     // Đảm bảo popup order không bị hiện lại ngoài ý muốn
     document.getElementById('order-popup').style.display = 'none';
 });
+
+// Hàm load mã ưu đãi theo SĐT khách hàng
+function loadDiscountOptionsByPhone(phone) {
+    const select = document.getElementById('discount-select');
+    select.innerHTML = '';
+    if (!phone || phone.trim() === '') {
+        select.disabled = true;
+        select.innerHTML = '<option value="">Vui lòng nhập SĐT khách hàng để xem ưu đãi</option>';
+        return;
+    }
+    select.disabled = true;
+    select.innerHTML = '<option>Đang tải mã ưu đãi...</option>';
+    fetch(`/UuDai/GetMaUuDaiBySDT?soDienThoai=${encodeURIComponent(phone)}`)
+        .then(res => res.json())
+        .then(data => {
+            select.innerHTML = '';
+            if (!data || !Array.isArray(data) || data.length === 0) {
+                select.innerHTML = '<option value="0">Không có mã ưu đãi khả dụng</option>';
+                select.disabled = true;
+                return;
+            }
+            select.disabled = false;
+            select.innerHTML = '<option value="0">Không áp dụng ưu đãi</option>';
+            data.forEach(uudai => {
+                // Đảm bảo TienGiam là số hợp lệ, nếu không thì để 0
+                let tienGiam = uudai.tienGiam;
+                if (typeof tienGiam === 'string') tienGiam = tienGiam.replace(/[^\d.-]/g, '');
+                tienGiam = Number(tienGiam);
+                if (isNaN(tienGiam) || tienGiam < 0) tienGiam = 0;
+                let text = uudai.maGiamGia ? `${uudai.maGiamGia} (${tienGiam.toLocaleString()}đ)` : `Giảm (${tienGiam.toLocaleString()}đ)`;
+                select.innerHTML += `<option value="${tienGiam}">${text}</option>`;
+            });
+        })
+        .catch(() => {
+            select.innerHTML = '<option value="0">Không thể tải ưu đãi</option>';
+            select.disabled = true;
+        });
+}
+
+// Giả sử có input nhập SĐT khách hàng với id="order-phone-input"
+// Gọi loadDiscountOptionsByPhone khi nhập đủ SĐT
+const phoneInput = document.getElementById('order-phone-input');
+if (phoneInput) {
+    phoneInput.addEventListener('input', function() {
+        const phone = phoneInput.value.trim();
+        if (phone.length >= 9) {
+            loadDiscountOptionsByPhone(phone);
+        } else {
+            loadDiscountOptionsByPhone('');
+        }
+    });
+}
 </script>
 
 @section Styles {
