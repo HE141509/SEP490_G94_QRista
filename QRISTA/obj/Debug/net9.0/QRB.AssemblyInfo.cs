@@ -13,15 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("QRB")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-<<<<<<< HEAD
-<<<<<<< HEAD
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21061cc2eb74fff8d0aea3772e58963429751b85")]
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+27ddda996b08d8d00da8c3ae31c4252f6ecbf8eb")]
->>>>>>> origin/hoangtuan
-=======
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3bffbbeddada7d26112c5506d439e74557dae7cf")]
->>>>>>> origin/anh0612
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fc7bb956ed66d90f8685945da7f38f73a247ebf9")]
 [assembly: System.Reflection.AssemblyProductAttribute("QRB")]
 [assembly: System.Reflection.AssemblyTitleAttribute("QRB")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

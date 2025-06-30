@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj": {}
+    "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj": {}
   },
   "projects": {
-    "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj": {
+    "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj",
+        "projectUniqueName": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj",
         "projectName": "QRISTA",
-        "projectPath": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj",
-        "packagesPath": "C:\\Users\\Anh nguyen\\.nuget\\packages\\",
-        "outputPath": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\obj\\",
+        "projectPath": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj",
+        "packagesPath": "C:\\Users\\salam\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Anh nguyen\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\salam\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -58,6 +58,10 @@
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[9.0.7, )"
+            },
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.9.0, )"
             }
           },
           "imports": [

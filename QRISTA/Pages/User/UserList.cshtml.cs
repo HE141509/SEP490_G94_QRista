@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
@@ -28,8 +29,16 @@ namespace QRB.Pages.User
 
         public string? CurrentUserDisplayName { get; set; }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Kiểm tra session đăng nhập
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Chưa đăng nhập, chuyển về trang index
+                return Redirect("/Index");
+            }
+
             // Lấy tên hiển thị user hiện tại từ session
             CurrentUserDisplayName = HttpContext.Session.GetString("DisplayName");
 
@@ -69,6 +78,7 @@ namespace QRB.Pages.User
                     }
                 }
             }
+            return Page();
         }
     }
 }

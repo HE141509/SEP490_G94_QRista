@@ -17,46 +17,7 @@
 </head>
 <body>
     
-<<<<<<< HEAD
     @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
-=======
-    <header class="header">
-        <div class="header-left">
-            <div class="logo-section">
-                <div class="fpt-logo">
-                    <img src="/images/Logo_FPT.png" alt="FPT Education" />
-                </div>
-                <div class="system-info">
-                    <div class="qrb-badge">QRB</div>
-                    <span class="system-title">QRB - Hệ thống quán cafe thông minh</span>
-                </div>
-            </div>
-        </div>
-        <div class="header-right">
-            <div class="header-actions">
-                <button class="notification-btn">
-                    <i class="fas fa-bell"></i>
-                </button>
-                <button class="help-btn">
-                    <i class="fas fa-question-circle"></i>
-                    <span>Quản trị viên</span>
-                </button>
-                @{
-                    // Ưu tiên lấy từ Model nếu có (ví dụ khi vừa đăng nhập xong), nếu không thì lấy từ Session
-                    var displayName = Model?.CurrentUserDisplayName as string;
-                    if (string.IsNullOrEmpty(displayName))
-                        displayName = HttpContext.Session.GetString("DisplayName") ?? "Người dùng";
-                    var avatarChar = !string.IsNullOrEmpty(displayName) ? displayName.Trim().Substring(0,1).ToUpper() : "U";
-                }
-                <div class="user-profile">
-                    <span class="user-name">@displayName</span>
-                    <div class="user-avatar user-avatar-dropdown" tabindex="0" onclick="toggleUserDropdown(event)">@avatarChar
-                        <div class="user-dropdown" style="display:none;">
-                            <a href="/Logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
-                        </div>
-                    </div>
-</header>
->>>>>>> origin/anh0612
 
 <script>
     function toggleUserDropdown(event) {
@@ -79,30 +40,7 @@
 
     <div class="main-container">
         
-        <nav class="sidebar">
-            <div class="sidebar-content">
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="/Dashboard" class="nav-link">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Thống kê hệ thống</span>
-                        </a>
-                    </li>
-                    <li class="nav-item active">
-                        <a href="/UserManagement" class="nav-link">
-                            <i class="fas fa-users"></i>
-                            <span>Quản lý người dùng</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/Authorization" class="nav-link">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Phân quyền</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml")
 
         
         <main class="main-content">

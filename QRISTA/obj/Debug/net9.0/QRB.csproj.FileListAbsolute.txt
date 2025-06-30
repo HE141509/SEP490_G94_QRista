@@ -227,16 +227,6 @@ C:\Users\Admin\Desktop\DuAn\qrb\C#\bin\Debug\net9.0\runtimes\win-x64\native\sni.
 C:\Users\Admin\Desktop\DuAn\qrb\C#\bin\Debug\net9.0\runtimes\win-x86\native\sni.dll
 C:\Users\Admin\Desktop\DuAn\qrb\C#\bin\Debug\net9.0\runtimes\unix\lib\net8.0\System.Data.SqlClient.dll
 C:\Users\Admin\Desktop\DuAn\qrb\C#\bin\Debug\net9.0\runtimes\win\lib\net8.0\System.Data.SqlClient.dll
-<<<<<<< HEAD
-<<<<<<< HEAD
-C:\Users\Admin\Desktop\DuAn\qrb\C#\obj\Debug\net9.0\compressed\0vajauymge-d11rog5mk6.gz
-=======
 C:\Users\Admin\Desktop\DuAn\qrb\C#\obj\Debug\net9.0\compressed\0vajauymge-l3o5n1d5sb.gz
 C:\Users\Admin\Desktop\DuAn\qrb\C#\obj\Debug\net9.0\compressed\atvcv34j0q-bebwssovis.gz
 C:\Users\Admin\Desktop\DuAn\qrb\C#\obj\Debug\net9.0\compressed\ar7ydvgfc3-l7upfla50w.gz
->>>>>>> origin/hoangtuan
-=======
-C:\Users\Admin\Desktop\DuAn\qrb\C#\obj\Debug\net9.0\compressed\0vajauymge-l3o5n1d5sb.gz
-C:\Users\Admin\Desktop\DuAn\qrb\C#\obj\Debug\net9.0\compressed\atvcv34j0q-bebwssovis.gz
-C:\Users\Admin\Desktop\DuAn\qrb\C#\obj\Debug\net9.0\compressed\ar7ydvgfc3-l7upfla50w.gz
->>>>>>> origin/anh0612
