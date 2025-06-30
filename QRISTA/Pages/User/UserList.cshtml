@@ -40,30 +40,7 @@
 
     <div class="main-container">
         
-        <nav class="sidebar">
-            <div class="sidebar-content">
-                <ul class="nav-menu">
-                    <li class="nav-item">
-                        <a href="/Dashboard" class="nav-link">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Thống kê hệ thống</span>
-                        </a>
-                    </li>
-                    <li class="nav-item active">
-                        <a href="/UserManagement" class="nav-link">
-                            <i class="fas fa-users"></i>
-                            <span>Quản lý người dùng</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/Authorization" class="nav-link">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Phân quyền</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+        @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml")
 
         
         <main class="main-content">
@@ -139,48 +116,42 @@
                 <div class="userlist-table-wrapper">
                     <table class="userlist-table userlist-table-modern" id="userListTable">
                         <thead>
-                            <tr>
-                                <th><input type="checkbox" onclick="toggleAllUserCheckbox(this)" /></th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Permission</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @if (Model.Users != null && Model.Users.Count > 0)
-                        {
-                            int stt = 1;
-                            for (int i = 0; i < Model.Users.Count; i++)
-                            {
-                                var user = Model.Users[i];
-                                <tr data-index="@i">
-                                    <td><input type="checkbox" class="user-checkbox" /></td>
-                                    <td>
-                                        <div class="userlist-avatar-group">
-                                            <div class="userlist-avatar userlist-avatar-img">@user.TenHienThi.Substring(0,1).ToUpper()</div>
-                                            <div class="userlist-info">
-                                                <div class="userlist-name" style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditUserModal('@user.ID')">@user.TenHienThi</div>
-                                                <div class="userlist-username">@user.TenNguoiDung</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="userlist-email">@user.TenNguoiDung.ToLower()@("@gmail.com")</td>
-                                    <td class="userlist-role">Team member</td>
-                                    <td class="userlist-permission">@((!user.IsDelete) ? "Owner" : "Viewer")</td>
-                                    <td class="userlist-action">
-                                        <button class="userlist-delete-btn" title="Xóa" onclick="showDeleteConfirm('@user.ID')"><i class="fas fa-trash"></i></button>
-                                    </td>
-                                </tr>
-                                stt++;
-                            }
-                        }
-                        else
-                        {
-                            <tr><td colspan="6">Không có dữ liệu người dùng.</td></tr>
-                        }
-                        </tbody>
+    <tr>
+        <th>STT</th>
+        <th>Tên hiển thị</th>
+        <th>Tên đăng nhập</th>
+        <th>Chi nhánh</th>
+        <th>Trạng thái</th>
+        <th>Ngày tạo</th>
+        <th></th>
+    </tr>
+</thead>
+<tbody>
+@{
+    int stt = 1;
+    if (Model.Users != null && Model.Users.Count > 0)
+    {
+        foreach (var user in Model.Users)
+        {
+            var status = user.IsDelete ? "Đã khóa" : "Đang hoạt động";
+            <tr>
+                <td>@stt</td>
+                <td>@user.TenHienThi</td>
+                <td>@user.TenNguoiDung</td>
+                <td>@user.TenChiNhanh</td>
+                <td class="user-status">@status</td>
+                <td>@user.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>
+                    <button class="userlist-delete-btn" title="Xóa" onclick="showDeleteConfirm('@user.ID')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+            stt++;
+        }
+    }
+}
+</tbody>
                     </table>
 
                     <div id="userlist-pagination"></div>
@@ -397,20 +368,18 @@ document.getElementById('editUserForm').onsubmit = function(e) {
         let rows = getAllUserRows();
         // Lọc theo trạng thái
         rows = rows.filter(function(row) {
-            var permissionCell = row.querySelector('.userlist-permission');
-            var isActive = true;
-            if (permissionCell) {
-                isActive = (permissionCell.textContent.trim() === 'Owner');
-            }
-            if (currentFilter === 'active') return isActive;
-            if (currentFilter === 'inactive') return !isActive;
+            var statusCell = row.querySelector('.user-status');
+            var statusText = statusCell ? statusCell.textContent.trim() : '';
+            if (currentFilter === 'active') return statusText === 'Đang hoạt động';
+            if (currentFilter === 'inactive') return statusText === 'Đã khóa';
+            return true;
         });
         // Lọc theo search
         if (currentSearch) {
             rows = rows.filter(function(row) {
-                var name = row.querySelector('.userlist-name')?.textContent.toLowerCase() || '';
-                var email = row.querySelector('.userlist-email')?.textContent.toLowerCase() || '';
-                return name.includes(currentSearch) || email.includes(currentSearch);
+                var name = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+                var username = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+                return name.includes(currentSearch) || username.includes(currentSearch);
             });
         }
         return rows;

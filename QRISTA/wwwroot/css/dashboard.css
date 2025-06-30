@@ -120,6 +120,68 @@ body {
 .user-name {
     font-weight: 500;
     color: #333;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    position: relative;
+    flex-wrap: nowrap;
+}
+
+.user-avatar-dropdown {
+    position: relative;
+    cursor: pointer;
+    margin-left: 2px;
+    display: flex;
+    align-items: center;
+    height: 32px;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    min-width: 120px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.13);
+    z-index: 1001;
+    padding: 8px 0;
+    display: none;
+    text-align: left;
+    white-space: nowrap;
+}
+.user-avatar-dropdown:focus .user-dropdown,
+.user-avatar-dropdown:active .user-dropdown {
+    display: block;
+}
+.user-dropdown .dropdown-item {
+    display: block;
+    padding: 8px 18px;
+    color: #333;
+    text-decoration: none;
+    font-size: 15px;
+    transition: background 0.2s;
+}
+.user-dropdown .dropdown-item:hover {
+    background: #f5f7fa;
+    color: #4285f4;
+}
+
+@media (max-width: 900px) {
+    .user-name {
+        max-width: 80px;
+        font-size: 14px;
+    }
 }
 
 .user-avatar {

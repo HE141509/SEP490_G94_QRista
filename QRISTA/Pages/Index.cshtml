@@ -12,14 +12,38 @@
             FPT UNIVERSITY
         </div>
         <div class="qrb-desc mb-2">Quán cafe thông minh</div>
-        <form method="post">
+        <form method="post" id="phoneForm" autocomplete="off" onsubmit="return validatePhoneNumber(event)">
             <div class="mb-3">
                 <label for="PhoneNumber" class="form-label fw-bold">Nhập số điện thoại</label>
-                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="Nhập số điện thoại" required pattern="[0-9]{10,11}" maxlength="11" />
+                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="Nhập số điện thoại" pattern="[0-9]{10,11}" maxlength="11" />
+                <div id="phoneError" style="color:#ea4335;font-size:14px;margin-top:4px;display:none"></div>
             </div>
             <button type="submit" class="btn btn-primary w-100 mb-2">Xác nhận</button>
             <button type="submit" name="skip" value="1" class="btn qrb-btn-skip w-100">Bỏ qua</button>
         </form>
+        <script>
+        function validatePhoneNumber(e) {
+            var form = document.getElementById('phoneForm');
+            var phone = form.PhoneNumber.value.trim();
+            var skipBtn = e.submitter && e.submitter.name === 'skip';
+            var errorDiv = document.getElementById('phoneError');
+            errorDiv.style.display = 'none';
+            if (skipBtn) return true;
+            if (!phone) {
+                errorDiv.textContent = 'Vui lòng nhập số điện thoại!';
+                errorDiv.style.display = 'block';
+                e.preventDefault();
+                return false;
+            }
+            if (!/^\d{10,11}$/.test(phone)) {
+                errorDiv.textContent = 'Số điện thoại phải gồm 10-11 chữ số!';
+                errorDiv.style.display = 'block';
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        }
+        </script>
         <div class="mt-2 text-muted" style="font-size:0.95rem;">Bàn số: @(Model.TableNumber != null ? Model.TableNumber.ToString() : "")</div>
     </div>
 </div>

@@ -1,0 +1,31 @@
+@* Sidebar dùng chung cho QRB *@
+<nav class="sidebar">
+    <div class="sidebar-content">
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="/Dashboard" class="nav-link @(Context.Request.Path.Value.Contains("/Dashboard") ? "active" : "")">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Thống kê hệ thống</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/UserManagement" class="nav-link @(Context.Request.Path.Value.Contains("/User") ? "active" : "")">
+                    <i class="fas fa-users"></i>
+                    <span>Quản lý người dùng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/Branch/BranchList" class="nav-link @(Context.Request.Path.Value.Contains("/Branch") ? "active" : "")">
+                    <i class="fas fa-store"></i>
+                    <span>Chi nhánh</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/Authorization" class="nav-link @(Context.Request.Path.Value.Contains("/Authorization") ? "active" : "")">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Phân quyền</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>

@@ -1,0 +1,377 @@
+@page
+@model QRB.Pages.Branch.BranchListModel
+@{
+    ViewData["Title"] = "Danh sách chi nhánh";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/userlist.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
+    <div class="main-container">
+        @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml", Model)
+        <main class="main-content">
+            <div class="dashboard-header userlist-header-flex">
+                <h1 class="page-title">Danh sách chi nhánh</h1>
+                <button class="userlist-add-btn" type="button">
+                    <i class="fas fa-plus"></i> Thêm mới
+                </button>
+                <div id="addBranchModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                    <div class="modal-content userlist-add-modal-content">
+                        <div class="userlist-add-modal-title"><i class="fas fa-store"></i> Thêm chi nhánh mới</div>
+                        <form id="addBranchForm" autocomplete="off">
+                            <div class="userlist-add-form-group">
+                                <label for="addMaChiNhanh">Mã chi nhánh</label>
+                                <input type="text" id="addMaChiNhanh" name="MaChiNhanh" class="userlist-input" required />
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addTenChiNhanh">Tên chi nhánh</label>
+                                <input type="text" id="addTenChiNhanh" name="TenChiNhanh" class="userlist-input" required />
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addIsDelete">Trạng thái</label>
+                                <select id="addIsDelete" name="IsDelete" class="userlist-input">
+                                    <option value="false">Đang hoạt động</option>
+                                    <option value="true">Đã xóa</option>
+                                </select>
+                            </div>
+                            <div class="userlist-add-modal-actions">
+                                <button type="button" onclick="closeAddBranchModal()" class="userlist-add-cancel-btn">Hủy</button>
+                                <button type="submit" class="userlist-add-submit-btn">Thêm mới</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="userlist-card userlist-modern">
+                <div class="userlist-toolbar">
+                    <div class="userlist-toolbar-left">
+                        <label for="filterBranchStatus">Trạng thái:</label>
+                        <select id="filterBranchStatus" class="userlist-filter" onchange="filterBranchByStatus()">
+                            <option value="active">Đang hoạt động</option>
+                            <option value="inactive">Đã xóa</option>
+                        </select>
+                    </div>
+                    <div class="userlist-toolbar-right">
+                        <label for="branchPageSize" style="font-size:15px;margin-right:8px;color:#555;">Hiển thị:</label>
+                        <select id="branchPageSize" class="userlist-filter" style="width:auto;min-width:60px;" onchange="changeBranchPageSize()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterBranchList()" style="margin-left:12px;" />
+                    </div>
+                </div>
+                <div class="userlist-table-wrapper">
+                    <table class="userlist-table userlist-table-modern" id="branchListTable">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Mã chi nhánh</th>
+                                <th>Tên chi nhánh</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (Model.Branches != null && Model.Branches.Count > 0)
+                        {
+                            int stt = 1;
+                            foreach (var branch in Model.Branches)
+                            {
+                                var status = branch.IsDelete ? "Đã xóa" : "Đang hoạt động";
+                                <tr data-index="@stt" data-status="@(branch.IsDelete ? "inactive" : "active")">
+                                    <td>@stt</td>
+                                    <td>@branch.MaChiNhanh</td>
+                                    <td>
+                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditBranchModal('@branch.ID', '@branch.MaChiNhanh', '@branch.TenChiNhanh', '@branch.IsDelete')">@branch.TenChiNhanh</span>
+                                    </td>
+                                    <td class="branch-status">@status</td>
+                                    <td>@branch.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <button class="userlist-delete-btn" title="Xóa" onclick="showDeleteBranchConfirm('@branch.ID')"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="4">Không có dữ liệu chi nhánh.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                    <div id="branchlist-pagination"></div>
+                </div>
+            </div>
+            <script>
+            // PHÂN TRANG + SEARCH + FILTER CHI NHÁNH
+            let branchCurrentPage = 1;
+            let branchPageSize = 10;
+            let branchCurrentFilter = 'active';
+            let branchCurrentSearch = '';
+
+            function getAllBranchRows() {
+                return Array.from(document.querySelectorAll('#branchListTable tbody tr')).filter(function(row) {
+                    return row.querySelectorAll('td').length > 1;
+                });
+            }
+            function getFilteredBranchRows() {
+                let rows = getAllBranchRows();
+                // Lọc theo trạng thái
+                rows = rows.filter(function(row) {
+                    var statusCell = row.querySelector('.branch-status');
+                    var isActive = true;
+                    if (statusCell) {
+                        isActive = (statusCell.textContent.trim() === 'Đang hoạt động');
+                    }
+                    if (branchCurrentFilter === 'active') return isActive;
+                    if (branchCurrentFilter === 'inactive') return !isActive;
+                });
+                // Lọc theo search
+                if (branchCurrentSearch) {
+                    rows = rows.filter(function(row) {
+                        var name = row.querySelector('td:nth-child(2) span')?.textContent.toLowerCase() || '';
+                        return name.includes(branchCurrentSearch);
+                    });
+                }
+                return rows;
+            }
+            function renderBranchPagination() {
+                let rows = getFilteredBranchRows();
+                let total = rows.length;
+                let totalPages = Math.ceil(total / branchPageSize);
+                let pag = document.getElementById('branchlist-pagination');
+                if (!pag) return;
+                if (totalPages <= 1) {
+                    pag.innerHTML = '';
+                    return;
+                }
+                let html = '';
+                html += `<button onclick="gotoBranchPage(1)" ${branchCurrentPage==1?'disabled':''}>&laquo;</button>`;
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || Math.abs(i-branchCurrentPage)<=2) {
+                        html += `<button onclick="gotoBranchPage(${i})" ${i==branchCurrentPage?'class="active"':''}>${i}</button>`;
+                    } else if (i === branchCurrentPage-3 || i === branchCurrentPage+3) {
+                        html += '<span>...</span>';
+                    }
+                }
+                html += `<button onclick="gotoBranchPage(${totalPages})" ${branchCurrentPage==totalPages?'disabled':''}>&raquo;</button>`;
+                pag.className = 'userlist-pagination';
+                pag.innerHTML = html;
+            }
+            function updateBranchPagination() {
+                let allRows = getAllBranchRows();
+                let rows = getFilteredBranchRows();
+                let total = rows.length;
+                let totalPages = Math.ceil(total / branchPageSize);
+                if (branchCurrentPage > totalPages) branchCurrentPage = totalPages || 1;
+                allRows.forEach(function(row) { row.style.display = 'none'; });
+                rows.forEach(function(row, idx) {
+                    if (idx >= (branchCurrentPage-1)*branchPageSize && idx < branchCurrentPage*branchPageSize) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                let pag = document.getElementById('branchlist-pagination');
+                if (rows.length === 0) {
+                    if (pag) pag.innerHTML = '';
+                    return;
+                }
+                renderBranchPagination();
+            }
+            function gotoBranchPage(page) {
+                branchCurrentPage = page;
+                updateBranchPagination();
+            }
+            function changeBranchPageSize() {
+                branchPageSize = parseInt(document.getElementById('branchPageSize').value);
+                branchCurrentPage = 1;
+                updateBranchPagination();
+            }
+            function filterBranchList() {
+                branchCurrentSearch = document.querySelector('.userlist-search').value.toLowerCase();
+                branchCurrentPage = 1;
+                updateBranchPagination();
+            }
+            function filterBranchByStatus() {
+                branchCurrentFilter = document.getElementById('filterBranchStatus').value;
+                branchCurrentPage = 1;
+                updateBranchPagination();
+            }
+            window.addEventListener('DOMContentLoaded', function() {
+                branchPageSize = parseInt(document.getElementById('branchPageSize').value) || 10;
+                setTimeout(updateBranchPagination, 0);
+            });
+            </script>
+            <form id="antiForgeryForm" style="display:none;">
+                @Html.AntiForgeryToken()
+            </form>
+            <div id="deleteBranchModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:320px;max-width:90vw;text-align:center;">
+                    <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa chi nhánh</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:24px;">Bạn có chắc chắn muốn xóa chi nhánh này không?</div>
+                    <div style="display:flex;justify-content:center;gap:18px;">
+                        <button onclick="confirmDeleteBranch()" style="background:#ea4335;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Xác nhận</button>
+                        <button onclick="closeDeleteBranchModal()" style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy</button>
+                    </div>
+                </div>
+            </div>
+            <div id="editBranchModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content userlist-add-modal-content">
+                    <div class="userlist-add-modal-title"><i class="fas fa-store"></i> Sửa chi nhánh</div>
+                    <form id="editBranchForm" autocomplete="off">
+                        <input type="hidden" id="editBranchId" name="ID" />
+                        <div class="userlist-add-form-group">
+                            <label for="editMaChiNhanh">Mã chi nhánh</label>
+                            <input type="text" id="editMaChiNhanh" name="MaChiNhanh" class="userlist-input" required readonly style="background:#f5f7fa;cursor:not-allowed;" />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="editTenChiNhanh">Tên chi nhánh</label>
+                            <input type="text" id="editTenChiNhanh" name="TenChiNhanh" class="userlist-input" required />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="editIsDelete">Trạng thái</label>
+                            <select id="editIsDelete" name="IsDelete" class="userlist-input">
+                                <option value="false">Đang hoạt động</option>
+                                <option value="true">Đã xóa</option>
+                            </select>
+                        </div>
+                        <div class="userlist-add-modal-actions">
+                            <button type="button" onclick="closeEditBranchModal()" class="userlist-add-cancel-btn">Hủy</button>
+                            <button type="submit" class="userlist-add-submit-btn">Lưu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="footer">
+        <div class="footer-content">
+            <span>© 2025 QRB - Hệ thống quán cafe thông minh. All rights reserved.</span>
+        </div>
+    </footer>
+    <script>
+        // Hiển thị popup Thêm chi nhánh
+        document.querySelector('.userlist-add-btn').onclick = function() {
+            document.getElementById('addBranchModal').style.display = 'flex';
+        };
+        function closeAddBranchModal() {
+            document.getElementById('addBranchModal').style.display = 'none';
+            document.getElementById('addBranchForm').reset();
+        }
+
+        // Hiển thị popup Sửa chi nhánh
+        function showEditBranchModal(id, maChiNhanh, tenChiNhanh, isDelete) {
+            document.getElementById('editBranchId').value = id;
+            document.getElementById('editMaChiNhanh').value = maChiNhanh;
+            document.getElementById('editTenChiNhanh').value = tenChiNhanh;
+            document.getElementById('editIsDelete').value = (isDelete === 'True' || isDelete === 'true' || isDelete === true) ? 'true' : 'false';
+            document.getElementById('editBranchModal').style.display = 'flex';
+        }
+        function closeEditBranchModal() {
+            document.getElementById('editBranchModal').style.display = 'none';
+            document.getElementById('editBranchForm').reset();
+        }
+
+        // Hiển thị popup Xóa chi nhánh
+        let deleteBranchId = null;
+        function showDeleteBranchConfirm(id) {
+            deleteBranchId = id;
+            document.getElementById('deleteBranchModal').style.display = 'flex';
+        }
+        function closeDeleteBranchModal() {
+            deleteBranchId = null;
+            document.getElementById('deleteBranchModal').style.display = 'none';
+        }
+
+        // Thêm chi nhánh (AJAX)
+        document.getElementById('addBranchForm').onsubmit = function(e) {
+            e.preventDefault();
+            var form = e.target;
+            var data = {
+                MaChiNhanh: form.MaChiNhanh.value,
+                TenChiNhanh: form.TenChiNhanh.value,
+                IsDelete: form.IsDelete.value === 'true'
+            };
+            fetch('/Branch/AddBranch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.message || 'Thêm chi nhánh thất bại!');
+                }
+            });
+        };
+
+        // Sửa chi nhánh (AJAX)
+        document.getElementById('editBranchForm').onsubmit = function(e) {
+            e.preventDefault();
+            var form = e.target;
+            var data = {
+                ID: form.ID.value,
+                MaChiNhanh: form.MaChiNhanh.value,
+                TenChiNhanh: form.TenChiNhanh.value,
+                IsDelete: form.IsDelete.value === 'true'
+            };
+            fetch('/Branch/UpdateBranch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.message || 'Cập nhật chi nhánh thất bại!');
+                }
+            });
+        };
+
+        // Xóa chi nhánh (AJAX)
+        function confirmDeleteBranch() {
+            if (!deleteBranchId) return;
+            fetch('/Branch/DeleteBranch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+                },
+                body: JSON.stringify({ id: deleteBranchId })
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.message || 'Xóa chi nhánh thất bại!');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
