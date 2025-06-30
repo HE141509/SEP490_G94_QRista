@@ -15,10 +15,14 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 <<<<<<< HEAD
+<<<<<<< HEAD
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2907942542559463548f3c233377bfc43942f333")]
 =======
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+87f54c517327fb1a58644da238debbe90b1170cb")]
 >>>>>>> origin/hoangtuan
+=======
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3f42e7dfdbd9d5957f0a17e4744fb5cd3bfc3ab0")]
+>>>>>>> origin/anh0612
 [assembly: System.Reflection.AssemblyProductAttribute("QRISTA")]
 [assembly: System.Reflection.AssemblyTitleAttribute("QRISTA")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,6 +1,7 @@
 {
   "Version": 1,
 <<<<<<< HEAD
+<<<<<<< HEAD
   "WorkspaceRootPath": "E:\\Github\\SEP490_G94_QRista\\",
   "Documents": [
     {
@@ -48,13 +49,16 @@
       "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\data\\qrbdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
 =======
   "WorkspaceRootPath": "C:\\Users\\salam\\source\\repos\\QRISTA\\",
+=======
+  "WorkspaceRootPath": "D:\\DO ANNNN\\SEP490_G94_QRista\\",
+>>>>>>> origin/anh0612
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|d:\\do annnn\\sep490_g94_qrista\\qrista\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|d:\\do annnn\\sep490_g94_qrista\\qrista\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
 >>>>>>> origin/anh0612
     }
@@ -206,15 +210,19 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\appsettings.json",
+              "DocumentMoniker": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\appsettings.json",
               "RelativeDocumentMoniker": "QRISTA\\appsettings.json",
-              "ToolTip": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\appsettings.json",
+              "ToolTip": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\appsettings.json",
               "RelativeToolTip": "QRISTA\\appsettings.json",
+<<<<<<< HEAD
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAACaAAAA",
 >>>>>>> origin/anh0612
 =======
 >>>>>>> origin/hoangtuan
 >>>>>>> origin/hoangtuan
+=======
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAACYAAAAAAAAAA==",
+>>>>>>> origin/anh0612
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
               "WhenOpened": "2025-07-22T08:53:43.196Z"
             },
@@ -255,14 +263,18 @@
 =======
               "DocumentIndex": 1,
               "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Program.cs",
+              "DocumentMoniker": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\Program.cs",
               "RelativeDocumentMoniker": "QRISTA\\Program.cs",
-              "ToolTip": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Program.cs",
+              "ToolTip": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\Program.cs",
               "RelativeToolTip": "QRISTA\\Program.cs",
               "ViewState": "AQIAAAMAAAAAAAAAAAAAwBYAAAAUAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+<<<<<<< HEAD
               "WhenOpened": "2025-07-21T04:22:36.496Z",
               "EditorCaption": ""
+>>>>>>> origin/anh0612
+=======
+              "WhenOpened": "2025-07-21T04:22:36.496Z"
 >>>>>>> origin/anh0612
             }
           ]
