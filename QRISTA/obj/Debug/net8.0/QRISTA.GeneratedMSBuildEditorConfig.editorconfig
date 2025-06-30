@@ -44,12 +44,48 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVudS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/Menu/Menu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVudVxNZW51LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/Payment/Payment.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxQYXltZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/ReturnUrl.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmV0dXJuVXJsLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/UserManagement.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck1hbmFnZW1lbnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/User/AddUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxBZGRVc2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/User/DeleteUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxEZWxldGVVc2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/User/GetUserById.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxHZXRVc2VyQnlJZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/User/UpdateUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxVcGRhdGVVc2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/User/UserList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxVc2VyTGlzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/DO ANNNN/SEP490_G94_QRista/QRISTA/Pages/_ViewImports.cshtml]

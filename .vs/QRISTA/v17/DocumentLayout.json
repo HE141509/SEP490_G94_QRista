@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\DO ANNNN\\SEP490_G94_QRista\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|d:\\do annnn\\sep490_g94_qrista\\qrista\\qrista.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\qrista.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|d:\\do annnn\\sep490_g94_qrista\\qrista\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
@@ -23,6 +27,19 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "QRISTA",
+              "DocumentMoniker": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj",
+              "RelativeDocumentMoniker": "QRISTA\\QRISTA.csproj",
+              "ToolTip": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj",
+              "RelativeToolTip": "QRISTA\\QRISTA.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-07-24T14:52:57.468Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "appsettings.json",
               "DocumentMoniker": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\appsettings.json",
               "RelativeDocumentMoniker": "QRISTA\\appsettings.json",
@@ -35,15 +52,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\Program.cs",
               "RelativeDocumentMoniker": "QRISTA\\Program.cs",
               "ToolTip": "D:\\DO ANNNN\\SEP490_G94_QRista\\QRISTA\\Program.cs",
               "RelativeToolTip": "QRISTA\\Program.cs",
-              "ViewState": "AQIAAAMAAAAAAAAAAAAAwBYAAAAUAAAA",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAwBYAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-21T04:22:36.496Z"
+              "WhenOpened": "2025-07-21T04:22:36.496Z",
+              "EditorCaption": ""
             }
           ]
         }

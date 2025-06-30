@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
@@ -9,12 +10,11 @@ namespace QRB.Pages.User
         public class UserInfo
         {
             public Guid ID { get; set; }
-            public string TenNguoiDung { get; set; } = string.Empty;
-            public string TenHienThi { get; set; } = string.Empty;
-            public Guid IDChiNhanh { get; set; }
+            public string TenHienThi { get; set; }
+            public string TenNguoiDung { get; set; }
+            public string TenChiNhanh { get; set; }
             public bool IsDelete { get; set; }
             public DateTime CreateTime { get; set; }
-            public DateTime? UpdateTime { get; set; }
         }
 
         public List<UserInfo> Users { get; set; } = new List<UserInfo>();
@@ -28,8 +28,16 @@ namespace QRB.Pages.User
 
         public string? CurrentUserDisplayName { get; set; }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Kiểm tra session đăng nhập
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Chưa đăng nhập, chuyển về trang index
+                return Redirect("/Index");
+            }
+
             // Lấy tên hiển thị user hiện tại từ session
             CurrentUserDisplayName = HttpContext.Session.GetString("DisplayName");
 
@@ -38,7 +46,10 @@ namespace QRB.Pages.User
             {
                 connection.Open();
                 // Lấy danh sách user
-                var command = new SqlCommand(@"SELECT ID, TenNguoiDung, TenHienThi, IDChiNhanh, IsDelete, CreateTime, UpdateTime FROM NguoiDung", connection);
+                var command = new SqlCommand(@"SELECT u.ID, u.TenHienThi, u.TenNguoiDung, c.TenChiNhanh, ISNULL(u.IsDelete,0), u.CreateTime
+FROM NguoiDung u
+LEFT JOIN ChiNhanh c ON u.IDChiNhanh = c.ID
+ORDER BY u.CreateTime DESC", connection);
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
@@ -46,12 +57,11 @@ namespace QRB.Pages.User
                         Users.Add(new UserInfo
                         {
                             ID = reader.GetGuid(0),
-                            TenNguoiDung = reader.GetString(1),
-                            TenHienThi = reader.GetString(2),
-                            IDChiNhanh = reader.GetGuid(3),
+                            TenHienThi = reader.GetString(1),
+                            TenNguoiDung = reader.GetString(2),
+                            TenChiNhanh = reader.IsDBNull(3) ? "" : reader.GetString(3),
                             IsDelete = reader.GetBoolean(4),
-                            CreateTime = reader.GetDateTime(5),
-                            UpdateTime = reader.IsDBNull(6) ? null : reader.GetDateTime(6)
+                            CreateTime = reader.GetDateTime(5)
                         });
                     }
                 }
@@ -69,6 +79,7 @@ namespace QRB.Pages.User
                     }
                 }
             }
+            return Page();
         }
     }
 }
