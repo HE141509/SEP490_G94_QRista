@@ -15,8 +15,25 @@
         <form method="post" id="phoneForm" autocomplete="off" onsubmit="return validatePhoneNumber(event)">
             <div class="mb-3">
                 <label for="PhoneNumber" class="form-label fw-bold">Nhập số điện thoại</label>
-                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="Nhập số điện thoại" pattern="[0-9]{10,11}" maxlength="11" />
-                <div id="phoneError" style="color:#ea4335;font-size:14px;margin-top:4px;display:none"></div>
+                <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="Nhập số điện thoại" pattern="[0-9]{10,11}" maxlength="11" value="@Model.PhoneNumber" />
+                <div id="phoneError" style="color:#ea4335;font-size:14px;margin-top:4px;display:@(ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0 ? "block" : "none")">
+                    @{
+                        var phoneErrors = ViewData.ModelState["PhoneNumber"]?.Errors;
+                        if (phoneErrors != null && phoneErrors.Count > 0)
+                        {
+                            <span>@phoneErrors[0].ErrorMessage</span>
+                            <script>
+                            setTimeout(function() {
+                                var input = document.getElementById('PhoneNumber');
+                                if(input) {
+                                    input.focus();
+                                    input.classList.add('is-invalid');
+                                }
+                            }, 100);
+                            </script>
+                        }
+                    }
+                </div>
             </div>
             <button type="submit" class="btn btn-primary w-100 mb-2">Xác nhận</button>
             <button type="submit" name="skip" value="1" class="btn qrb-btn-skip w-100">Bỏ qua</button>

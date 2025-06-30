@@ -1,3 +1,8 @@
+/* Highlight input when error */
+#PhoneNumber.is-invalid {
+    border-color: #ea4335;
+    box-shadow: 0 0 0 0.2rem rgba(234,67,53,.15);
+}
 /* QRB custom styles for phone input page */
 html, body {
     height: 100%;
