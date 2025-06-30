@@ -132,6 +132,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxVc2VyTGlzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/AddUuDai.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcQWRkVXVEYWkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/GetKhachHang.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcR2V0S2hhY2hIYW5nLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/MaUuDaiList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcTWFVdURhaUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

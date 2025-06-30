@@ -92,7 +92,7 @@
                                     <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditCustomerModal('@c.Id', '@c.TenKhachHang', '@c.SoDienThoai', '@c.GiaTriDonHang', '@c.IsDelete')">@c.TenKhachHang</span>
                                 </td>
                                 <td>@c.SoDienThoai</td>
-                                <td>@c.GiaTriDonHang</td>
+                                <td>@Convert.ToDecimal(c.GiaTriDonHang).ToString("N0")</td>
                                 <td class="customer-status">@status</td>
                                 <td>
                                     <button class="userlist-delete-btn btnDeleteCustomer" data-id="@c.Id" title="Xóa"><i class="fas fa-trash"></i></button>
@@ -272,12 +272,27 @@ function closeAddCustomerModal() {
     document.getElementById('addCustomerModal').style.display = 'none';
     document.getElementById('addCustomerForm').reset();
 }
+// Định dạng tiền cho input
+function formatCurrencyInput(val) {
+    if (!val) return '';
+    val = val.toString().replace(/[^\d]/g, '');
+    return val.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+// Format khi nhập giá trị đơn hàng (thêm dấu phẩy)
+document.getElementById('addGiaTriDonHang').addEventListener('input', function(e) {
+    let val = e.target.value.replace(/[^\d]/g, '');
+    e.target.value = formatCurrencyInput(val);
+});
+document.getElementById('editGiaTriDonHang').addEventListener('input', function(e) {
+    let val = e.target.value.replace(/[^\d]/g, '');
+    e.target.value = formatCurrencyInput(val);
+});
 // Hiển thị popup Sửa khách hàng
 function showEditCustomerModal(id, tenKhachHang, soDienThoai, giaTriDonHang, isDelete) {
     document.getElementById('editCustomerId').value = id;
     document.getElementById('editTenKhachHang').value = tenKhachHang;
     document.getElementById('editSoDienThoai').value = soDienThoai;
-    document.getElementById('editGiaTriDonHang').value = giaTriDonHang;
+    document.getElementById('editGiaTriDonHang').value = formatCurrencyInput(giaTriDonHang);
     document.getElementById('editIsDelete').value = (isDelete === 'True' || isDelete === 'true' || isDelete === true) ? 'true' : 'false';
     document.getElementById('editCustomerModal').style.display = 'flex';
 }
@@ -302,7 +317,7 @@ document.getElementById('addCustomerForm').onsubmit = function(e) {
     var data = {
         TenKhachHang: form.TenKhachHang.value,
         SoDienThoai: form.SoDienThoai.value,
-        GiaTriDonHang: form.GiaTriDonHang.value,
+        GiaTriDonHang: form.GiaTriDonHang.value.replace(/[^\d]/g, ''),
         IsDelete: form.IsDelete.value === 'true'
     };
     fetch('/Customer/AddCustomer', {
@@ -330,7 +345,7 @@ document.getElementById('editCustomerForm').onsubmit = function(e) {
         Id: form.Id.value,
         TenKhachHang: form.TenKhachHang.value,
         SoDienThoai: form.SoDienThoai.value,
-        GiaTriDonHang: form.GiaTriDonHang.value,
+        GiaTriDonHang: form.GiaTriDonHang.value.replace(/[^\d]/g, ''),
         IsDelete: form.IsDelete.value === 'true'
     };
     fetch('/Customer/UpdateCustomer', {

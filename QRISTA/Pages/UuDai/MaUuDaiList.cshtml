@@ -1,0 +1,471 @@
+@page
+@model QRB.Pages.UuDai.MaUuDaiListModel
+@{
+    ViewData["Title"] = "Danh sách mã ưu đãi";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/ma-uudai.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
+    <div class="main-container">
+        @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml", Model)
+        <main class="main-content">
+            <div class="dashboard-header userlist-header-flex">
+                <h1 class="page-title">Danh sách mã ưu đãi</h1>
+                <button class="userlist-add-btn" type="button" onclick="showAddUuDaiModal()" style="background:#2196f3;color:#fff;border:none;padding:7px 18px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="fas fa-plus"></i> Thêm mới</button>
+            </div>
+            <div class="userlist-card userlist-modern">
+                <div class="userlist-toolbar">
+                    <div class="userlist-toolbar-left" style="display:flex;align-items:center;gap:16px;">
+                        <label for="filterUuDaiStatus">Trạng thái:</label>
+                        <select id="filterUuDaiStatus" class="userlist-filter" onchange="filterUuDaiByStatus()">
+                            <option value="active">Đang hoạt động</option>
+                            <option value="inactive">Đã xóa</option>
+                        </select>
+                    </div>
+                    <div class="userlist-toolbar-right">
+                        <label for="uudaiPageSize" style="font-size:15px;margin-right:8px;color:#555;">Hiển thị:</label>
+                        <select id="uudaiPageSize" class="userlist-filter" style="width:auto;min-width:60px;" onchange="changeUuDaiPageSize()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterUuDaiList()" style="margin-left:12px;" />
+                    </div>
+                </div>
+                <div class="userlist-table-wrapper">
+                    <table class="userlist-table userlist-table-modern" id="maUuDaiTable">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Mã ưu đãi</th>
+                                <th>Khách hàng</th>
+                                <th>Mã giảm giá</th>
+                                <th>Tiền giảm</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Ngày cập nhật</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (Model.MaUuDaiList != null && Model.MaUuDaiList.Count > 0)
+                        {
+                            int stt = 1;
+                            foreach (var item in Model.MaUuDaiList)
+                            {
+                                var status = item.TrangThaiSuDung ? "Đã dùng" : "Chưa dùng";
+                                <tr data-index="@stt" data-status="@(item.IsDelete ? "inactive" : "active")">
+                                    <td>@stt</td>
+                                    <td>
+                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditUuDaiModal('@item.ID', '@item.TenKhachHang', '@item.MaGiamGia', '@item.TienGiam')">@item.ID</span>
+                                    </td>
+                                    <td>@item.TenKhachHang</td>
+                                    <td>@item.MaGiamGia</td>
+                                    <td>@Convert.ToDecimal(item.TienGiam).ToString("N0")</td>
+                                    <td class="uudai-status">@status</td>
+                                    <td>@item.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@(item.UpdateTime?.ToString("dd/MM/yyyy HH:mm") ?? "")</td>
+                                    <td>
+                                        @if (!item.TrangThaiSuDung)
+                                        {
+                                            <button class="uudai-delete-btn" title="Xóa mã ưu đãi" onclick="showUuDaiDeleteConfirm('@item.ID')"><i class="fas fa-trash"></i></button>
+                                        }
+                                    </td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="8">Không có dữ liệu mã ưu đãi.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                    <div id="uudailist-pagination"></div>
+            <form id="antiForgeryFormUuDai" style="display:none;">
+                @Html.AntiForgeryToken()
+            </form>
+            <div id="deleteUuDaiModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:320px;max-width:90vw;text-align:center;">
+                    <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i class="fas fa-exclamation-triangle"></i> Xác nhận đánh dấu đã dùng</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:24px;">Bạn có chắc chắn muốn xóa mã ưu đãi này không?</div>
+                    <div style="display:flex;justify-content:center;gap:18px;">
+                        <button onclick="confirmDeleteUuDai()" style="background:#ea4335;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Xác nhận</button>
+                        <button onclick="closeDeleteUuDaiModal()" style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Popup thêm mới mã ưu đãi -->
+            <div id="addUuDaiModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);align-items:center;justify-content:center;">
+                <div class="uudai-modal-content">
+                    <div class="uudai-modal-title"><i class="fas fa-plus-circle"></i> Thêm mới mã ưu đãi</div>
+                    <form id="addUuDaiForm" autocomplete="off" onsubmit="return submitAddUuDai(event)">
+                        <div class="uudai-form-group">
+                            <label for="addKhachHang">Tên khách hàng</label>
+                            <select id="addKhachHang" name="IDKhachHang" class="uudai-select2" style="width:100%" required></select>
+                        </div>
+                        <div class="uudai-form-group">
+                            <label for="addMaGiamGia">Mã giảm giá</label>
+                            <input id="addMaGiamGia" name="MaGiamGia" type="text" required />
+                        </div>
+                        <div class="uudai-form-group">
+                            <label for="addTienGiam">Tiền giảm</label>
+                            <input id="addTienGiam" name="TienGiam" type="text" required />
+                        </div>
+                        <div class="uudai-modal-actions">
+                            <button type="button" onclick="closeAddUuDaiModal()" class="uudai-cancel-btn">Hủy</button>
+                            <button type="submit" class="uudai-submit-btn">Thêm mới</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Popup sửa mã ưu đãi -->
+            <div id="editUuDaiModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);align-items:center;justify-content:center;">
+                <div class="uudai-modal-content">
+                    <div class="uudai-modal-title edit"><i class="fas fa-edit"></i> Sửa mã ưu đãi</div>
+                    <form id="editUuDaiForm" autocomplete="off" onsubmit="return submitEditUuDai(event)">
+                        <input type="hidden" id="editUuDaiId" name="ID" />
+                        <div class="uudai-form-group">
+                            <label for="editTenKhachHang">Tên khách hàng</label>
+                            <input id="editTenKhachHang" name="TenKhachHang" type="text" required readonly style="background:#f5f7fa;cursor:not-allowed;" />
+                        </div>
+                        <div class="uudai-form-group">
+                            <label for="editMaGiamGia">Mã giảm giá</label>
+                            <input id="editMaGiamGia" name="MaGiamGia" type="text" required />
+                        </div>
+                        <div class="uudai-form-group">
+                            <label for="editTienGiam">Tiền giảm</label>
+                            <input id="editTienGiam" name="TienGiam" type="text" required />
+                        </div>
+                        <div class="uudai-modal-actions">
+                            <button type="button" onclick="closeEditUuDaiModal()" class="uudai-cancel-btn">Hủy</button>
+                            <button type="submit" class="uudai-submit-btn">Lưu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+                </div>
+            </div>
+            <script>
+            // AJAX load khách hàng cho combobox thêm mới (search theo SĐT hoặc tên)
+            let khachHangCache = [];
+            function formatKhachHangOption(kh) {
+                // Đảm bảo lấy đúng thuộc tính (phân biệt hoa thường)
+                return kh && kh.ID !== undefined ? `${kh.TenKhachHang || ''} (${kh.SoDienThoai || ''})` : '';
+            }
+            function fetchKhachHangList(query, cb) {
+                fetch(`/UuDai/GetKhachHang?search=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        khachHangCache = data;
+                        cb(data);
+                    });
+            }
+            function renderKhachHangOptions(list) {
+                const select = document.getElementById('addKhachHang');
+                select.innerHTML = '';
+                if (!list || list.length === 0) {
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.textContent = 'Không tìm thấy khách hàng';
+                    select.appendChild(opt);
+                    return;
+                }
+                list.forEach(kh => {
+                    const opt = document.createElement('option');
+                    // Lấy đúng ID (ưu tiên kiểu GUID, không phải rỗng)
+                    let id = kh.ID || kh.Id || kh.id || '';
+                    if (typeof id === 'object' && id !== null && id.hasOwnProperty('Value')) id = id.Value;
+                    opt.value = id;
+                    // Nếu không có tên hoặc số điện thoại thì hiển thị rõ ràng
+                    let ten = kh.TenKhachHang || kh.tenKhachHang || '';
+                    let sdt = kh.SoDienThoai || kh.soDienThoai || '';
+                    if (!ten && !sdt) {
+                        opt.textContent = 'Không rõ khách hàng';
+                    } else if (!ten) {
+                        opt.textContent = sdt;
+                    } else if (!sdt) {
+                        opt.textContent = ten;
+                    } else {
+                        opt.textContent = `${ten} (${sdt})`;
+                    }
+                    select.appendChild(opt);
+                });
+            }
+            // Simple autocomplete for select
+            function setupKhachHangSelect() {
+                const select = document.getElementById('addKhachHang');
+                select.innerHTML = '';
+                select.setAttribute('data-loaded', '0');
+                select.addEventListener('focus', function() {
+                    if (select.getAttribute('data-loaded') !== '1') {
+                        fetchKhachHangList('', function(list) {
+                            renderKhachHangOptions(list);
+                            select.setAttribute('data-loaded', '1');
+                        });
+                    }
+                });
+                // Tìm kiếm bằng ô nhập riêng (autocomplete-like)
+                if (!document.getElementById('addKhachHangSearch')) {
+                    const searchInput = document.createElement('input');
+                    searchInput.type = 'text';
+                    searchInput.id = 'addKhachHangSearch';
+                    searchInput.placeholder = 'Tìm khách hàng theo tên/SĐT...';
+                    searchInput.className = 'uudai-select2-search';
+                    searchInput.style = 'width:100%;margin-bottom:6px;padding:6px 8px;border-radius:4px;border:1px solid #ccc;';
+                    select.parentNode.insertBefore(searchInput, select);
+                    let debounceTimeout = null;
+                    searchInput.addEventListener('input', function(e) {
+                        const q = e.target.value;
+                        if (debounceTimeout) clearTimeout(debounceTimeout);
+                        debounceTimeout = setTimeout(() => {
+                            fetchKhachHangList(q, renderKhachHangOptions);
+                        }, 350);
+                    });
+                }
+            }
+            // Reset combobox khi đóng popup
+            function resetAddKhachHangSelect() {
+                const select = document.getElementById('addKhachHang');
+                select.innerHTML = '';
+                select.setAttribute('data-loaded', '0');
+                // Xóa ô tìm kiếm nếu có
+                const searchInput = document.getElementById('addKhachHangSearch');
+                if (searchInput) searchInput.remove();
+            }
+            // SỬA MÃ ƯU ĐÃI
+            function showEditUuDaiModal(id, tenKhachHang, maGiamGia, tienGiam) {
+                document.getElementById('editUuDaiId').value = id;
+                document.getElementById('editTenKhachHang').value = tenKhachHang;
+                document.getElementById('editMaGiamGia').value = maGiamGia;
+                document.getElementById('editTienGiam').value = formatCurrencyInput(tienGiam);
+                document.getElementById('editUuDaiModal').style.display = 'flex';
+            }
+            function closeEditUuDaiModal() {
+                document.getElementById('editUuDaiModal').style.display = 'none';
+                document.getElementById('editUuDaiForm').reset();
+            }
+            function submitEditUuDai(event) {
+                event.preventDefault();
+                // TODO: Gửi dữ liệu lên backend để cập nhật mã ưu đãi
+                // Lấy giá trị đúng cách từ các trường input
+                const tienGiamInput = document.getElementById('editTienGiam');
+                let tienGiam = tienGiamInput.value.trim().replace(/[^\d]/g, '');
+                tienGiamInput.value = formatCurrencyInput(tienGiam);
+                alert('Chức năng sửa mã ưu đãi đang được phát triển!');
+                closeEditUuDaiModal();
+                return false;
+            }
+            // THÊM MỚI MÃ ƯU ĐÃI
+            function showAddUuDaiModal() {
+                document.getElementById('addUuDaiModal').style.display = 'flex';
+                setupKhachHangSelect();
+            }
+            function closeAddUuDaiModal() {
+                document.getElementById('addUuDaiModal').style.display = 'none';
+                document.getElementById('addUuDaiForm').reset();
+                resetAddKhachHangSelect();
+            }
+            function submitAddUuDai(event) {
+                event.preventDefault();
+                // Lấy giá trị đúng cách từ các trường input/select
+                const select = document.getElementById('addKhachHang');
+                let idKhachHang = '';
+                if (select && select.selectedIndex >= 0) {
+                    idKhachHang = select.options[select.selectedIndex].value;
+                }
+                const maGiamGia = document.getElementById('addMaGiamGia').value.trim();
+                let tienGiam = document.getElementById('addTienGiam').value.trim();
+                tienGiam = tienGiam.replace(/[^\d]/g, '');
+                if (!idKhachHang || !maGiamGia || !tienGiam) {
+                    alert('Vui lòng nhập đầy đủ thông tin!');
+                    return false;
+                }
+                fetch('/UuDai/AddUuDai', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('#antiForgeryFormUuDai input[name=__RequestVerificationToken]').value
+                    },
+                    body: JSON.stringify({
+                        IDKhachHang: idKhachHang,
+                        MaGiamGia: maGiamGia,
+                        TienGiam: tienGiam
+                    })
+                })
+                .then(res => res.json())
+                .then(resp => {
+                    if (resp.success) {
+                        alert('Thêm mới mã ưu đãi thành công!');
+                        location.reload();
+                    } else {
+                        alert(resp.message || 'Thêm mới thất bại!');
+                    }
+                })
+                .catch(() => alert('Lỗi kết nối server!'));
+                closeAddUuDaiModal();
+                return false;
+            }
+            // XÓA MÃ ƯU ĐÃI
+            let deleteUuDaiId = null;
+            function showUuDaiDeleteConfirm(id) {
+                deleteUuDaiId = id;
+                document.getElementById('deleteUuDaiModal').style.display = 'flex';
+            }
+            function closeDeleteUuDaiModal() {
+                deleteUuDaiId = null;
+                document.getElementById('deleteUuDaiModal').style.display = 'none';
+            }
+            function confirmDeleteUuDai() {
+                if (!deleteUuDaiId) return;
+                fetch('/UuDai/Delete', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('#antiForgeryFormUuDai input[name=__RequestVerificationToken]').value
+                    },
+                    body: JSON.stringify({ id: deleteUuDaiId })
+                })
+                .then(res => res.json())
+                .then(resp => {
+                    if (resp.success) {
+                        location.reload();
+                    } else {
+                        alert(resp.message || 'Xóa mã ưu đãi thất bại!');
+                    }
+                });
+            }
+            // PHÂN TRANG + SEARCH + FILTER MÃ ƯU ĐÃI
+            let uudaiCurrentPage = 1;
+            let uudaiPageSize = 10;
+            let uudaiCurrentFilter = 'active';
+            let uudaiCurrentSearch = '';
+
+            function getAllUuDaiRows() {
+                return Array.from(document.querySelectorAll('#maUuDaiTable tbody tr')).filter(function(row) {
+                    return row.querySelectorAll('td').length > 1;
+                });
+            }
+            function getFilteredUuDaiRows() {
+                let rows = getAllUuDaiRows();
+                // Lọc theo IsDelete (data-status)
+                rows = rows.filter(function(row) {
+                    var status = row.getAttribute('data-status');
+                    if (uudaiCurrentFilter === 'active') return status === 'active';
+                    if (uudaiCurrentFilter === 'inactive') return status === 'inactive';
+                });
+                // Lọc theo search
+                if (uudaiCurrentSearch) {
+                    rows = rows.filter(function(row) {
+                        var name = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+                        return name.includes(uudaiCurrentSearch);
+                    });
+                }
+                return rows;
+            }
+            function renderUuDaiPagination() {
+                let rows = getFilteredUuDaiRows();
+                let total = rows.length;
+                let totalPages = Math.ceil(total / uudaiPageSize);
+                let pag = document.getElementById('uudailist-pagination');
+                if (!pag) return;
+                if (totalPages <= 1) {
+                    pag.innerHTML = '';
+                    return;
+                }
+                let html = '';
+                html += `<button onclick="gotoUuDaiPage(1)" ${uudaiCurrentPage==1?'disabled':''}>&laquo;</button>`;
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || Math.abs(i-uudaiCurrentPage)<=2) {
+                        html += `<button onclick="gotoUuDaiPage(${i})" ${i==uudaiCurrentPage?'class="active"':''}>${i}</button>`;
+                    } else if (i === uudaiCurrentPage-3 || i === uudaiCurrentPage+3) {
+                        html += '<span>...</span>';
+                    }
+                }
+                html += `<button onclick="gotoUuDaiPage(${totalPages})" ${uudaiCurrentPage==totalPages?'disabled':''}>&raquo;</button>`;
+                pag.className = 'userlist-pagination';
+                pag.innerHTML = html;
+            }
+            function updateUuDaiPagination() {
+                let allRows = getAllUuDaiRows();
+                let rows = getFilteredUuDaiRows();
+                let total = rows.length;
+                let totalPages = Math.ceil(total / uudaiPageSize);
+                if (uudaiCurrentPage > totalPages) uudaiCurrentPage = totalPages || 1;
+                allRows.forEach(function(row) { row.style.display = 'none'; });
+                rows.forEach(function(row, idx) {
+                    if (idx >= (uudaiCurrentPage-1)*uudaiPageSize && idx < uudaiCurrentPage*uudaiPageSize) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                let pag = document.getElementById('uudailist-pagination');
+                if (rows.length === 0) {
+                    if (pag) pag.innerHTML = '';
+                    return;
+                }
+                renderUuDaiPagination();
+            }
+            function gotoUuDaiPage(page) {
+                uudaiCurrentPage = page;
+                updateUuDaiPagination();
+            }
+            function changeUuDaiPageSize() {
+                uudaiPageSize = parseInt(document.getElementById('uudaiPageSize').value);
+                uudaiCurrentPage = 1;
+                updateUuDaiPagination();
+            }
+            function filterUuDaiList() {
+                uudaiCurrentSearch = document.querySelector('.userlist-search').value.toLowerCase();
+                uudaiCurrentPage = 1;
+                updateUuDaiPagination();
+            }
+            function filterUuDaiByStatus() {
+                uudaiCurrentFilter = document.getElementById('filterUuDaiStatus').value;
+                uudaiCurrentPage = 1;
+                updateUuDaiPagination();
+            }
+            window.addEventListener('DOMContentLoaded', function() {
+                uudaiPageSize = parseInt(document.getElementById('uudaiPageSize').value) || 10;
+                setTimeout(updateUuDaiPagination, 0);
+                document.getElementById('addUuDaiModal').style.display = 'none';
+                document.getElementById('editUuDaiModal').style.display = 'none';
+            });
+            // Định dạng tiền cho input
+            function formatCurrencyInput(val) {
+                if (!val) return '';
+                val = val.toString().replace(/[^\d]/g, '');
+                return val.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            }
+            // Format khi nhập tiền giảm (thêm dấu phẩy)
+            document.getElementById('addTienGiam').addEventListener('input', function(e) {
+                let val = e.target.value.replace(/[^\d]/g, '');
+                e.target.value = formatCurrencyInput(val);
+            });
+            document.getElementById('editTienGiam').addEventListener('input', function(e) {
+                let val = e.target.value.replace(/[^\d]/g, '');
+                e.target.value = formatCurrencyInput(val);
+            });
+            </script>
+        </main>
+    </div>
+    <footer class="footer">
+        <div class="footer-content">
+            <span>© 2025 QRB - Hệ thống quán cafe thông minh. All rights reserved.</span>
+        </div>
+    </footer>
+</body>
+</html>
