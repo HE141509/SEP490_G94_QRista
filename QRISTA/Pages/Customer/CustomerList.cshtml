@@ -1,0 +1,452 @@
+@page
+@model QRB.Pages.Customer.CustomerListModel
+@{
+    ViewData["Title"] = "Quản lý khách hàng";
+}
+
+<link rel="stylesheet" href="/css/dashboard.css" />
+<link rel="stylesheet" href="/css/userlist.css" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<partial name="../Shared/_Header.cshtml" />
+<div class="main-container">
+    <partial name="../Shared/_Sidebar.cshtml" />
+    <main class="main-content">
+        <div class="dashboard-header userlist-header-flex">
+            <h1 class="page-title">Danh sách khách hàng</h1>
+            <button class="userlist-add-btn" type="button" id="btnAddCustomer">
+                <i class="fas fa-plus"></i> Thêm khách hàng
+            </button>
+            <div id="addCustomerModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content userlist-add-modal-content">
+                    <div class="userlist-add-modal-title"><i class="fas fa-user"></i> Thêm khách hàng mới</div>
+                    <form id="addCustomerForm" autocomplete="off">
+                        <div class="userlist-add-form-group">
+                            <label for="addTenKhachHang">Tên khách hàng</label>
+                            <input type="text" id="addTenKhachHang" name="TenKhachHang" class="userlist-input" required maxlength="100" />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="addSoDienThoai">Số điện thoại</label>
+                            <input type="text" id="addSoDienThoai" name="SoDienThoai" class="userlist-input" maxlength="15" pattern="[0-9]{9,15}" />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="addGiaTriDonHang">Giá trị đơn hàng</label>
+                            <input type="text" id="addGiaTriDonHang" name="GiaTriDonHang" class="userlist-input" maxlength="20" />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="addIsDelete">Trạng thái</label>
+                            <select id="addIsDelete" name="IsDelete" class="userlist-input">
+                                <option value="false">Hoạt động</option>
+                                <option value="true">Đã xóa</option>
+                            </select>
+                        </div>
+                        <div class="userlist-add-modal-actions">
+                            <button type="button" onclick="closeAddCustomerModal()" class="userlist-add-cancel-btn">Hủy</button>
+                            <button type="submit" class="userlist-add-submit-btn">Thêm mới</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="userlist-card userlist-modern">
+            <div class="userlist-toolbar">
+                <div class="userlist-toolbar-left">
+                    <label for="filterCustomerStatus">Trạng thái:</label>
+                    <select id="filterCustomerStatus" class="userlist-filter" onchange="filterCustomerByStatus()">
+                        <option value="active">Hoạt động</option>
+                        <option value="inactive">Đã xóa</option>
+                    </select>
+                </div>
+                <div class="userlist-toolbar-right">
+                    <label for="customerPageSize" style="font-size:15px;margin-right:8px;color:#555;">Hiển thị:</label>
+                    <select id="customerPageSize" class="userlist-filter" style="width:auto;min-width:60px;" onchange="changeCustomerPageSize()">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterCustomerList()" style="margin-left:12px;" />
+                </div>
+            </div>
+            <div class="userlist-table-wrapper">
+                <table class="userlist-table userlist-table-modern" id="customerListTable">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên khách hàng</th>
+                            <th>SĐT</th>
+                            <th>Giá trị đơn hàng</th>
+                            <th>Trạng thái</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="customerTableBody">
+                    @if (Model.Customers != null && Model.Customers.Count > 0)
+                    {
+                        int stt = 1;
+                        foreach (var c in Model.Customers)
+                        {
+                            var status = c.IsDelete ? "Đã xóa" : "Hoạt động";
+                            <tr data-index="@stt" data-status="@(c.IsDelete ? "inactive" : "active")">
+                                <td>@stt</td>
+                                <td>
+                                    <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditCustomerModal('@c.Id', '@c.TenKhachHang', '@c.SoDienThoai', '@c.GiaTriDonHang', '@c.IsDelete')">@c.TenKhachHang</span>
+                                </td>
+                                <td>@c.SoDienThoai</td>
+                                <td>@c.GiaTriDonHang</td>
+                                <td class="customer-status">@status</td>
+                                <td>
+                                    <button class="userlist-delete-btn btnDeleteCustomer" data-id="@c.Id" title="Xóa"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6">Không có dữ liệu khách hàng.</td></tr>
+                    }
+                    </tbody>
+                </table>
+                <div id="customerlist-pagination"></div>
+            </div>
+        </div>
+        <form id="antiForgeryForm" style="display:none;">
+            @Html.AntiForgeryToken()
+        </form>
+        <div id="deleteCustomerModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+            <div class="modal-content userlist-add-modal-content" style="text-align:center;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);">
+                <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa khách hàng</div>
+                <div style="font-size:16px;color:#333;margin-bottom:24px;">Bạn có chắc chắn muốn xóa khách hàng này không?</div>
+                <div style="display:flex;justify-content:center;gap:18px;">
+                    <button onclick="confirmDeleteCustomer()" class="userlist-add-submit-btn" style="background:#ea4335;min-width:100px;">Xác nhận</button>
+                    <button onclick="closeDeleteCustomerModal()" class="userlist-add-cancel-btn" style="min-width:100px;">Hủy</button>
+                </div>
+            </div>
+        </div>
+        <div id="editCustomerModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+            <div class="modal-content userlist-add-modal-content">
+                <div class="userlist-add-modal-title"><i class="fas fa-user"></i> Sửa khách hàng</div>
+                <form id="editCustomerForm" autocomplete="off">
+                    <input type="hidden" id="editCustomerId" name="Id" />
+                    <div class="userlist-add-form-group">
+                        <label for="editTenKhachHang">Tên khách hàng</label>
+                        <input type="text" id="editTenKhachHang" name="TenKhachHang" class="userlist-input" required maxlength="100" />
+                    </div>
+                    <div class="userlist-add-form-group">
+                        <label for="editSoDienThoai">Số điện thoại</label>
+                        <input type="text" id="editSoDienThoai" name="SoDienThoai" class="userlist-input" maxlength="15" pattern="[0-9]{9,15}" />
+                    </div>
+                    <div class="userlist-add-form-group">
+                        <label for="editGiaTriDonHang">Giá trị đơn hàng</label>
+                        <input type="text" id="editGiaTriDonHang" name="GiaTriDonHang" class="userlist-input" maxlength="20" />
+                    </div>
+                    <div class="userlist-add-form-group">
+                        <label for="editIsDelete">Trạng thái</label>
+                        <select id="editIsDelete" name="IsDelete" class="userlist-input">
+                            <option value="false">Hoạt động</option>
+                            <option value="true">Đã xóa</option>
+                        </select>
+                    </div>
+                    <div class="userlist-add-modal-actions">
+                        <button type="button" onclick="closeEditCustomerModal()" class="userlist-add-cancel-btn">Hủy</button>
+                        <button type="submit" class="userlist-add-submit-btn">Lưu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+<footer class="footer">
+    <div class="footer-content">
+        <span>© 2025 QRB - Hệ thống quán cafe thông minh. All rights reserved.</span>
+    </div>
+</footer>
+<script src="/lib/jquery/dist/jquery.min.js"></script>
+<!-- <script src="/js/customer.js"></script> -->
+<script>
+// PHÂN TRANG + SEARCH + FILTER KHÁCH HÀNG
+let customerCurrentPage = 1;
+let customerPageSize = 10;
+let customerCurrentFilter = 'active';
+let customerCurrentSearch = '';
+
+function getAllCustomerRows() {
+    return Array.from(document.querySelectorAll('#customerListTable tbody tr')).filter(function(row) {
+        return row.querySelectorAll('td').length > 1;
+    });
+}
+function getFilteredCustomerRows() {
+    let rows = getAllCustomerRows();
+    // Lọc theo trạng thái
+    rows = rows.filter(function(row) {
+        var statusCell = row.querySelector('.customer-status');
+        var isActive = true;
+        if (statusCell) {
+            isActive = (statusCell.textContent.trim() === 'Hoạt động');
+        }
+        if (customerCurrentFilter === 'active') return isActive;
+        if (customerCurrentFilter === 'inactive') return !isActive;
+    });
+    // Lọc theo search
+    if (customerCurrentSearch) {
+        rows = rows.filter(function(row) {
+            var name = row.querySelector('td:nth-child(2) span')?.textContent.toLowerCase() || '';
+            var phone = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+            return name.includes(customerCurrentSearch) || phone.includes(customerCurrentSearch);
+        });
+    }
+    return rows;
+}
+function renderCustomerPagination() {
+    let rows = getFilteredCustomerRows();
+    let total = rows.length;
+    let totalPages = Math.ceil(total / customerPageSize);
+    let pag = document.getElementById('customerlist-pagination');
+    if (!pag) return;
+    if (totalPages <= 1) {
+        pag.innerHTML = '';
+        return;
+    }
+    let html = '';
+    html += `<button onclick="gotoCustomerPage(1)" ${customerCurrentPage==1?'disabled':''}>&laquo;</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || Math.abs(i-customerCurrentPage)<=2) {
+            html += `<button onclick="gotoCustomerPage(${i})" ${i==customerCurrentPage?'class="active"':''}>${i}</button>`;
+        } else if (i === customerCurrentPage-3 || i === customerCurrentPage+3) {
+            html += '<span>...</span>';
+        }
+    }
+    html += `<button onclick="gotoCustomerPage(${totalPages})" ${customerCurrentPage==totalPages?'disabled':''}>&raquo;</button>`;
+    pag.className = 'userlist-pagination';
+    pag.innerHTML = html;
+}
+function updateCustomerPagination() {
+    let allRows = getAllCustomerRows();
+    let rows = getFilteredCustomerRows();
+    let total = rows.length;
+    let totalPages = Math.ceil(total / customerPageSize);
+    if (customerCurrentPage > totalPages) customerCurrentPage = totalPages || 1;
+    allRows.forEach(function(row) { row.style.display = 'none'; });
+    rows.forEach(function(row, idx) {
+        if (idx >= (customerCurrentPage-1)*customerPageSize && idx < customerCurrentPage*customerPageSize) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    let pag = document.getElementById('customerlist-pagination');
+    if (rows.length === 0) {
+        if (pag) pag.innerHTML = '';
+        return;
+    }
+    renderCustomerPagination();
+}
+function gotoCustomerPage(page) {
+    customerCurrentPage = page;
+    updateCustomerPagination();
+}
+function changeCustomerPageSize() {
+    customerPageSize = parseInt(document.getElementById('customerPageSize').value);
+    customerCurrentPage = 1;
+    updateCustomerPagination();
+}
+function filterCustomerList() {
+    customerCurrentSearch = document.querySelector('.userlist-search').value.toLowerCase();
+    customerCurrentPage = 1;
+    updateCustomerPagination();
+}
+function filterCustomerByStatus() {
+    customerCurrentFilter = document.getElementById('filterCustomerStatus').value;
+    customerCurrentPage = 1;
+    updateCustomerPagination();
+}
+window.addEventListener('DOMContentLoaded', function() {
+    customerPageSize = parseInt(document.getElementById('customerPageSize').value) || 10;
+    setTimeout(updateCustomerPagination, 0);
+});
+// Hiển thị popup Thêm khách hàng
+document.getElementById('btnAddCustomer').onclick = function() {
+    document.getElementById('addCustomerModal').style.display = 'flex';
+};
+function closeAddCustomerModal() {
+    document.getElementById('addCustomerModal').style.display = 'none';
+    document.getElementById('addCustomerForm').reset();
+}
+// Hiển thị popup Sửa khách hàng
+function showEditCustomerModal(id, tenKhachHang, soDienThoai, giaTriDonHang, isDelete) {
+    document.getElementById('editCustomerId').value = id;
+    document.getElementById('editTenKhachHang').value = tenKhachHang;
+    document.getElementById('editSoDienThoai').value = soDienThoai;
+    document.getElementById('editGiaTriDonHang').value = giaTriDonHang;
+    document.getElementById('editIsDelete').value = (isDelete === 'True' || isDelete === 'true' || isDelete === true) ? 'true' : 'false';
+    document.getElementById('editCustomerModal').style.display = 'flex';
+}
+function closeEditCustomerModal() {
+    document.getElementById('editCustomerModal').style.display = 'none';
+    document.getElementById('editCustomerForm').reset();
+}
+// Hiển thị popup Xóa khách hàng
+let deleteCustomerId = null;
+function showDeleteCustomerConfirm(id) {
+    deleteCustomerId = id;
+    document.getElementById('deleteCustomerModal').style.display = 'flex';
+}
+function closeDeleteCustomerModal() {
+    deleteCustomerId = null;
+    document.getElementById('deleteCustomerModal').style.display = 'none';
+}
+// Thêm khách hàng (AJAX)
+document.getElementById('addCustomerForm').onsubmit = function(e) {
+    e.preventDefault();
+    var form = e.target;
+    var data = {
+        TenKhachHang: form.TenKhachHang.value,
+        SoDienThoai: form.SoDienThoai.value,
+        GiaTriDonHang: form.GiaTriDonHang.value,
+        IsDelete: form.IsDelete.value === 'true'
+    };
+    fetch('/Customer/AddCustomer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(resp => {
+        if (resp.success) {
+            location.reload();
+        } else {
+            alert(resp.message || 'Thêm khách hàng thất bại!');
+        }
+    });
+};
+// Sửa khách hàng (AJAX)
+document.getElementById('editCustomerForm').onsubmit = function(e) {
+    e.preventDefault();
+    var form = e.target;
+    var data = {
+        Id: form.Id.value,
+        TenKhachHang: form.TenKhachHang.value,
+        SoDienThoai: form.SoDienThoai.value,
+        GiaTriDonHang: form.GiaTriDonHang.value,
+        IsDelete: form.IsDelete.value === 'true'
+    };
+    fetch('/Customer/UpdateCustomer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+        },
+        body: JSON.stringify(data)
+    })
+    .then(res => res.json())
+    .then(resp => {
+        if (resp.success) {
+            location.reload();
+        } else {
+            alert(resp.message || 'Cập nhật khách hàng thất bại!');
+        }
+    });
+};
+// Xóa khách hàng (AJAX)
+function confirmDeleteCustomer() {
+    if (!deleteCustomerId) return;
+    fetch('/Customer/DeleteCustomer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+        },
+        body: JSON.stringify({ id: deleteCustomerId })
+    })
+    .then(res => res.json())
+    .then(resp => {
+        if (resp.success) {
+            location.reload();
+        } else {
+            alert(resp.message || 'Xóa khách hàng thất bại!');
+        }
+    });
+}
+</script>
+
+<!-- Modal Thêm/Sửa Khách Hàng -->
+<div class="modal fade" id="customerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="userlist-add-modal-content">
+            <form id="customerForm">
+                <div class="userlist-add-modal-title" id="customerModalTitle">Thêm khách hàng</div>
+                <input type="hidden" id="customerId" name="Id" />
+                <div class="userlist-add-form-group">
+                    <label for="tenKhachHang">Tên khách hàng</label>
+                    <input type="text" class="form-control" id="tenKhachHang" name="TenKhachHang" required maxlength="100" />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="soDienThoai">Số điện thoại</label>
+                    <input type="text" class="form-control" id="soDienThoai" name="SoDienThoai" maxlength="15" pattern="[0-9]{9,15}" />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="giaTriDonHang">Giá trị đơn hàng</label>
+                    <input type="text" class="form-control" id="giaTriDonHang" name="GiaTriDonHang" maxlength="20" />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="isDelete">Trạng thái</label>
+                    <select class="form-select" id="isDelete" name="IsDelete">
+                        <option value="0">Hoạt động</option>
+                        <option value="1">Đã xóa</option>
+                    </select>
+                </div>
+                <div class="userlist-add-modal-actions">
+                    <button type="button" class="userlist-add-cancel-btn" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="userlist-add-submit-btn">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Xóa Khách Hàng -->
+<div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="userlist-add-modal-content">
+            <div class="userlist-add-modal-title">Xác nhận xóa khách hàng</div>
+            <div class="mb-3">Bạn có chắc chắn muốn xóa khách hàng này?</div>
+            <div class="userlist-add-modal-actions">
+                <button type="button" class="userlist-add-cancel-btn" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="userlist-add-submit-btn" id="confirmDeleteCustomer">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+$(document).ready(function () {
+    // Sửa khách hàng khi click vào tên (bắt buộc IsDelete là 0 hoặc 1)
+    $(document).on('click', '.customer-edit-link', function (e) {
+        e.preventDefault();
+        var row = $(this).closest('tr');
+        $('#customerId').val($(this).data('id'));
+        $('#tenKhachHang').val(row.find('td:eq(1)').text());
+        $('#soDienThoai').val(row.find('td:eq(2)').text());
+        $('#giaTriDonHang').val(row.find('td:eq(3)').text());
+        // Trạng thái: nếu text là 'Đã xóa' thì IsDelete=1, ngược lại IsDelete=0
+        var isDelete = row.find('td:eq(4)').text().trim() === 'Đã xóa' ? '1' : '0';
+        $('#isDelete').val(isDelete);
+        $('#customerModalTitle').text('Sửa khách hàng');
+        document.getElementById('customerModal').style.display = 'flex';
+    });
+
+    // Hiển thị popup xác nhận xóa khách hàng
+    $(document).on('click', '.btnDeleteCustomer', function () {
+        deleteCustomerId = $(this).data('id');
+        document.getElementById('deleteCustomerModal').style.display = 'flex';
+    });
+    // Đóng popup xác nhận xóa (ẩn modal thủ công, không dùng .modal('hide') vì không phải Bootstrap modal)
+    $(document).on('click', '.userlist-add-cancel-btn[data-bs-dismiss="modal"]', function () {
+        deleteCustomerId = null;
+        $('#deleteCustomerModal').css('display', 'none');
+    });
+});
+</script>
+<!-- <script src="~/js/customer.js"></script> -->
