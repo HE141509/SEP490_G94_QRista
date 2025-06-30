@@ -160,23 +160,52 @@
     <!-- Order Confirmation Popup -->
     <div id="order-popup" class="order-popup" style="display:none;">
         <div class="order-popup-content">
-            <h2>Xác nhận đơn hàng</h2>
-            <div id="order-items-list"></div>
-            <div style="margin: 12px 0 8px 0;">
-                <label for="discount-select" style="font-weight:500;">Giảm giá: </label>
-                <select id="discount-select" style="padding:4px 10px; border-radius:6px; border:1px solid #ccc;">
+            <h2 class="order-popup-title">Xác nhận đơn hàng</h2>
+            <div class="order-section order-list-section">
+                <div class="order-section-title">Sản phẩm đã chọn</div>
+                <div id="order-items-list"></div>
+            </div>
+            <div class="order-section order-discount-section">
+                <div class="order-section-title order-section-title-divider">Chọn giảm giá</div>
+                <select id="discount-select" class="order-discount-select">
                     <option value="0">Không giảm giá</option>
                     <option value="10000">Giảm 10.000đ</option>
                     <option value="20000">Giảm 20.000đ</option>
                     <option value="50000">Giảm 50.000đ</option>
                 </select>
             </div>
-            <div class="order-popup-total">
-                Tổng: <span id="order-popup-total">0</span> đ
-            </div>
-            <div class="order-popup-actions">
+                <div class="order-section order-total-section">
+                    <div class="order-section-title order-section-title-divider">Tổng thanh toán</div>
+                    <div class="order-popup-total">
+                        <div class="order-total-row">
+                            <span class="order-label-left">Tổng số tiền:</span>
+                            <span class="order-value-right"><span id="order-total-raw">0</span> đ</span>
+                        </div>
+                        <div class="order-total-row">
+                            <span class="order-label-left">Số tiền giảm:</span>
+                            <span class="order-value-right"><span id="order-total-discount">0</span> đ</span>
+                        </div>
+                        <div class="order-total-row order-total-final">
+                            <span class="order-label-left">Số tiền cần thanh toán:</span>
+                            <span class="order-value-right"><span id="order-popup-total">0</span> đ</span>
+                        </div>
+                    </div>
+                </div>
+            <div class="order-section order-action-section">
                 <button id="order-cancel-btn" class="order-cancel-btn">Huỷ</button>
-                <button id="order-confirm-btn" class="order-confirm-btn">Xác nhận</button>
+                <button id="order-confirm-btn" class="order-confirm-btn" type="button">Xác nhận</button>
+<!-- QR Code Payment Popup -->
+<div id="qr-popup" class="qr-popup" style="display:none;">
+    <div class="qr-popup-content">
+        <h2 class="qr-popup-title">Quét mã QR để thanh toán</h2>
+        <div id="qr-image-wrapper" class="qr-image-wrapper">
+            <img id="vietqr-img" src="" alt="QR code thanh toán" style="max-width: 260px; display: block; margin: 0 auto;" />
+        </div>
+        <div id="qr-loading" style="display:none; color:#1976d2; font-weight:500; margin:10px 0;">Đang tạo mã QR...</div>
+        <div class="qr-popup-desc">Vui lòng sử dụng app ngân hàng hoặc ví điện tử hỗ trợ VietQR để thanh toán.</div>
+        <button id="qr-close-btn" class="order-cancel-btn" style="margin: 18px auto 0 auto; display: block;">Đóng</button>
+    </div>
+</div>
             </div>
         </div>
     </div>
@@ -318,12 +347,26 @@ if (document.readyState !== 'loading') {
 
 let currentOrderTotal = 0;
 function updateOrderPopupTotal() {
+    // Tính lại tổng số tiền các sản phẩm trong cart
+    let total = 0;
+    for (const key in cart) {
+        const item = cart[key];
+        total += item.qty * item.price;
+    }
     let discount = parseInt(document.getElementById('discount-select').value) || 0;
-    let finalTotal = Math.max(0, currentOrderTotal - discount);
+    let finalTotal = Math.max(0, total - discount);
+    document.getElementById('order-total-raw').innerText = total.toLocaleString();
+    document.getElementById('order-total-discount').innerText = discount.toLocaleString();
     document.getElementById('order-popup-total').innerText = finalTotal.toLocaleString();
+    currentOrderTotal = total;
 }
 
 document.getElementById('cart-checkout-btn').addEventListener('click', function() {
+    // Đảm bảo ẩn popup QR nếu đang mở
+    // Chỉ ẩn popup QR nếu đang mở, KHÔNG ẩn popup order
+    if (document.getElementById('qr-popup').style.display !== 'none') {
+        document.getElementById('qr-popup').style.display = 'none';
+    }
     const list = document.getElementById('order-items-list');
     list.innerHTML = '';
     let total = 0;
@@ -351,14 +394,143 @@ document.getElementById('order-cancel-btn').addEventListener('click', function()
 });
 
 document.getElementById('order-confirm-btn').addEventListener('click', function() {
-    alert('Đơn hàng đã được gửi!');
+    // Lấy số tiền cần thanh toán
+    let finalPrice = 0;
+    try {
+        finalPrice = parseInt(document.getElementById('order-popup-total').innerText.replace(/\D/g, ''));
+    } catch {}
+    if (!finalPrice || finalPrice < 1000) {
+        alert('Số tiền thanh toán không hợp lệ!');
+        return;
+    }
+    // Ẩn popup xác nhận đơn hàng
+    document.getElementById('order-popup').style.display = 'none';
+    // Chuyển hướng sang trang thanh toán riêng
+    window.location.href = '/Payment?amount=' + finalPrice;
+    // Reset giỏ hàng phía client
     cart = {};
     updateCartSummary();
     updateMenuItemQtyUI();
+});
+
+document.getElementById('qr-close-btn').addEventListener('click', function() {
+    document.getElementById('qr-popup').style.display = 'none';
+    // Sau khi đóng QR, có thể reset giỏ hàng nếu muốn:
+    cart = {};
+    updateCartSummary();
+    updateMenuItemQtyUI();
+    // Đảm bảo popup order không bị hiện lại ngoài ý muốn
     document.getElementById('order-popup').style.display = 'none';
 });
 </script>
 
 @section Styles {
     <link rel="stylesheet" href="~/css/menu.css" />
+    <style>
+        .qr-popup {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.25);
+            z-index: 1200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-popup-content {
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px 28px 24px 28px;
+            min-width: 320px;
+            max-width: 95vw;
+            box-shadow: 0 4px 32px 0 rgba(25, 118, 210, 0.10);
+            text-align: center;
+        }
+        .qr-popup-title {
+            font-size: 1.18rem;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 18px;
+        }
+        .qr-image-wrapper {
+            margin: 0 auto 16px auto;
+        }
+        .qr-popup-desc {
+            color: #333;
+            font-size: 1rem;
+            margin-top: 8px;
+        }
+        .order-discount-select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 16px;
+            font-size: 1.08rem;
+            margin-top: 8px;
+            border: 1.5px solid #90caf9;
+            border-radius: 8px;
+            background: #f7fbff;
+            color: #1a237e;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            appearance: none;
+            font-weight: 600;
+            box-shadow: 0 1px 4px 0 rgba(25, 118, 210, 0.04);
+        }
+        .order-discount-select:focus {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px #90caf9;
+            background: #e3f2fd;
+        }
+        .order-discount-select option {
+            font-weight: 500;
+            color: #1976d2;
+        }
+        .order-section-title-divider {
+            border-top: 1.5px solid #e0e0e0;
+            padding-top: 10px;
+            margin-top: 18px;
+        }
+        .order-section-title {
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 8px;
+            letter-spacing: 0.2px;
+        }
+        .order-popup-title {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+        .order-popup-total {
+            width: 100%;
+        }
+        .order-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .order-label-left {
+            flex: 1;
+            text-align: left;
+            font-weight: 500;
+        }
+        .order-value-right {
+            flex: 1;
+            text-align: right;
+            font-weight: 600;
+            color: #1a237e;
+        }
+        .order-total-final .order-value-right {
+            color: #d32f2f;
+        }
+        .order-section.order-action-section {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 18px;
+        }
+        .order-cancel-btn, .order-confirm-btn {
+            min-width: 100px;
+        }
+    </style>
 }
