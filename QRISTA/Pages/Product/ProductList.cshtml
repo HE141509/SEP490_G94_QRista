@@ -123,7 +123,7 @@
                                     <td>@stt</td>
                                     <td>@sp.MaSanPham</td>
                                     <td>
-                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditProductModal('@sp.ID', '@sp.MaSanPham', '@sp.TenSanPham', '@sp.IdNhomSanPham', '@sp.IDChiNhanh', '@sp.IsDelete', '@sp.TenNhom', '@sp.TenChiNhanh')">@sp.TenSanPham</span>
+                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditProductModal('@sp.ID', '@sp.MaSanPham', '@sp.TenSanPham', '@sp.IdNhomSanPham', '@sp.IDChiNhanh', '@sp.IsDelete', '@sp.TenNhom', '@sp.TenChiNhanh', '@(sp.HinhAnh != null && sp.HinhAnh.Length > 0 ? ("data:image/jpeg;base64," + Convert.ToBase64String(sp.HinhAnh)) : "")')">@sp.TenSanPham</span>
                                     </td>
                                     <td style="text-align:center;">
                                         @if (sp.HinhAnh != null && sp.HinhAnh.Length > 0)
@@ -333,7 +333,7 @@
         // Hiển thị popup Sửa sản phẩm
         let currentEditIdNhomSanPham = '';
         let currentEditIDChiNhanh = '';
-        function showEditProductModal(id, maSanPham, tenSanPham, idNhomSanPham, idChiNhanh, isDelete, tenNhom, tenChiNhanh) {
+        function showEditProductModal(id, maSanPham, tenSanPham, idNhomSanPham, idChiNhanh, isDelete, tenNhom, tenChiNhanh, hinhAnhBase64) {
             document.getElementById('editProductId').value = id;
             document.getElementById('editMaSanPham').value = maSanPham;
             document.getElementById('editTenSanPham').value = tenSanPham;
@@ -347,6 +347,13 @@
             document.getElementById('editIDChiNhanh').value = tenChiNhanh || '';
             
             document.getElementById('editIsDelete').value = (isDelete === 'True' || isDelete === 'true' || isDelete === true) ? 'true' : 'false';
+            // Hiển thị ảnh hiện tại
+            var imgDiv = document.getElementById('editCurrentImage');
+            if (hinhAnhBase64 && hinhAnhBase64.startsWith('data:image')) {
+                imgDiv.innerHTML = '<img src="' + hinhAnhBase64 + '" style="max-width:120px;max-height:120px;border-radius:6px;object-fit:cover;" />';
+            } else {
+                imgDiv.innerHTML = '<span style="color:#999;">Không có ảnh</span>';
+            }
             document.getElementById('editProductModal').style.display = 'flex';
         }
         function closeEditProductModal() {
