@@ -38,12 +38,28 @@
                                 <input type="text" id="addTenSanPham" name="TenSanPham" class="userlist-input" required />
                             </div>
                             <div class="userlist-add-form-group">
+                                <label for="addHinhAnh">Hình ảnh</label>
+                                <input type="file" id="addHinhAnh" name="HinhAnh" class="userlist-input" accept="image/*" />
+                            </div>
+                            <div class="userlist-add-form-group">
                                 <label for="addIdNhomSanPham">Nhóm sản phẩm</label>
-                                <input type="text" id="addIdNhomSanPham" name="IdNhomSanPham" class="userlist-input" required />
+                                <select id="addIdNhomSanPham" name="IdNhomSanPham" class="userlist-input" required>
+                                    <option value="">-- Chọn nhóm sản phẩm --</option>
+                                    @foreach (var nhom in Model.NhomSanPhams)
+                                    {
+                                        <option value="@nhom.ID">@nhom.TenNhom</option>
+                                    }
+                                </select>
                             </div>
                             <div class="userlist-add-form-group">
                                 <label for="addIDChiNhanh">Chi nhánh</label>
-                                <input type="text" id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required />
+                                <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required>
+                                    <option value="">-- Chọn chi nhánh --</option>
+                                    @foreach (var cn in Model.ChiNhanhs)
+                                    {
+                                        <option value="@cn.ID">@cn.TenChiNhanh</option>
+                                    }
+                                </select>
                             </div>
                             <div class="userlist-add-form-group">
                                 <label for="addIsDelete">Trạng thái</label>
@@ -87,6 +103,7 @@
                                 <th>STT</th>
                                 <th>Mã sản phẩm</th>
                                 <th>Tên sản phẩm</th>
+                                <th>Hình ảnh</th>
                                 <th>Nhóm sản phẩm</th>
                                 <th>Chi nhánh</th>
                                 <th>Trạng thái</th>
@@ -106,7 +123,17 @@
                                     <td>@stt</td>
                                     <td>@sp.MaSanPham</td>
                                     <td>
-                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditProductModal('@sp.ID', '@sp.MaSanPham', '@sp.TenSanPham', '@sp.IdNhomSanPham', '@sp.IDChiNhanh', '@sp.IsDelete')">@sp.TenSanPham</span>
+                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditProductModal('@sp.ID', '@sp.MaSanPham', '@sp.TenSanPham', '@sp.IdNhomSanPham', '@sp.IDChiNhanh', '@sp.IsDelete', '@sp.TenNhom', '@sp.TenChiNhanh')">@sp.TenSanPham</span>
+                                    </td>
+                                    <td style="text-align:center;">
+                                        @if (sp.HinhAnh != null && sp.HinhAnh.Length > 0)
+                                        {
+                                            <img src="data:image/jpeg;base64,@Convert.ToBase64String(sp.HinhAnh)" alt="Hình sản phẩm" style="width:50px;height:50px;object-fit:cover;border-radius:4px;" />
+                                        }
+                                        else
+                                        {
+                                            <span style="color:#999;font-style:italic;">Không có ảnh</span>
+                                        }
                                     </td>
                                     <td>@sp.TenNhom</td>
                                     <td>@sp.TenChiNhanh</td>
@@ -122,7 +149,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="9">Không có dữ liệu sản phẩm.</td></tr>
+                            <tr><td colspan="10">Không có dữ liệu sản phẩm.</td></tr>
                         }
                         </tbody>
                     </table>
@@ -257,12 +284,20 @@
                             <input type="text" id="editTenSanPham" name="TenSanPham" class="userlist-input" required />
                         </div>
                         <div class="userlist-add-form-group">
+                            <label>Hình ảnh hiện tại</label>
+                            <div id="editCurrentImage" style="text-align:center;padding:10px;border:1px dashed #ddd;border-radius:4px;">
+                                <span style="color:#999;">Không có ảnh</span>
+                            </div>
+                            <label for="editHinhAnh" style="margin-top:8px;">Chọn ảnh mới (tùy chọn)</label>
+                            <input type="file" id="editHinhAnh" name="HinhAnh" class="userlist-input" accept="image/*" />
+                        </div>
+                        <div class="userlist-add-form-group">
                             <label for="editIdNhomSanPham">Nhóm sản phẩm</label>
-                            <input type="text" id="editIdNhomSanPham" name="IdNhomSanPham" class="userlist-input" required />
+                            <input type="text" id="editIdNhomSanPham" name="IdNhomSanPham" class="userlist-input" readonly style="background:#f5f7fa;cursor:not-allowed;" />
                         </div>
                         <div class="userlist-add-form-group">
                             <label for="editIDChiNhanh">Chi nhánh</label>
-                            <input type="text" id="editIDChiNhanh" name="IDChiNhanh" class="userlist-input" required />
+                            <input type="text" id="editIDChiNhanh" name="IDChiNhanh" class="userlist-input" readonly style="background:#f5f7fa;cursor:not-allowed;" />
                         </div>
                         <div class="userlist-add-form-group">
                             <label for="editIsDelete">Trạng thái</label>
@@ -296,12 +331,21 @@
         }
 
         // Hiển thị popup Sửa sản phẩm
-        function showEditProductModal(id, maSanPham, tenSanPham, idNhomSanPham, idChiNhanh, isDelete) {
+        let currentEditIdNhomSanPham = '';
+        let currentEditIDChiNhanh = '';
+        function showEditProductModal(id, maSanPham, tenSanPham, idNhomSanPham, idChiNhanh, isDelete, tenNhom, tenChiNhanh) {
             document.getElementById('editProductId').value = id;
             document.getElementById('editMaSanPham').value = maSanPham;
             document.getElementById('editTenSanPham').value = tenSanPham;
-            document.getElementById('editIdNhomSanPham').value = idNhomSanPham;
-            document.getElementById('editIDChiNhanh').value = idChiNhanh;
+            
+            // Lưu ID thực để gửi khi submit
+            currentEditIdNhomSanPham = idNhomSanPham;
+            currentEditIDChiNhanh = idChiNhanh;
+            
+            // Hiển thị tên trực tiếp (không cần tra cứu)
+            document.getElementById('editIdNhomSanPham').value = tenNhom || '';
+            document.getElementById('editIDChiNhanh').value = tenChiNhanh || '';
+            
             document.getElementById('editIsDelete').value = (isDelete === 'True' || isDelete === 'true' || isDelete === true) ? 'true' : 'false';
             document.getElementById('editProductModal').style.display = 'flex';
         }
@@ -325,20 +369,25 @@
         document.getElementById('addProductForm').onsubmit = function(e) {
             e.preventDefault();
             var form = e.target;
-            var data = {
-                MaSanPham: form.MaSanPham.value,
-                TenSanPham: form.TenSanPham.value,
-                IdNhomSanPham: form.IdNhomSanPham.value,
-                IDChiNhanh: form.IDChiNhanh.value,
-                IsDelete: form.IsDelete.value === 'true'
-            };
+            var formData = new FormData();
+            
+            formData.append('maSanPham', form.MaSanPham.value);
+            formData.append('tenSanPham', form.TenSanPham.value);
+            formData.append('nhomSanPhamID', form.IdNhomSanPham.value);
+            formData.append('chiNhanhID', form.IDChiNhanh.value);
+            formData.append('isDelete', form.IsDelete.value);
+            
+            // Thêm file ảnh nếu có
+            if (form.HinhAnh.files.length > 0) {
+                formData.append('hinhAnh', form.HinhAnh.files[0]);
+            }
+            
             fetch('/Product/AddProduct', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
                 },
-                body: JSON.stringify(data)
+                body: formData
             })
             .then(res => res.json())
             .then(resp => {
@@ -354,21 +403,26 @@
         document.getElementById('editProductForm').onsubmit = function(e) {
             e.preventDefault();
             var form = e.target;
-            var data = {
-                ID: form.ID.value,
-                MaSanPham: form.MaSanPham.value,
-                TenSanPham: form.TenSanPham.value,
-                IdNhomSanPham: form.IdNhomSanPham.value,
-                IDChiNhanh: form.IDChiNhanh.value,
-                IsDelete: form.IsDelete.value === 'true'
-            };
+            var formData = new FormData();
+            
+            formData.append('idSanPham', form.ID.value);
+            formData.append('maSanPham', form.MaSanPham.value);
+            formData.append('tenSanPham', form.TenSanPham.value);
+            formData.append('nhomSanPhamID', currentEditIdNhomSanPham);
+            formData.append('chiNhanhID', currentEditIDChiNhanh);
+            formData.append('isDelete', form.IsDelete.value);
+            
+            // Thêm file ảnh nếu có
+            if (form.HinhAnh.files.length > 0) {
+                formData.append('hinhAnh', form.HinhAnh.files[0]);
+            }
+            
             fetch('/Product/UpdateProduct', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
                     'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
                 },
-                body: JSON.stringify(data)
+                body: formData
             })
             .then(res => res.json())
             .then(resp => {

@@ -13,6 +13,7 @@ namespace QRB.Pages.Product
             public Guid ID { get; set; }
             public string? MaSanPham { get; set; }
             public string? TenSanPham { get; set; }
+            public byte[]? HinhAnh { get; set; }
             public Guid IdNhomSanPham { get; set; }
             public string? TenNhom { get; set; }
             public Guid IDChiNhanh { get; set; }
@@ -23,6 +24,19 @@ namespace QRB.Pages.Product
         }
 
         public List<SanPhamViewModel> SanPhams { get; set; } = new();
+        public List<NhomSanPhamItem> NhomSanPhams { get; set; } = new();
+        public List<ChiNhanhItem> ChiNhanhs { get; set; } = new();
+
+        public class NhomSanPhamItem
+        {
+            public Guid ID { get; set; }
+            public string TenNhom { get; set; } = string.Empty;
+        }
+        public class ChiNhanhItem
+        {
+            public Guid ID { get; set; }
+            public string TenChiNhanh { get; set; } = string.Empty;
+        }
 
         public void OnGet()
         {
@@ -31,7 +45,8 @@ namespace QRB.Pages.Product
             {
                 connection.Open();
                 var command = new SqlCommand(@"
-                    SELECT sp.ID, sp.MaSanPham, sp.TenSanPham, 
+                    SELECT sp.ID, sp.MaSanPham, sp.TenSanPham, sp.HinhAnh,
+                           sp.IdNhomSanPham, sp.IDChiNhanh,
                            ISNULL(nsp.TenNhom, N''), ISNULL(cn.TenChiNhanh, N''), 
                            ISNULL(sp.IsDelete,0), sp.CreateTime, sp.UpdateTime
                     FROM SanPham sp
@@ -47,11 +62,40 @@ namespace QRB.Pages.Product
                             ID = reader.GetGuid(0),
                             MaSanPham = reader.IsDBNull(1) ? "" : reader.GetString(1),
                             TenSanPham = reader.IsDBNull(2) ? "" : reader.GetString(2),
-                            TenNhom = reader.IsDBNull(3) ? "" : reader.GetString(3),
-                            TenChiNhanh = reader.IsDBNull(4) ? "" : reader.GetString(4),
-                            IsDelete = reader.IsDBNull(5) ? false : reader.GetBoolean(5),
-                            CreateTime = reader.IsDBNull(6) ? DateTime.Now : reader.GetDateTime(6),
-                            UpdateTime = reader.IsDBNull(7) ? null : reader.GetDateTime(7)
+                            HinhAnh = reader.IsDBNull(3) ? null : (byte[])reader[3],
+                            IdNhomSanPham = reader.IsDBNull(4) ? Guid.Empty : reader.GetGuid(4),
+                            IDChiNhanh = reader.IsDBNull(5) ? Guid.Empty : reader.GetGuid(5),
+                            TenNhom = reader.IsDBNull(6) ? "" : reader.GetString(6),
+                            TenChiNhanh = reader.IsDBNull(7) ? "" : reader.GetString(7),
+                            IsDelete = reader.IsDBNull(8) ? false : reader.GetBoolean(8),
+                            CreateTime = reader.IsDBNull(9) ? DateTime.Now : reader.GetDateTime(9),
+                            UpdateTime = reader.IsDBNull(10) ? null : reader.GetDateTime(10)
+                        });
+                    }
+                }
+                // Lấy danh sách nhóm sản phẩm
+                var cmdNhom = new SqlCommand("SELECT ID, TenNhom FROM NhomSanPham WHERE IsDelete=0", connection);
+                using (var reader = cmdNhom.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        NhomSanPhams.Add(new NhomSanPhamItem
+                        {
+                            ID = reader.GetGuid(0),
+                            TenNhom = reader.IsDBNull(1) ? "" : reader.GetString(1)
+                        });
+                    }
+                }
+                // Lấy danh sách chi nhánh
+                var cmdCN = new SqlCommand("SELECT ID, TenChiNhanh FROM ChiNhanh WHERE IsDelete=0", connection);
+                using (var reader = cmdCN.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        ChiNhanhs.Add(new ChiNhanhItem
+                        {
+                            ID = reader.GetGuid(0),
+                            TenChiNhanh = reader.IsDBNull(1) ? "" : reader.GetString(1)
                         });
                     }
                 }
