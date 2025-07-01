@@ -112,6 +112,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdEdyb3VwXFVwZGF0ZUdyb3VwLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductType/AddProductType.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcQWRkUHJvZHVjdFR5cGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductType/DeleteProductType.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcRGVsZXRlUHJvZHVjdFR5cGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductType/ProductTypeList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcUHJvZHVjdFR5cGVMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Product/AddProduct.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFxBZGRQcm9kdWN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
