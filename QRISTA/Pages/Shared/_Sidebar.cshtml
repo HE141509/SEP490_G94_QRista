@@ -29,6 +29,18 @@
                     <span>Khách hàng</span>
                 </a>
             </li>
+            <li class="nav-item sidebar-product-parent">
+                <a href="#" class="nav-link sidebar-product-toggle@(currentPath.StartsWith("/product") ? " active" : "")" onclick="toggleSidebarProductMenu(event)">
+                    <i class="fas fa-box"></i>
+                    <span>Sản phẩm</span>
+                    <i class="fas fa-chevron-down sidebar-chevron" style="float:right;margin-top:4px;"></i>
+                </a>
+                <ul class="sidebar-submenu" id="sidebar-product-submenu" style="display:none;">
+                    <li><a href="/ProductGroup/ProductGroupList" class="nav-link@(currentPath.StartsWith("/productgroup") ? " active" : "")">Nhóm sản phẩm</a></li>
+                    <li><a href="/Product/ProductList" class="nav-link@(currentPath.StartsWith("/product/") ? " active" : "")">Sản phẩm</a></li>
+                    <li><a href="/ProductType/ProductTypeList" class="nav-link@(currentPath.StartsWith("/producttype") ? " active" : "")">Loại sản phẩm</a></li>
+                </ul>
+            </li>
             <li class="nav-item">
                 <a href="/UuDai/MaUuDaiList" class="nav-link@(currentPath.StartsWith("/uudai") ? " active" : "")">
                     <i class="fas fa-gift"></i>
@@ -44,3 +56,45 @@
         </ul>
     </div>
 </nav>
+<style>
+    .sidebar-submenu {
+        padding-left: 24px;
+        margin: 0;
+        list-style: none;
+    }
+    .sidebar-submenu li {
+        margin: 2px 0;
+    }
+    .sidebar-submenu .nav-link {
+        font-weight: 400 !important;
+        font-size: 1rem;
+        color: #333;
+        background: none;
+        padding-left: 0;
+        border-radius: 4px;
+        transition: background 0.15s, color 0.15s;
+    }
+    .sidebar-submenu .nav-link.active,
+    .sidebar-submenu .nav-link:focus,
+    .sidebar-submenu .nav-link:hover {
+        color: #1976d2;
+        background: #e3f2fd;
+        font-weight: 500 !important;
+        outline: none;
+        text-decoration: none;
+    }
+    .sidebar-product-toggle {
+        font-weight: 600;
+    }
+</style>
+<script>
+function toggleSidebarProductMenu(e) {
+    e.preventDefault();
+    var submenu = document.getElementById('sidebar-product-submenu');
+    if (submenu.style.display === 'none' || submenu.style.display === '') {
+        submenu.style.display = 'block';
+    } else {
+        submenu.style.display = 'none';
+    }
+}
+</script>

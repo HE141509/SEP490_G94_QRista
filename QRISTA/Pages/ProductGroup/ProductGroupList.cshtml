@@ -1,0 +1,377 @@
+@page
+@model QRB.Pages.ProductGroup.ProductGroupListModel
+@{
+    ViewData["Title"] = "Danh sách nhóm sản phẩm";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/userlist.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
+    <div class="main-container">
+        @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml", Model)
+        <main class="main-content">
+            <div class="dashboard-header userlist-header-flex">
+                <h1 class="page-title">Danh sách nhóm sản phẩm</h1>
+                <button class="userlist-add-btn" type="button">
+                    <i class="fas fa-plus"></i> Thêm mới
+                </button>
+                <div id="addGroupModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                    <div class="modal-content userlist-add-modal-content">
+                        <div class="userlist-add-modal-title"><i class="fas fa-layer-group"></i> Thêm nhóm sản phẩm mới</div>
+                        <form id="addGroupForm" autocomplete="off">
+                            <div class="userlist-add-form-group">
+                                <label for="addMaNhom">Mã nhóm</label>
+                                <input type="text" id="addMaNhom" name="MaNhom" class="userlist-input" required />
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addTenNhom">Tên nhóm</label>
+                                <input type="text" id="addTenNhom" name="TenNhom" class="userlist-input" required />
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addIsDelete">Trạng thái</label>
+                                <select id="addIsDelete" name="IsDelete" class="userlist-input">
+                                    <option value="false">Đang hoạt động</option>
+                                    <option value="true">Đã xóa</option>
+                                </select>
+                            </div>
+                            <div class="userlist-add-modal-actions">
+                                <button type="button" onclick="closeAddGroupModal()" class="userlist-add-cancel-btn">Hủy</button>
+                                <button type="submit" class="userlist-add-submit-btn">Thêm mới</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="userlist-card userlist-modern">
+                <div class="userlist-toolbar">
+                    <div class="userlist-toolbar-left">
+                        <label for="filterGroupStatus">Trạng thái:</label>
+                        <select id="filterGroupStatus" class="userlist-filter" onchange="filterGroupByStatus()">
+                            <option value="active">Đang hoạt động</option>
+                            <option value="inactive">Đã xóa</option>
+                        </select>
+                    </div>
+                    <div class="userlist-toolbar-right">
+                        <label for="groupPageSize" style="font-size:15px;margin-right:8px;color:#555;">Hiển thị:</label>
+                        <select id="groupPageSize" class="userlist-filter" style="width:auto;min-width:60px;" onchange="changeGroupPageSize()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterGroupList()" style="margin-left:12px;" />
+                    </div>
+                </div>
+                <div class="userlist-table-wrapper">
+                    <table class="userlist-table userlist-table-modern" id="groupListTable">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Mã nhóm</th>
+                                <th>Tên nhóm</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (Model.Groups != null && Model.Groups.Count > 0)
+                        {
+                            int stt = 1;
+                            foreach (var group in Model.Groups)
+                            {
+                                var status = group.IsDelete ? "Đã xóa" : "Đang hoạt động";
+                                <tr data-index="@stt" data-status="@(group.IsDelete ? "inactive" : "active")">
+                                    <td>@stt</td>
+                                    <td>@group.MaNhom</td>
+                                    <td>
+                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditGroupModal('@group.ID', '@group.MaNhom', '@group.TenNhom', '@group.IsDelete')">@group.TenNhom</span>
+                                    </td>
+                                    <td class="group-status">@status</td>
+                                    <td>@group.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>
+                                        <button class="userlist-delete-btn" title="Xóa" onclick="showDeleteGroupConfirm('@group.ID')"><i class="fas fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="6">Không có dữ liệu nhóm sản phẩm.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                    <div id="grouplist-pagination"></div>
+                </div>
+            </div>
+            <script>
+            // PHÂN TRANG + SEARCH + FILTER NHÓM SẢN PHẨM
+            let groupCurrentPage = 1;
+            let groupPageSize = 10;
+            let groupCurrentFilter = 'active';
+            let groupCurrentSearch = '';
+
+            function getAllGroupRows() {
+                return Array.from(document.querySelectorAll('#groupListTable tbody tr')).filter(function(row) {
+                    return row.querySelectorAll('td').length > 1;
+                });
+            }
+            function getFilteredGroupRows() {
+                let rows = getAllGroupRows();
+                // Lọc theo trạng thái
+                rows = rows.filter(function(row) {
+                    var statusCell = row.querySelector('.group-status');
+                    var isActive = true;
+                    if (statusCell) {
+                        isActive = (statusCell.textContent.trim() === 'Đang hoạt động');
+                    }
+                    if (groupCurrentFilter === 'active') return isActive;
+                    if (groupCurrentFilter === 'inactive') return !isActive;
+                });
+                // Lọc theo search
+                if (groupCurrentSearch) {
+                    rows = rows.filter(function(row) {
+                        var name = row.querySelector('td:nth-child(3) span')?.textContent.toLowerCase() || '';
+                        return name.includes(groupCurrentSearch);
+                    });
+                }
+                return rows;
+            }
+            function renderGroupPagination() {
+                let rows = getFilteredGroupRows();
+                let total = rows.length;
+                let totalPages = Math.ceil(total / groupPageSize);
+                let pag = document.getElementById('grouplist-pagination');
+                if (!pag) return;
+                if (totalPages <= 1) {
+                    pag.innerHTML = '';
+                    return;
+                }
+                let html = '';
+                html += `<button onclick="gotoGroupPage(1)" ${groupCurrentPage==1?'disabled':''}>&laquo;</button>`;
+                for (let i = 1; i <= totalPages; i++) {
+                    if (i === 1 || i === totalPages || Math.abs(i-groupCurrentPage)<=2) {
+                        html += `<button onclick="gotoGroupPage(${i})" ${i==groupCurrentPage?'class="active"':''}>${i}</button>`;
+                    } else if (i === groupCurrentPage-3 || i === groupCurrentPage+3) {
+                        html += '<span>...</span>';
+                    }
+                }
+                html += `<button onclick="gotoGroupPage(${totalPages})" ${groupCurrentPage==totalPages?'disabled':''}>&raquo;</button>`;
+                pag.className = 'userlist-pagination';
+                pag.innerHTML = html;
+            }
+            function updateGroupPagination() {
+                let allRows = getAllGroupRows();
+                let rows = getFilteredGroupRows();
+                let total = rows.length;
+                let totalPages = Math.ceil(total / groupPageSize);
+                if (groupCurrentPage > totalPages) groupCurrentPage = totalPages || 1;
+                allRows.forEach(function(row) { row.style.display = 'none'; });
+                rows.forEach(function(row, idx) {
+                    if (idx >= (groupCurrentPage-1)*groupPageSize && idx < groupCurrentPage*groupPageSize) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+                let pag = document.getElementById('grouplist-pagination');
+                if (rows.length === 0) {
+                    if (pag) pag.innerHTML = '';
+                    return;
+                }
+                renderGroupPagination();
+            }
+            function gotoGroupPage(page) {
+                groupCurrentPage = page;
+                updateGroupPagination();
+            }
+            function changeGroupPageSize() {
+                groupPageSize = parseInt(document.getElementById('groupPageSize').value);
+                groupCurrentPage = 1;
+                updateGroupPagination();
+            }
+            function filterGroupList() {
+                groupCurrentSearch = document.querySelector('.userlist-search').value.toLowerCase();
+                groupCurrentPage = 1;
+                updateGroupPagination();
+            }
+            function filterGroupByStatus() {
+                groupCurrentFilter = document.getElementById('filterGroupStatus').value;
+                groupCurrentPage = 1;
+                updateGroupPagination();
+            }
+            window.addEventListener('DOMContentLoaded', function() {
+                groupPageSize = parseInt(document.getElementById('groupPageSize').value) || 10;
+                setTimeout(updateGroupPagination, 0);
+            });
+            </script>
+            <form id="antiForgeryForm" style="display:none;">
+                @Html.AntiForgeryToken()
+            </form>
+            <div id="deleteGroupModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:320px;max-width:90vw;text-align:center;">
+                    <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa nhóm sản phẩm</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:24px;">Bạn có chắc chắn muốn xóa nhóm sản phẩm này không?</div>
+                    <div style="display:flex;justify-content:center;gap:18px;">
+                        <button onclick="confirmDeleteGroup()" style="background:#ea4335;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Xác nhận</button>
+                        <button onclick="closeDeleteGroupModal()" style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy</button>
+                    </div>
+                </div>
+            </div>
+            <div id="editGroupModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content userlist-add-modal-content">
+                    <div class="userlist-add-modal-title"><i class="fas fa-layer-group"></i> Sửa nhóm sản phẩm</div>
+                    <form id="editGroupForm" autocomplete="off">
+                        <input type="hidden" id="editGroupId" name="ID" />
+                        <div class="userlist-add-form-group">
+                            <label for="editMaNhom">Mã nhóm</label>
+                            <input type="text" id="editMaNhom" name="MaNhom" class="userlist-input" required readonly style="background:#f5f7fa;cursor:not-allowed;" />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="editTenNhom">Tên nhóm</label>
+                            <input type="text" id="editTenNhom" name="TenNhom" class="userlist-input" required />
+                        </div>
+                        <div class="userlist-add-form-group">
+                            <label for="editIsDelete">Trạng thái</label>
+                            <select id="editIsDelete" name="IsDelete" class="userlist-input">
+                                <option value="false">Đang hoạt động</option>
+                                <option value="true">Đã xóa</option>
+                            </select>
+                        </div>
+                        <div class="userlist-add-modal-actions">
+                            <button type="button" onclick="closeEditGroupModal()" class="userlist-add-cancel-btn">Hủy</button>
+                            <button type="submit" class="userlist-add-submit-btn">Lưu</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    <footer class="footer">
+        <div class="footer-content">
+            <span>© 2025 QRB - Hệ thống quán cafe thông minh. All rights reserved.</span>
+        </div>
+    </footer>
+    <script>
+        // Hiển thị popup Thêm nhóm
+        document.querySelector('.userlist-add-btn').onclick = function() {
+            document.getElementById('addGroupModal').style.display = 'flex';
+        };
+        function closeAddGroupModal() {
+            document.getElementById('addGroupModal').style.display = 'none';
+            document.getElementById('addGroupForm').reset();
+        }
+
+        // Hiển thị popup Sửa nhóm
+        function showEditGroupModal(id, maNhom, tenNhom, isDelete) {
+            document.getElementById('editGroupId').value = id;
+            document.getElementById('editMaNhom').value = maNhom;
+            document.getElementById('editTenNhom').value = tenNhom;
+            document.getElementById('editIsDelete').value = (isDelete === 'True' || isDelete === 'true' || isDelete === true) ? 'true' : 'false';
+            document.getElementById('editGroupModal').style.display = 'flex';
+        }
+        function closeEditGroupModal() {
+            document.getElementById('editGroupModal').style.display = 'none';
+            document.getElementById('editGroupForm').reset();
+        }
+
+        // Hiển thị popup Xóa nhóm
+        let deleteGroupId = null;
+        function showDeleteGroupConfirm(id) {
+            deleteGroupId = id;
+            document.getElementById('deleteGroupModal').style.display = 'flex';
+        }
+        function closeDeleteGroupModal() {
+            deleteGroupId = null;
+            document.getElementById('deleteGroupModal').style.display = 'none';
+        }
+
+        // Thêm nhóm (AJAX)
+        document.getElementById('addGroupForm').onsubmit = function(e) {
+            e.preventDefault();
+            var form = e.target;
+            var data = {
+                MaNhom: form.MaNhom.value,
+                TenNhom: form.TenNhom.value,
+                IsDelete: form.IsDelete.value === 'true'
+            };
+            fetch('/ProductGroup/AddGroup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.message || 'Thêm nhóm sản phẩm thất bại!');
+                }
+            });
+        };
+
+        // Sửa nhóm (AJAX)
+        document.getElementById('editGroupForm').onsubmit = function(e) {
+            e.preventDefault();
+            var form = e.target;
+            var data = {
+                ID: form.ID.value,
+                MaNhom: form.MaNhom.value,
+                TenNhom: form.TenNhom.value,
+                IsDelete: form.IsDelete.value === 'true'
+            };
+            fetch('/ProductGroup/UpdateGroup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.message || 'Cập nhật nhóm sản phẩm thất bại!');
+                }
+            });
+        };
+
+        // Xóa nhóm (AJAX)
+        function confirmDeleteGroup() {
+            if (!deleteGroupId) return;
+            fetch('/ProductGroup/DeleteGroup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
+                },
+                body: JSON.stringify({ id: deleteGroupId })
+            })
+            .then(res => res.json())
+            .then(resp => {
+                if (resp.success) {
+                    location.reload();
+                } else {
+                    alert(resp.message || 'Xóa nhóm sản phẩm thất bại!');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
