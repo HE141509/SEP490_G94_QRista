@@ -50,6 +50,11 @@ namespace QRB.Models
 
         public byte[]? HinhAnh { get; set; }
 
+        [Required]
+        public Guid IdNhomSanPham { get; set; } // map đúng tên cột DB
+        [ForeignKey("IdNhomSanPham")]
+        public virtual NhomSanPham NhomSanPham { get; set; } = null!;
+
         public bool IsDelete { get; set; } = false;
 
         public DateTime CreateTime { get; set; } = DateTime.Now;

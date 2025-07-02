@@ -1,12 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace QRB.Pages.Branch
 {
     public class BranchListModel : PageModel
     {
+        private readonly IConfiguration _configuration;
+        public BranchListModel(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public class BranchInfo
         {
             public Guid ID { get; set; }
@@ -29,7 +34,7 @@ namespace QRB.Pages.Branch
             }
             CurrentUserDisplayName = HttpContext.Session.GetString("DisplayName");
 
-            string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
