@@ -5,12 +5,28 @@
       "PackagePath": "staticwebassets\\QRISTA.bundle.scp.css"
     },
     {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\customerlist.css",
+      "PackagePath": "staticwebassets\\css\\customerlist.css"
+    },
+    {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\dashboard.css",
       "PackagePath": "staticwebassets\\css\\dashboard.css"
     },
     {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\ma-uudai.css",
+      "PackagePath": "staticwebassets\\css\\ma-uudai.css"
+    },
+    {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\menu.css",
       "PackagePath": "staticwebassets\\css\\menu.css"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\payment.css",
+      "PackagePath": "staticwebassets\\css\\payment.css"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\product-list.css",
+      "PackagePath": "staticwebassets\\css\\product-list.css"
     },
     {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\qrb-login.css",
@@ -19,6 +35,10 @@
     {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\css\\userlist.css",
+      "PackagePath": "staticwebassets\\css\\userlist.css"
     },
     {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\favicon.ico",
@@ -35,6 +55,10 @@
     {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\images\\cafe.png",
       "PackagePath": "staticwebassets\\images\\cafe.png"
+    },
+    {
+      "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\js\\customer.js",
+      "PackagePath": "staticwebassets\\js\\customer.js"
     },
     {
       "Id": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\wwwroot\\js\\dashboard.js",
