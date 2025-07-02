@@ -1,12 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace QRB.Pages.Product
 {
+    [IgnoreAntiforgeryToken]
     public class DeleteProductModel : PageModel
     {
-        [IgnoreAntiforgeryToken]
+        private readonly IConfiguration _configuration;
+        public DeleteProductModel(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public IActionResult OnPost()
         {
             try
@@ -20,7 +25,7 @@ namespace QRB.Pages.Product
                 if (req == null || req.id == Guid.Empty)
                     return new JsonResult(new { success = false, message = "Dữ liệu không hợp lệ." });
 
-                string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();

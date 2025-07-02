@@ -1,7 +1,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Text.Json;
 
 namespace QRB.Pages.Branch
@@ -9,6 +9,11 @@ namespace QRB.Pages.Branch
     [IgnoreAntiforgeryToken]
     public class UpdateBranchModel : PageModel
     {
+        private readonly IConfiguration _configuration;
+        public UpdateBranchModel(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public class BranchInput
         {
             public Guid ID { get; set; }
@@ -28,7 +33,7 @@ namespace QRB.Pages.Branch
                     if (input == null || input.ID == Guid.Empty || string.IsNullOrWhiteSpace(input.TenChiNhanh) || string.IsNullOrWhiteSpace(input.MaChiNhanh))
                         return new JsonResult(new { success = false, message = "Dữ liệu không hợp lệ!" });
 
-                    string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+                    var connectionString = _configuration.GetConnectionString("DefaultConnection");
                     using (var connection = new SqlConnection(connectionString))
                     {
                         connection.Open();
