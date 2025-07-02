@@ -102,6 +102,36 @@ namespace QRB.Pages.ProductType
                 }
             }
         }
+
+        public JsonResult OnGetSanPhamByChiNhanh(Guid chiNhanhId)
+        {
+            try
+            {
+                string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    var command = new SqlCommand(@"SELECT ID, TenSanPham FROM SanPham WHERE IDChiNhanh = @IDChiNhanh", connection);
+                    command.Parameters.AddWithValue("@IDChiNhanh", chiNhanhId);
+
+                    var reader = command.ExecuteReader();
+                    var sanPhams = new List<SanPhamItem>();
+                    while (reader.Read())
+                    {
+                        sanPhams.Add(new SanPhamItem
+                        {
+                            ID = reader.GetGuid(0),
+                            TenSanPham = reader.GetString(1)
+                        });
+                    }
+                    return new JsonResult(sanPhams);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
+            }
+        }
     }
 }
 

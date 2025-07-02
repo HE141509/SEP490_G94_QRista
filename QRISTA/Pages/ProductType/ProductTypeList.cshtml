@@ -89,7 +89,7 @@
                         }
                         else
                         {
-                            <tr><td colspan="9">Không có dữ liệu loại sản phẩm.</td></tr>
+                            <tr><td colspan="10">Không có dữ liệu loại sản phẩm.</td></tr>
                         }
                         </tbody>
                     </table>
@@ -123,6 +123,22 @@
         <div class="userlist-add-modal-title"><i class="fas fa-box"></i> Thêm loại sản phẩm mới</div>
         <form id="addProductTypeForm" autocomplete="off">
             <div class="userlist-add-form-group">
+                <label for="addIDChiNhanh">Chi nhánh</label>
+                <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required onchange="loadSanPhamByChiNhanh(this.value)">
+                    <option value="">-- Chọn chi nhánh --</option>
+                    @foreach (var cn in Model.ChiNhanhs)
+                    {
+                        <option value="@cn.ID">@cn.TenChiNhanh</option>
+                    }
+                </select>
+            </div>
+            <div class="userlist-add-form-group">
+                <label for="addIDSanPham">Sản phẩm</label>
+                <select id="addIDSanPham" name="IDSanPham" class="userlist-input" required>
+                    <option value="">-- Chọn sản phẩm --</option>
+                </select>
+            </div>
+            <div class="userlist-add-form-group">
                 <label for="addTenLoai">Tên loại</label>
                 <input type="text" id="addTenLoai" name="TenLoai" class="userlist-input" required />
             </div>
@@ -133,26 +149,6 @@
             <div class="userlist-add-form-group">
                 <label for="addDonGia">Đơn giá</label>
                 <input type="text" id="addDonGia" name="DonGia" class="userlist-input" required oninput="formatDonGiaInput(this)" />
-            </div>
-            <div class="userlist-add-form-group">
-                <label for="addIDSanPham">Sản phẩm</label>
-                <select id="addIDSanPham" name="IDSanPham" class="userlist-input" required>
-                    <option value="">-- Chọn sản phẩm --</option>
-                    @foreach (var sp in Model.SanPhams)
-                    {
-                        <option value="@sp.ID">@sp.TenSanPham</option>
-                    }
-                </select>
-            </div>
-            <div class="userlist-add-form-group">
-                <label for="addIDChiNhanh">Chi nhánh</label>
-                <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required>
-                    <option value="">-- Chọn chi nhánh --</option>
-                    @foreach (var cn in Model.ChiNhanhs)
-                    {
-                        <option value="@cn.ID">@cn.TenChiNhanh</option>
-                    }
-                </select>
             </div>
             <div class="userlist-add-form-group">
                 <label for="addIsDelete">Trạng thái</label>
@@ -298,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({ id: deleteProductTypeId })
             })
             .then(res => res.json())
-            .then(data => {
+            .then(function(data) {
                 if (data.success) {
                     alert('Xóa loại sản phẩm thành công!');
                     closeDeleteProductTypeModal();
@@ -347,4 +343,26 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+function loadSanPhamByChiNhanh(chiNhanhId) {
+    const sanPhamSelect = document.getElementById('addIDSanPham');
+    sanPhamSelect.innerHTML = '<option value="">-- Chọn sản phẩm --</option>'; // Reset sản phẩm
+
+    if (!chiNhanhId) return; // Nếu chưa chọn chi nhánh thì không làm gì
+
+    fetch(`/ProductType/ProductTypeList?handler=SanPhamByChiNhanh&chiNhanhId=${chiNhanhId}`)
+        .then(res => res.json())
+        .then(function(data) {
+            if (data && Array.isArray(data)) {
+                data.forEach(sp => {
+                    const option = document.createElement('option');
+                    option.value = sp.id;
+                    option.textContent = sp.tenSanPham;
+                    sanPhamSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(() => {
+            alert('Có lỗi xảy ra khi tải danh sách sản phẩm!');
+        });
+}
 </script>
