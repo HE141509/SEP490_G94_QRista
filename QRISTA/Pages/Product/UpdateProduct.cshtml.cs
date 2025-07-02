@@ -30,7 +30,7 @@ namespace QRB.Pages.Product
                     return BadRequest("ID sản phẩm không hợp lệ.");
                 }
 
-                var connectionString = _configuration.GetConnectionString("DefaultConnection") ?? "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
                 using (var connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();

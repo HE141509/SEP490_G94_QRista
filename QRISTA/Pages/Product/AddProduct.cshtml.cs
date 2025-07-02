@@ -1,11 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace QRB.Pages.Product
 {
+    [IgnoreAntiforgeryToken]
     public class AddProductModel : PageModel
     {
+        private readonly IConfiguration _configuration;
+        public AddProductModel(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
@@ -33,7 +39,7 @@ namespace QRB.Pages.Product
                     }
                 }
 
-                string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();

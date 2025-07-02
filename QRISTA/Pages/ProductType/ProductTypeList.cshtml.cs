@@ -8,6 +8,17 @@ namespace QRB.Pages.ProductType
     [IgnoreAntiforgeryToken]
     public class ProductTypeListModel : PageModel
     {
+        public override void OnPageHandlerExecuting(Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutingContext context)
+        {
+            var userId = context.HttpContext.Session.GetString("UserId");
+            var username = context.HttpContext.Session.GetString("Username");
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(username))
+            {
+                context.Result = new RedirectToPageResult("/Login");
+            }
+            base.OnPageHandlerExecuting(context);
+        }
+
         public class LoaiSanPhamViewModel
         {
             public Guid ID { get; set; }

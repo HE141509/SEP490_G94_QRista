@@ -70,7 +70,7 @@
                                 var status = lsp.IsDelete ? "Ngừng kinh doanh" : "Đang kinh doanh";
                                 <tr data-index="@stt" data-status="@(lsp.IsDelete ? "inactive" : "active")" data-id="@lsp.ID">
                                     <td>@stt</td>
-                                    <td>@lsp.TenLoai</td>
+                                    <td><a href="#" class="edit-producttype-link" data-id="@lsp.ID" data-tenloai="@lsp.TenLoai">@lsp.TenLoai</a></td>
                                     <td>@lsp.MaLoai</td>
                                     <td>@lsp.DonGia</td>
                                     <td>@lsp.TenSanPham</td>
@@ -111,6 +111,92 @@
             </div>
         </div>
     </div>
+    <!-- Popup thêm loại sản phẩm -->
+    <div id="addProductTypeModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+        <div class="modal-content userlist-add-modal-content">
+            <div class="userlist-add-modal-title"><i class="fas fa-box"></i> Thêm loại sản phẩm mới</div>
+            <form id="addProductTypeForm" autocomplete="off">
+                <div class="userlist-add-form-group">
+                    <label for="addIDChiNhanh">Chi nhánh</label>
+                    <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required onchange="loadSanPhamByChiNhanh(this.value)">
+                        <option value="">-- Chọn chi nhánh --</option>
+                        @foreach (var cn in Model.ChiNhanhs)
+                        {
+                            <option value="@cn.ID">@cn.TenChiNhanh</option>
+                        }
+                    </select>
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addIDSanPham">Sản phẩm</label>
+                    <select id="addIDSanPham" name="IDSanPham" class="userlist-input" required>
+                        <option value="">-- Chọn sản phẩm --</option>
+                    </select>
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addTenLoai">Tên loại</label>
+                    <input type="text" id="addTenLoai" name="TenLoai" class="userlist-input" required />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addMaLoai">Mã loại</label>
+                    <input type="text" id="addMaLoai" name="MaLoai" class="userlist-input" required />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addDonGia">Đơn giá</label>
+                    <input type="text" id="addDonGia" name="DonGia" class="userlist-input" required oninput="formatDonGiaInput(this)" />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addIsDelete">Trạng thái</label>
+                    <select id="addIsDelete" name="IsDelete" class="userlist-input">
+                        <option value="false">Đang kinh doanh</option>
+                        <option value="true">Ngừng kinh doanh</option>
+                    </select>
+                </div>
+                <div class="userlist-add-modal-actions">
+                    <button type="button" onclick="closeAddProductTypeModal()" class="userlist-add-cancel-btn">Hủy</button>
+                    <button type="submit" class="userlist-add-submit-btn">Thêm mới</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Popup sửa loại sản phẩm -->
+    <div id="editProductTypeModal" class="modal" style="display:none;position:fixed;z-index:3500;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+        <div class="modal-content userlist-add-modal-content" id="editProductTypeModalContent" style="min-width:420px;max-width:540px;width:100%;box-sizing:border-box;">
+            <form id="editProductTypeForm" autocomplete="off">
+                <input type="hidden" name="ID" id="editID" />
+                <div class="userlist-add-form-group">
+                    <label for="editIDChiNhanh">Chi nhánh</label>
+                    <input type="text" id="editIDChiNhanh" class="userlist-input" readonly />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editIDSanPham">Sản phẩm</label>
+                    <input type="text" id="editIDSanPham" class="userlist-input" readonly />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editTenLoai">Tên loại</label>
+                    <input type="text" id="editTenLoai" name="TenLoai" class="userlist-input" required />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editMaLoai">Mã loại</label>
+                    <input type="text" id="editMaLoai" class="userlist-input" readonly />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editDonGia">Đơn giá</label>
+                    <input type="text" id="editDonGia" name="DonGia" class="userlist-input" required oninput="formatDonGiaInput(this)" />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editIsDelete">Trạng thái</label>
+                    <select id="editIsDelete" name="IsDelete" class="userlist-input">
+                        <option value="false">Đang kinh doanh</option>
+                        <option value="true">Ngừng kinh doanh</option>
+                    </select>
+                </div>
+                <div class="userlist-add-modal-actions">
+                    <button type="button" onclick="closeEditProductTypeModal()" class="userlist-add-cancel-btn">Hủy</button>
+                    <button type="submit" class="userlist-add-submit-btn">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <footer class="footer">
         <div class="footer-content">
             <span>© 2025 QRB - Hệ thống quán cafe thông minh. All rights reserved.</span>
@@ -118,6 +204,7 @@
     </footer>
 </body>
 </html>
+<<<<<<< HEAD
 <div id="addProductTypeModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
     <div class="modal-content userlist-add-modal-content">
         <div class="userlist-add-modal-title"><i class="fas fa-box"></i> Thêm loại sản phẩm mới</div>
@@ -164,6 +251,8 @@
         </form>
     </div>
 </div>
+=======
+>>>>>>> origin/phuong
 <script>
 // PHÂN TRANG + SEARCH + FILTER LOẠI SẢN PHẨM
 let productTypeCurrentPage = 1;
@@ -263,13 +352,22 @@ function closeAddProductTypeModal() {
     document.getElementById('addProductTypeForm').reset();
 }
 function formatDonGiaInput(input) {
-    // Chỉ cho nhập số
+    // Chỉ cho nhập số, làm tròn xuống hàng nghìn và định dạng xxx,000 (dấu phẩy)
     let value = input.value.replace(/[^\d]/g, '');
-    if (value) {
-        // Format dạng 1,000,000 (dấu phẩy)
-        value = parseInt(value, 10).toLocaleString('en-US');
+    if (value === '') {
+        input.value = '';
+        return;
     }
-    input.value = value;
+    let num = Math.floor(parseInt(value, 10) / 1000) * 1000;
+    // Cho phép nhập 0 hoặc các số nhỏ hơn 1000 (sẽ để trống)
+    if (num > 0) {
+        input.value = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    } else if (value.length < 4) {
+        // Nếu người dùng đang nhập số nhỏ hơn 1000, cho phép hiển thị số đó (chưa làm tròn)
+        input.value = value;
+    } else {
+        input.value = '';
+    }
 }
 
 // Xóa loại sản phẩm
@@ -342,6 +440,59 @@ window.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    // Sửa loại sản phẩm (popup)
+    document.querySelectorAll('.edit-producttype-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            fetch(`/ProductType/UpdateProductType?id=${id}`)
+                .then(res => res.json())
+                .then(function(data) {
+                    if (data && data.success !== false) {
+                        openEditProductTypeModal(data);
+                    } else {
+                        alert(data.message || 'Không lấy được dữ liệu loại sản phẩm!');
+                    }
+                })
+                .catch(() => alert('Có lỗi xảy ra khi tải dữ liệu loại sản phẩm!'));
+        });
+    });
+    // Xử lý submit form sửa loại sản phẩm
+    const editForm = document.getElementById('editProductTypeForm');
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Đảm bảo DonGia gửi về là số nguyên
+            let donGiaInput = editForm.querySelector('[name="DonGia"]');
+            if (donGiaInput) {
+                let raw = donGiaInput.value.replace(/[^\d]/g, '');
+                donGiaInput.value = raw;
+            }
+            var formData = new FormData();
+            formData.append('ID', document.getElementById('editID').value);
+            formData.append('TenLoai', document.getElementById('editTenLoai').value);
+            formData.append('DonGia', document.getElementById('editDonGia').value);
+            formData.append('IsDelete', document.getElementById('editIsDelete').value);
+            fetch(`/ProductType/UpdateProductType?id=${document.getElementById('editID').value}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(function(data) {
+                if (data.success) {
+                    alert('Cập nhật loại sản phẩm thành công!');
+                    closeEditProductTypeModal();
+                    location.reload();
+                } else {
+                    alert(data.message || 'Cập nhật loại sản phẩm thất bại!');
+                }
+            })
+            .catch(() => {
+                alert('Có lỗi xảy ra khi cập nhật loại sản phẩm!');
+            });
+        });
+    }
 });
 function loadSanPhamByChiNhanh(chiNhanhId) {
     const sanPhamSelect = document.getElementById('addIDSanPham');
@@ -365,4 +516,20 @@ function loadSanPhamByChiNhanh(chiNhanhId) {
             alert('Có lỗi xảy ra khi tải danh sách sản phẩm!');
         });
 }
+<<<<<<< HEAD
+=======
+function openEditProductTypeModal(data) {
+    document.getElementById('editID').value = data.id;
+    document.getElementById('editIDChiNhanh').value = data.tenChiNhanh || '';
+    document.getElementById('editIDSanPham').value = data.tenSanPham || '';
+    document.getElementById('editTenLoai').value = data.tenLoai || '';
+    document.getElementById('editMaLoai').value = data.maLoai || '';
+    document.getElementById('editDonGia').value = data.donGia || '';
+    document.getElementById('editIsDelete').value = data.isDelete ? 'true' : 'false';
+    document.getElementById('editProductTypeModal').style.display = 'flex';
+}
+function closeEditProductTypeModal() {
+    document.getElementById('editProductTypeModal').style.display = 'none';
+}
+>>>>>>> origin/phuong
 </script>

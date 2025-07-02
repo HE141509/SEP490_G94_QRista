@@ -1,12 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Text.Json;
 
 namespace QRB.Pages.Branch
 {
     public class DeleteBranchModel : PageModel
     {
+        private readonly IConfiguration _configuration;
+        public DeleteBranchModel(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public class DeleteInput
         {
             public Guid id { get; set; }
@@ -23,7 +28,7 @@ namespace QRB.Pages.Branch
                     if (input == null || input.id == Guid.Empty)
                         return new JsonResult(new { success = false, message = "ID không hợp lệ!" });
 
-                    string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+                    var connectionString = _configuration.GetConnectionString("DefaultConnection");
                     using (var connection = new SqlConnection(connectionString))
                     {
                         connection.Open();

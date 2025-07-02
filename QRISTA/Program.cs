@@ -39,4 +39,10 @@ app.UseRouting();
 app.UseSession();
 app.UseAuthorization();
 
+<<<<<<< HEAD
+=======
+app.UseStaticFiles();
+app.MapRazorPages();
+
+>>>>>>> origin/phuong
 app.Run();

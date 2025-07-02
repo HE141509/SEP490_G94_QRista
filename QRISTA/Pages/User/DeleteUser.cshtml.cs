@@ -7,6 +7,7 @@ using System.Text.Json;
 
 namespace QRB.Pages.User
 {
+    [IgnoreAntiforgeryToken]
     public class DeleteUserModel : PageModel
     {
         public async Task<IActionResult> OnPostAsync()
