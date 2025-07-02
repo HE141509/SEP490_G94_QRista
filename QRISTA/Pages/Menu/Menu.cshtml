@@ -52,7 +52,7 @@ if (!window.qrbMenuState) {
         allItems: [],
         filteredItems: [],
         currentPage: 1,
-        itemsPerPage: 15,
+        itemsPerPage: 9, // 9 sản phẩm/trang
         totalPages: 1
     };
 }
@@ -108,7 +108,14 @@ function renderMenuItems(items) {
         return;
     }
     // Render từng sản phẩm, nếu có nhiều loại thì hiển thị từng loại riêng biệt
-    items.forEach(item => {
+    // Hiển thị 3 sản phẩm trên 1 hàng
+    let rowDiv = null;
+    items.forEach((item, idx) => {
+        if (idx % 3 === 0) {
+            rowDiv = document.createElement('div');
+            rowDiv.className = 'menu-items-row';
+            section.appendChild(rowDiv);
+        }
         const div = document.createElement('div');
         div.className = 'menu-item';
         div.dataset.category = item.IdNhomSanPham;
@@ -122,7 +129,7 @@ function renderMenuItems(items) {
                     <span class="menu-item-type-price">${type.DonGia ? type.DonGia.toLocaleString() : 0} đ</span>
                     <div class="menu-item-qty" style="display:inline-block;margin-left:12px;">
                         <button type="button" onclick="changeQuantityType(this, -1)">-</button>
-                        <span class="quantity" data-maloai="${type.MaLoai}">${type.Qty || 0}</span>
+                        <span class="quantity" data-maloai="${type.MaLoai}">0</span>
                         <button type="button" onclick="changeQuantityType(this, 1)">+</button>
                     </div>
                 </div>
@@ -133,7 +140,7 @@ function renderMenuItems(items) {
                 <div class="menu-item-price">Giá: <span>${item.Price ? item.Price.toLocaleString() : 0}</span> đ</div>
                 <div class="menu-item-qty">
                     <button type="button" onclick="changeQuantity(this, -1)">-</button>
-                    <span class="quantity">${item.Qty}</span>
+                    <span class="quantity">0</span>
                     <button type="button" onclick="changeQuantity(this, 1)">+</button>
                 </div>
             `;
@@ -148,7 +155,7 @@ function renderMenuItems(items) {
             ${typesHtml}
             </div>
         `;
-        section.appendChild(div);
+        if (rowDiv) rowDiv.appendChild(div);
     });
 }
 
@@ -339,14 +346,25 @@ function updateCartSummary() {
 }
 
 function updateMenuItemQtyUI() {
-    document.querySelectorAll('.menu-item').forEach((itemDiv, idx) => {
-        let sKey = itemDiv.querySelector('.menu-item-title').innerText + '_S';
-        let lKey = itemDiv.querySelector('.menu-item-title').innerText + '_L';
-        let sQty = window.qrbMenuState.cart[sKey]?.qty || 0;
-        let lQty = window.qrbMenuState.cart[lKey]?.qty || 0;
-        let qtySpans = itemDiv.querySelectorAll('.quantity');
-        if (qtySpans[0]) qtySpans[0].innerText = sQty;
-        if (qtySpans[1]) qtySpans[1].innerText = lQty;
+    document.querySelectorAll('.menu-item').forEach((itemDiv) => {
+        // Nếu có nhiều loại
+        const typeRows = itemDiv.querySelectorAll('.menu-item-type-row');
+        if (typeRows.length > 0) {
+            typeRows.forEach(typeRow => {
+                const name = itemDiv.querySelector('.menu-item-title').innerText;
+                const maLoai = typeRow.querySelector('.quantity').dataset.maloai;
+                const key = name + '_' + maLoai;
+                const qty = window.qrbMenuState.cart[key]?.qty || 0;
+                typeRow.querySelector('.quantity').innerText = qty;
+            });
+        } else {
+            // Sản phẩm không có loại
+            const name = itemDiv.querySelector('.menu-item-title').innerText;
+            const key = name;
+            const qty = window.qrbMenuState.cart[key]?.qty || 0;
+            const qtySpan = itemDiv.querySelector('.quantity');
+            if (qtySpan) qtySpan.innerText = qty;
+        }
     });
 }
 

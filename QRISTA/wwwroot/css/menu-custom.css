@@ -112,10 +112,15 @@
     justify-content: center;
 }
 .menu-items {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px 18px;
+    /* Không dùng grid nữa, dùng flex cho từng hàng */
     width: 100%;
+}
+
+.menu-items-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 24px 18px;
+    margin-bottom: 24px;
 }
 .menu-item {
     height: auto !important;
@@ -128,7 +133,7 @@
     box-shadow: 0 2px 8px 0 rgba(25, 118, 210, 0.04);
     padding: 16px 12px 12px 12px;
     width: 100%;
-    max-width: 390px;
+    max-width: 460px;
     margin: 0 auto;
 }
 .menu-item-img {
