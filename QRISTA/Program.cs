@@ -40,7 +40,10 @@ app.UseSession();
 app.UseAuthorization();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> a895709 (update css menu and get product)
 app.UseStaticFiles();
 app.MapRazorPages();
 
