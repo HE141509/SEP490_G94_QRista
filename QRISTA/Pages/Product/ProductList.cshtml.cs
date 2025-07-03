@@ -1,13 +1,29 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 using Microsoft.AspNetCore.Mvc;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
 
 namespace QRB.Pages.Product
 {
     public class ProductListModel : PageModel
     {
+        private readonly IConfiguration _configuration;
+        public ProductListModel(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+        public override void OnPageHandlerExecuting(Microsoft.AspNetCore.Mvc.Filters.PageHandlerExecutingContext context)
+        {
+            var userId = context.HttpContext.Session.GetString("UserId");
+            var username = context.HttpContext.Session.GetString("Username");
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(username))
+            {
+                context.Result = new RedirectToPageResult("/Login");
+            }
+            base.OnPageHandlerExecuting(context);
+        }
+
         public class SanPhamViewModel
         {
             public Guid ID { get; set; }
@@ -40,7 +56,7 @@ namespace QRB.Pages.Product
 
         public void OnGet()
         {
-            string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();

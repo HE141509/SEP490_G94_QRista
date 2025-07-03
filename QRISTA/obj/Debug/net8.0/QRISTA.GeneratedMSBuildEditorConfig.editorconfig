@@ -112,6 +112,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdEdyb3VwXFVwZGF0ZUdyb3VwLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/ProductType/AddProductType.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcQWRkUHJvZHVjdFR5cGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/ProductType/DeleteProductType.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcRGVsZXRlUHJvZHVjdFR5cGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/ProductType/ProductTypeList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcUHJvZHVjdFR5cGVMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/ProductType/UpdateProductType.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcVXBkYXRlUHJvZHVjdFR5cGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/Github/SEP490_G94_QRista/QRISTA/Pages/Product/AddProduct.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFxBZGRQcm9kdWN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

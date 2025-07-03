@@ -1,15 +1,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 namespace QRB.Pages.Branch
 {
     public class GetBranchByIdModel : PageModel
     {
+        private readonly IConfiguration _configuration;
+        public GetBranchByIdModel(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
         public IActionResult OnGet(Guid id)
         {
             if (id == Guid.Empty) return new JsonResult(null);
-            string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
