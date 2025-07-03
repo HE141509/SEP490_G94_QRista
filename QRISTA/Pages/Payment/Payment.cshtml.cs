@@ -25,7 +25,7 @@ namespace QRB.Pages.Payment
             // txnRef nên là mã đơn hàng thực tế, nếu chưa có thì tạo theo timestamp để không trùng
             string txnRef = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             // Truyền mã đơn hàng (txnRef) vào returnUrl để callback nhận diện đơn hàng
-            string returnUrl = $"https://localhost:5233/VnpayReturn?orderId={txnRef}";
+            string returnUrl = $"http://localhost:5233/VnpayReturn?orderId={txnRef}";
             string clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1";
 
             PaymentUrl = VnpayHelper.CreateVnpayPaymentUrl(

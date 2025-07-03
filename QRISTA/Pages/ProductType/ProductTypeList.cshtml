@@ -204,58 +204,6 @@
     </footer>
 </body>
 </html>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<div id="addProductTypeModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
-    <div class="modal-content userlist-add-modal-content">
-        <div class="userlist-add-modal-title"><i class="fas fa-box"></i> Thêm loại sản phẩm mới</div>
-        <form id="addProductTypeForm" autocomplete="off">
-            <div class="userlist-add-form-group">
-                <label for="addIDChiNhanh">Chi nhánh</label>
-                <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required onchange="loadSanPhamByChiNhanh(this.value)">
-                    <option value="">-- Chọn chi nhánh --</option>
-                    @foreach (var cn in Model.ChiNhanhs)
-                    {
-                        <option value="@cn.ID">@cn.TenChiNhanh</option>
-                    }
-                </select>
-            </div>
-            <div class="userlist-add-form-group">
-                <label for="addIDSanPham">Sản phẩm</label>
-                <select id="addIDSanPham" name="IDSanPham" class="userlist-input" required>
-                    <option value="">-- Chọn sản phẩm --</option>
-                </select>
-            </div>
-            <div class="userlist-add-form-group">
-                <label for="addTenLoai">Tên loại</label>
-                <input type="text" id="addTenLoai" name="TenLoai" class="userlist-input" required />
-            </div>
-            <div class="userlist-add-form-group">
-                <label for="addMaLoai">Mã loại</label>
-                <input type="text" id="addMaLoai" name="MaLoai" class="userlist-input" required />
-            </div>
-            <div class="userlist-add-form-group">
-                <label for="addDonGia">Đơn giá</label>
-                <input type="text" id="addDonGia" name="DonGia" class="userlist-input" required oninput="formatDonGiaInput(this)" />
-            </div>
-            <div class="userlist-add-form-group">
-                <label for="addIsDelete">Trạng thái</label>
-                <select id="addIsDelete" name="IsDelete" class="userlist-input">
-                    <option value="false">Đang kinh doanh</option>
-                    <option value="true">Ngừng kinh doanh</option>
-                </select>
-            </div>
-            <div class="userlist-add-modal-actions">
-                <button type="button" onclick="closeAddProductTypeModal()" class="userlist-add-cancel-btn">Hủy</button>
-                <button type="submit" class="userlist-add-submit-btn">Thêm mới</button>
-            </div>
-        </form>
-    </div>
-</div>
-=======
->>>>>>> origin/phuong
-=======
->>>>>>> a895709 (update css menu and get product)
 <script>
 // PHÂN TRANG + SEARCH + FILTER LOẠI SẢN PHẨM
 let productTypeCurrentPage = 1;
@@ -519,11 +467,6 @@ function loadSanPhamByChiNhanh(chiNhanhId) {
             alert('Có lỗi xảy ra khi tải danh sách sản phẩm!');
         });
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> a895709 (update css menu and get product)
 function openEditProductTypeModal(data) {
     document.getElementById('editID').value = data.id;
     document.getElementById('editIDChiNhanh').value = data.tenChiNhanh || '';
@@ -537,8 +480,4 @@ function openEditProductTypeModal(data) {
 function closeEditProductTypeModal() {
     document.getElementById('editProductTypeModal').style.display = 'none';
 }
-<<<<<<< HEAD
->>>>>>> origin/phuong
-=======
->>>>>>> a895709 (update css menu and get product)
 </script>

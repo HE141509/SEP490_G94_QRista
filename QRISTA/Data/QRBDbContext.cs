@@ -100,6 +100,10 @@ namespace QRB.Data
                 entity.HasOne(d => d.ChiNhanh)
                     .WithMany(p => p.DonHangs)
                     .HasForeignKey(d => d.IDChiNhanh);
+
+                // Configure new properties for DonHang
+                entity.Property(e => e.TrangThaiThanhToan).HasDefaultValue(false);
+                entity.Property(e => e.NgayThanhToan).IsRequired(false);
             });
 
             // ChiTietDonHang

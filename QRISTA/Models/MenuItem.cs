@@ -211,6 +211,10 @@ namespace QRB.Models
         [Column(TypeName = "decimal(15,2)")]
         public decimal TongTien { get; set; }
 
+        // Thêm các trường mới để đồng bộ với DB
+        public bool TrangThaiThanhToan { get; set; } = false;
+        public DateTime? NgayThanhToan { get; set; }
+
         public bool IsDelete { get; set; } = false;
 
         public DateTime CreateTime { get; set; } = DateTime.Now;
