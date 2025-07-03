@@ -400,6 +400,7 @@ function changeQuantity(button, change) {
             price = 30000;
         }
     }
+<<<<<<< HEAD
     // Ensure key is properly initialized and cart object is updated
     if (!window.qrbMenuState.cart[key]) {
         window.qrbMenuState.cart[key] = { name, qty: 0, price: 30000 }; // Default price
@@ -414,6 +415,12 @@ function changeQuantity(button, change) {
         delete window.qrbMenuState.cart[key];
     }
 
+=======
+    if (!window.qrbMenuState.cart[key]) window.qrbMenuState.cart[key] = { name, qty: 0, price };
+    window.qrbMenuState.cart[key].price = price; // luôn đồng bộ lại giá
+    window.qrbMenuState.cart[key].qty = Math.max(0, window.qrbMenuState.cart[key].qty + change);
+    if (window.qrbMenuState.cart[key].qty === 0) delete window.qrbMenuState.cart[key];
+>>>>>>> 012cf6108682eed2a0083951e972605090bb4f8c
     updateCartSummary();
     updateMenuItemQtyUI();
 }
