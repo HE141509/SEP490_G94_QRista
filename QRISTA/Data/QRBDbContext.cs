@@ -265,7 +265,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Cà phê đen",
                     MaLoai = "CFD001",
-                    DonGia = 25000,
+                    DonGia = "25000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 },
@@ -276,7 +276,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Cà phê sữa",
                     MaLoai = "CFS001",
-                    DonGia = 30000,
+                    DonGia = "30000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 },
@@ -287,7 +287,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Trà sữa",
                     MaLoai = "TS001",
-                    DonGia = 35000,
+                    DonGia = "35000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 },
@@ -298,7 +298,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Bánh croissant",
                     MaLoai = "BC001",
-                    DonGia = 40000,
+                    DonGia = "40000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 }
