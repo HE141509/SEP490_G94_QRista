@@ -1,0 +1,9 @@
+@page 
+@functions {
+    public Microsoft.AspNetCore.Mvc.IActionResult OnGet()
+    {
+        return RedirectToPage("/User/UserList");
+    }
+}
+@* Tự động chuyển hướng sang trang danh sách user *@
+<meta http-equiv="refresh" content="0; url=/User/UserList" />
