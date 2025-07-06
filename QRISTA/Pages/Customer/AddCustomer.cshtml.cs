@@ -64,8 +64,7 @@ public class AddCustomerModel : PageModel
                     return new JsonResult(new { success = false, message = "Lỗi khi thêm khách hàng: " + ex.Message });
                 }
             }
-        } // test
-        
+        }
         return new JsonResult(new { success = true });
     }
 }

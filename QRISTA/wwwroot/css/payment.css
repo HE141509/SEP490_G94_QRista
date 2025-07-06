@@ -107,36 +107,6 @@ body, html {
 .payment-back-btn:hover {
     background: #1565c0;
 }
-/* Payment error styles */
-.payment-error {
-    text-align: center;
-    padding: 20px;
-    background: #ffe6e6;
-    border: 1px solid #ff9999;
-    border-radius: 8px;
-    margin: 15px 0;
-}
-
-.payment-error p {
-    color: #d32f2f;
-    font-size: 16px;
-    margin: 0 0 15px 0;
-    font-weight: 500;
-}
-
-.payment-error .payment-back-btn {
-    display: inline-block;
-    padding: 8px 16px;
-    background: #2196f3;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
-.payment-error .payment-back-btn:hover {
-    background: #1976d2;
-}
 /* Responsive for mobile */
 @media screen and (max-width: 480px) {
     .payment-card {

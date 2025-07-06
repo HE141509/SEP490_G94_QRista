@@ -123,11 +123,10 @@ function renderMenuItems(items) {
         let typesHtml = '';
         if (Array.isArray(item.Types) && item.Types.length > 0) {
             item.Types.forEach(type => {
-                const donGia = (type.DonGia && type.DonGia > 0) ? type.DonGia : 30000;
                 typesHtml += `
                 <div class="menu-item-type-row">
                     <span class="badge" style="background:#e3f2fd;color:#1976d2;margin-right:8px;">${type.TenLoai || type.MaLoai || ''}</span>
-                    <span class="menu-item-type-price">${donGia.toLocaleString()} đ</span>
+                    <span class="menu-item-type-price">${type.DonGia ? type.DonGia.toLocaleString() : 0} đ</span>
                     <div class="menu-item-qty" style="display:inline-block;margin-left:12px;">
                         <button type="button" onclick="changeQuantityType(this, -1)">-</button>
                         <span class="quantity" data-maloai="${type.MaLoai}">0</span>
@@ -137,10 +136,8 @@ function renderMenuItems(items) {
                 `;
             });
         } else {
-            const donGiaMacDinh = 30000;
-            let gia = (item.Price && item.Price > 0) ? item.Price : donGiaMacDinh;
             typesHtml = `
-                <div class="menu-item-price">Giá: <span>${gia.toLocaleString()}</span> đ</div>
+                <div class="menu-item-price">Giá: <span>${item.Price ? item.Price.toLocaleString() : 0}</span> đ</div>
                 <div class="menu-item-qty">
                     <button type="button" onclick="changeQuantity(this, -1)">-</button>
                     <span class="quantity">0</span>
@@ -378,55 +375,12 @@ function getPrice(size) {
 function changeQuantity(button, change) {
     const itemDiv = button.closest('.menu-item');
     const name = itemDiv.querySelector('.menu-item-title').innerText;
-    let price = 30000; // mặc định
-    let key = name;
-    // Nếu có badge (sản phẩm có loại), lấy theo loại
     const priceDiv = button.closest('.menu-item-price');
-    if (priceDiv && priceDiv.querySelector('.badge')) {
-        const size = priceDiv.querySelector('.badge').innerText.trim();
-        key = name + '_' + size;
-        price = getPrice(size);
-        if (!price || price <= 0) price = 30000;
-    } else {
-        // Nếu có thẻ span giá, lấy giá hiển thị
-        const priceSpan = itemDiv.querySelector('.menu-item-price span');
-        let gia = 0;
-        if (priceSpan) {
-            gia = parseInt(priceSpan.innerText.replace(/\D/g, ''));
-        }
-        if (!isNaN(gia) && gia > 0) {
-            price = gia;
-        } else {
-            price = 30000;
-        }
-    }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
-    // Ensure key is properly initialized and cart object is updated
-    if (!window.qrbMenuState.cart[key]) {
-        window.qrbMenuState.cart[key] = { name, qty: 0, price: 30000 }; // Default price
-    }
-
-    // Update price and quantity
-    window.qrbMenuState.cart[key].price = price || 30000; // Default price if undefined
-    window.qrbMenuState.cart[key].qty = Math.max(0, (window.qrbMenuState.cart[key].qty || 0) + change);
-
-    // Remove item if quantity is zero
-    if (window.qrbMenuState.cart[key].qty === 0) {
-        delete window.qrbMenuState.cart[key];
-    }
-
-<<<<<<< HEAD
-=======
-    if (!window.qrbMenuState.cart[key]) window.qrbMenuState.cart[key] = { name, qty: 0, price };
-    window.qrbMenuState.cart[key].price = price; // luôn đồng bộ lại giá
+    const size = priceDiv.querySelector('.badge').innerText.trim();
+    const key = name + '_' + size;
+    if (!window.qrbMenuState.cart[key]) window.qrbMenuState.cart[key] = { name, size, qty: 0, price: getPrice(size) };
     window.qrbMenuState.cart[key].qty = Math.max(0, window.qrbMenuState.cart[key].qty + change);
     if (window.qrbMenuState.cart[key].qty === 0) delete window.qrbMenuState.cart[key];
->>>>>>> 012cf6108682eed2a0083951e972605090bb4f8c
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
     updateCartSummary();
     updateMenuItemQtyUI();
 }
@@ -530,7 +484,7 @@ document.getElementById('cart-checkout-btn').addEventListener('click', function(
         total += item.qty * item.price;
         const div = document.createElement('div');
         div.className = 'order-item';
-        div.innerHTML = `<span>${item.name} (${item.maLoai || 'Không có loại'})</span> <span>${item.qty} x ${item.price.toLocaleString()} đ</span>`;
+        div.innerHTML = `<span>${item.name} (${item.size})</span> <span>${item.qty} x ${item.price.toLocaleString()} đ</span>`;
         list.appendChild(div);
     }
     window.qrbMenuState.currentOrderTotal = total;

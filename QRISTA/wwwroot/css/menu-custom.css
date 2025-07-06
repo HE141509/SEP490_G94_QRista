@@ -112,65 +112,12 @@
     justify-content: center;
 }
 .menu-items {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center; /* Center items horizontally */
-    align-items: center; /* Center items vertically */
-    gap: 20px;
-<<<<<<< HEAD
-=======
     /* Không dùng grid nữa, dùng flex cho từng hàng */
     width: 100%;
->>>>>>> 012cf6108682eed2a0083951e972605090bb4f8c
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
 }
 
 .menu-items-row {
     display: flex;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
-    justify-content: center; /* Center items horizontally */
-    gap: 24px; /* Maintain spacing between items */
-    margin-bottom: 24px;
-    align-items: center; /* Center items vertically */
-}
-.menu-item {
-    flex: 1 1 calc(33.333% - 24px); /* Ensure 3 items per row */
-    max-width: calc(33.333% - 24px);
-    height: auto; /* Allow dynamic height */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Center content vertically */
-    align-items: center; /* Center content horizontally */
-    box-sizing: border-box;
-    padding: 16px;
-    margin: 0; /* Remove margin to avoid misalignment */
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.menu-item-img {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100px; /* Đảm bảo chiều cao hình ảnh đồng đều */
-}
-.menu-item-img img {
-    max-width: 100px;
-    max-height: 100px;
-    object-fit: contain;
-    margin-bottom: 10px;
-<<<<<<< HEAD
-=======
     flex-wrap: nowrap;
     gap: 24px 18px;
     margin-bottom: 24px;
@@ -198,28 +145,11 @@
     object-fit: contain;
     display: block;
     margin: 0 auto;
->>>>>>> 012cf6108682eed2a0083951e972605090bb4f8c
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
 }
 .menu-item-info {
     width: 100%;
     display: flex;
     flex-direction: column;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
-    align-items: center; /* Căn giữa nội dung */
-    justify-content: center;
-}
-.menu-item-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 8px;
-<<<<<<< HEAD
-=======
     align-items: flex-start;
     justify-content: flex-start;
 }
@@ -229,9 +159,6 @@
     font-size: 1.18rem;
     font-weight: 700;
     margin-bottom: 2px;
->>>>>>> 012cf6108682eed2a0083951e972605090bb4f8c
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
 }
 .menu-item-code {
     width: 100%;
@@ -241,25 +168,11 @@
     margin-bottom: 4px;
 }
 .menu-item-type-row {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 8px;
-<<<<<<< HEAD
-=======
     margin-bottom: 6px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
->>>>>>> 012cf6108682eed2a0083951e972605090bb4f8c
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
 }
 .menu-item-type-row .badge {
     flex: 1 1 auto;
@@ -273,20 +186,6 @@
     flex: 0 0 auto;
 }
 .menu-item-type-price {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
-    text-align: right;
-    min-width: 80px;
-}
-.menu-item-qty {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-<<<<<<< HEAD
-=======
     min-width: 80px;
     display: inline-block;
     text-align: right;
@@ -297,9 +196,6 @@
     align-items: center;
     justify-content: flex-end;
     gap: 6px;
->>>>>>> 012cf6108682eed2a0083951e972605090bb4f8c
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
 }
 .menu-item-qty button {
     width: 36px;
@@ -357,58 +253,3 @@
     padding: 2px 8px;
     font-size: 0.98rem;
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
-@media screen and (max-width: 768px) {
-    .menu-items-row {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .menu-item {
-        width: 100%;
-        margin-bottom: 16px;
-        flex: 1 1 100%; /* Đảm bảo 1 sản phẩm/hàng */
-        max-width: 100%;
-    }
-
-    .menu-item-img img {
-        max-width: 100%;
-        height: auto;
-    }
-
-    .menu-item-info {
-        text-align: center;
-    }
-
-    .menu-item-title {
-        font-size: 1.2rem;
-    }
-
-    .menu-item-code {
-        font-size: 1rem;
-        margin-top: 8px;
-    }
-
-    .menu-item-price {
-        font-size: 1rem;
-        margin-top: 8px;
-    }
-
-    .menu-item-qty {
-        margin-top: 8px;
-    }
-
-    .menu-items {
-        flex-direction: column;
-        gap: 15px;
-    }
-}
-<<<<<<< HEAD
-=======
->>>>>>> 012cf6108682eed2a0083951e972605090bb4f8c
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using QRB.Helpers;
-using QRB.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,13 +9,6 @@ namespace QRB.Pages.Vnpay
 {
     public class VnpayReturnModel : PageModel
     {
-        private readonly QRBDbContext _context;
-
-        public VnpayReturnModel(QRBDbContext context)
-        {
-            _context = context;
-        }
-
         public bool IsSuccess { get; set; }
         public string? Message { get; set; }
         public string? OrderId { get; set; }
@@ -37,10 +29,8 @@ namespace QRB.Pages.Vnpay
                     VnpParams[key] = value;
                 }
             }
-
             // Lấy secure hash
             string? vnp_SecureHash = query.ContainsKey("vnp_SecureHash") ? query["vnp_SecureHash"].ToString() : null;
-
             // Sắp xếp params theo key và build chuỗi hash đúng chuẩn VNPAY
             var ordered = VnpParams.OrderBy(x => x.Key);
             StringBuilder data = new StringBuilder();
@@ -49,11 +39,9 @@ namespace QRB.Pages.Vnpay
                 if (data.Length > 0) data.Append('&');
                 data.Append(kv.Key + "=" + kv.Value);
             }
-
             // Lấy secret key
             string vnp_HashSecret = VnpayHelper.Vnp_HashSecret;
             string checkHash = VnpayHelper.HmacSHA512(vnp_HashSecret, data.ToString());
-
             // Kiểm tra checksum
             if (!string.IsNullOrEmpty(vnp_SecureHash) && vnp_SecureHash.Equals(checkHash, System.StringComparison.InvariantCultureIgnoreCase))
             {
@@ -62,26 +50,6 @@ namespace QRB.Pages.Vnpay
                 {
                     IsSuccess = true;
                     Message = "Thanh toán thành công!";
-
-                    // Cập nhật trạng thái đơn hàng
-                    if (query.ContainsKey("orderId"))
-                    {
-                        OrderId = query["orderId"].ToString();
-                        try
-                        {
-                            var order = _context.DonHangs.FirstOrDefault(o => o.MaDonHang == OrderId);
-                            if (order != null)
-                            {
-                                order.TrangThaiThanhToan = true;
-                                order.NgayThanhToan = DateTime.Now;
-                                _context.SaveChanges();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Error updating order: {ex}");
-                        }
-                    }
                 }
                 else
                 {
@@ -94,7 +62,6 @@ namespace QRB.Pages.Vnpay
                 IsSuccess = false;
                 Message = "Sai chữ ký xác thực!";
             }
-
             // Lấy orderId nếu có
             if (query.ContainsKey("orderId"))
                 OrderId = query["orderId"].ToString();
