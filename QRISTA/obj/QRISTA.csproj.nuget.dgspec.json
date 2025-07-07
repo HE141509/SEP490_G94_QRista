@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj": {}
+    "D:\\New folder (2)\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj": {}
   },
   "projects": {
-    "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj": {
+    "D:\\New folder (2)\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj",
+        "projectUniqueName": "D:\\New folder (2)\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj",
         "projectName": "QRISTA",
-        "projectPath": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj",
-        "packagesPath": "C:\\Users\\salam\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\obj\\",
+        "projectPath": "D:\\New folder (2)\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj",
+        "packagesPath": "C:\\Users\\jokA\\.nuget\\packages\\",
+        "outputPath": "D:\\New folder (2)\\SEP490_G94_QRista\\QRISTA\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\salam\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\jokA\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,7 +26,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -87,7 +86,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.302/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
