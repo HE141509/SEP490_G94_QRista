@@ -6,6 +6,7 @@ namespace QRB.Pages.Payment
     {
         public void OnGet()
         {
+            // Trang này chỉ để chuyển hướng với JavaScript
         }
     }
 }

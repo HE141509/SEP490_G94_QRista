@@ -162,7 +162,9 @@
     </div>
 </footer>
 <script src="/lib/jquery/dist/jquery.min.js"></script>
+<!-- <script src="/js/customer.js"></script> -->
 <script>
+// PHÂN TRANG + SEARCH + FILTER KHÁCH HÀNG
 let customerCurrentPage = 1;
 let customerPageSize = 10;
 let customerCurrentFilter = 'active';
@@ -175,6 +177,7 @@ function getAllCustomerRows() {
 }
 function getFilteredCustomerRows() {
     let rows = getAllCustomerRows();
+    // Lọc theo trạng thái
     rows = rows.filter(function(row) {
         var statusCell = row.querySelector('.customer-status');
         var isActive = true;
@@ -184,6 +187,7 @@ function getFilteredCustomerRows() {
         if (customerCurrentFilter === 'active') return isActive;
         if (customerCurrentFilter === 'inactive') return !isActive;
     });
+    // Lọc theo search
     if (customerCurrentSearch) {
         rows = rows.filter(function(row) {
             var name = row.querySelector('td:nth-child(2) span')?.textContent.toLowerCase() || '';
@@ -260,6 +264,7 @@ window.addEventListener('DOMContentLoaded', function() {
     customerPageSize = parseInt(document.getElementById('customerPageSize').value) || 10;
     setTimeout(updateCustomerPagination, 0);
 });
+// Hiển thị popup Thêm khách hàng
 document.getElementById('btnAddCustomer').onclick = function() {
     document.getElementById('addCustomerModal').style.display = 'flex';
 };
@@ -267,11 +272,13 @@ function closeAddCustomerModal() {
     document.getElementById('addCustomerModal').style.display = 'none';
     document.getElementById('addCustomerForm').reset();
 }
+// Định dạng tiền cho input
 function formatCurrencyInput(val) {
     if (!val) return '';
     val = val.toString().replace(/[^\d]/g, '');
     return val.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+// Format khi nhập giá trị đơn hàng (thêm dấu phẩy)
 document.getElementById('addGiaTriDonHang').addEventListener('input', function(e) {
     let val = e.target.value.replace(/[^\d]/g, '');
     e.target.value = formatCurrencyInput(val);
@@ -280,6 +287,7 @@ document.getElementById('editGiaTriDonHang').addEventListener('input', function(
     let val = e.target.value.replace(/[^\d]/g, '');
     e.target.value = formatCurrencyInput(val);
 });
+// Hiển thị popup Sửa khách hàng
 function showEditCustomerModal(id, tenKhachHang, soDienThoai, giaTriDonHang, isDelete) {
     document.getElementById('editCustomerId').value = id;
     document.getElementById('editTenKhachHang').value = tenKhachHang;
@@ -292,6 +300,7 @@ function closeEditCustomerModal() {
     document.getElementById('editCustomerModal').style.display = 'none';
     document.getElementById('editCustomerForm').reset();
 }
+// Hiển thị popup Xóa khách hàng
 let deleteCustomerId = null;
 function showDeleteCustomerConfirm(id) {
     deleteCustomerId = id;
@@ -301,6 +310,7 @@ function closeDeleteCustomerModal() {
     deleteCustomerId = null;
     document.getElementById('deleteCustomerModal').style.display = 'none';
 }
+// Thêm khách hàng (AJAX)
 document.getElementById('addCustomerForm').onsubmit = function(e) {
     e.preventDefault();
     var form = e.target;
@@ -327,6 +337,7 @@ document.getElementById('addCustomerForm').onsubmit = function(e) {
         }
     });
 };
+// Sửa khách hàng (AJAX)
 document.getElementById('editCustomerForm').onsubmit = function(e) {
     e.preventDefault();
     var form = e.target;
@@ -354,6 +365,7 @@ document.getElementById('editCustomerForm').onsubmit = function(e) {
         }
     });
 };
+// Xóa khách hàng (AJAX)
 function confirmDeleteCustomer() {
     if (!deleteCustomerId) return;
     fetch('/Customer/DeleteCustomer', {
@@ -375,6 +387,7 @@ function confirmDeleteCustomer() {
 }
 </script>
 
+<!-- Modal Thêm/Sửa Khách Hàng -->
 <div class="modal fade" id="customerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="userlist-add-modal-content">
@@ -408,6 +421,7 @@ function confirmDeleteCustomer() {
         </div>
     </div>
 </div>
+<!-- Modal Xóa Khách Hàng -->
 <div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="userlist-add-modal-content">
@@ -423,6 +437,7 @@ function confirmDeleteCustomer() {
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script>
 $(document).ready(function () {
+    // Sửa khách hàng khi click vào tên (bắt buộc IsDelete là 0 hoặc 1)
     $(document).on('click', '.customer-edit-link', function (e) {
         e.preventDefault();
         var row = $(this).closest('tr');
@@ -430,19 +445,23 @@ $(document).ready(function () {
         $('#tenKhachHang').val(row.find('td:eq(1)').text());
         $('#soDienThoai').val(row.find('td:eq(2)').text());
         $('#giaTriDonHang').val(row.find('td:eq(3)').text());
+        // Trạng thái: nếu text là 'Đã xóa' thì IsDelete=1, ngược lại IsDelete=0
         var isDelete = row.find('td:eq(4)').text().trim() === 'Đã xóa' ? '1' : '0';
         $('#isDelete').val(isDelete);
         $('#customerModalTitle').text('Sửa khách hàng');
         document.getElementById('customerModal').style.display = 'flex';
     });
 
+    // Hiển thị popup xác nhận xóa khách hàng
     $(document).on('click', '.btnDeleteCustomer', function () {
         deleteCustomerId = $(this).data('id');
         document.getElementById('deleteCustomerModal').style.display = 'flex';
     });
+    // Đóng popup xác nhận xóa (ẩn modal thủ công, không dùng .modal('hide') vì không phải Bootstrap modal)
     $(document).on('click', '.userlist-add-cancel-btn[data-bs-dismiss="modal"]', function () {
         deleteCustomerId = null;
         $('#deleteCustomerModal').css('display', 'none');
     });
 });
 </script>
+<!-- <script src="~/js/customer.js"></script> -->

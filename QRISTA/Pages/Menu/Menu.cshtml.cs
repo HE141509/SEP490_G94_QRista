@@ -100,7 +100,6 @@ namespace QRB.Pages.Menu
             try
             {
                 HttpContext.Session.SetString("CartData", request.CartData ?? "");
-                HttpContext.Session.SetString("qrb_cart_data", request.CartData ?? ""); // Thêm key cho Payment
                 HttpContext.Session.SetString("PhoneNumber", request.PhoneNumber ?? "");
                 HttpContext.Session.SetString("OrderTotalAmount", request.TotalAmount.ToString());
                 HttpContext.Session.SetString("OrderDiscountAmount", request.DiscountAmount.ToString());
@@ -113,34 +112,10 @@ namespace QRB.Pages.Menu
             }
         }
 
-        public JsonResult OnPostSaveCartData([FromBody] SaveCartRequest request)
-        {
-            try
-            {
-                Console.WriteLine($"SaveCartData called with: {request.CartData}");
-                HttpContext.Session.SetString("qrb_cart_data", request.CartData ?? "");
-                Console.WriteLine($"Saved to session. Session ID: {HttpContext.Session.Id}");
-                return new JsonResult(new { success = true, message = "Đã lưu cart data" });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in SaveCartData: {ex.Message}");
-                return new JsonResult(new { success = false, message = $"Lỗi khi lưu cart: {ex.Message}" });
-            }
-        }
-
         public JsonResult OnGetGetPhoneNumberFromSession()
         {
             var phoneNumber = HttpContext.Session.GetString("PhoneNumber");
             return new JsonResult(new { phoneNumber });
-        }
-
-        public JsonResult OnGetGetCartDataFromSession()
-        {
-            var cartData = HttpContext.Session.GetString("qrb_cart_data");
-            Console.WriteLine($"GetCartDataFromSession called. Session ID: {HttpContext.Session.Id}");
-            Console.WriteLine($"Cart data from session: {cartData ?? "NULL"}");
-            return new JsonResult(new { cartData });
         }
     }
 
@@ -150,10 +125,5 @@ namespace QRB.Pages.Menu
         public string? PhoneNumber { get; set; }
         public int TotalAmount { get; set; }
         public int DiscountAmount { get; set; }
-    }
-
-    public class SaveCartRequest
-    {
-        public string? CartData { get; set; }
     }
 }
