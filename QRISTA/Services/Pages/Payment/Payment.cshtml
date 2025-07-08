@@ -1,0 +1,34 @@
+@page
+@model QRB.Pages.Payment.PaymentModel
+@{
+    Layout = null;
+    ViewData["Title"] = "QRB - Thanh toán";
+}
+
+<div class="payment-bg">
+    <div class="payment-center">
+        <div class="payment-card">
+            <div class="payment-logo-row">
+                <img src="/images/Logo_FPT.png" alt="Logo" class="payment-logo" />
+                <span class="payment-brand">QRista Cafe</span>
+            </div>
+            <h2 class="payment-title">Quét mã QR để thanh toán</h2>
+            <div class="payment-amount">Số tiền cần thanh toán:<br><span>@Model.Amount.ToString("N0") đ</span></div>
+            <div class="payment-qr-wrapper">
+                <span>Đang chuyển hướng sang cổng thanh toán VNPAY...</span>
+            </div>
+            <div class="payment-desc">Bạn sẽ được chuyển sang cổng thanh toán VNPAY. Nếu không tự động chuyển, <a href="@Html.Raw(Model.PaymentUrl)" class="payment-vnpay-btn">bấm vào đây</a>.</div>
+            <script>
+                window.onload = function() {
+                    window.location.href = "@Html.Raw(Model.PaymentUrl)";
+                };
+            </script>
+            <a href="/Menu" class="payment-back-btn">&larr; Quay lại Menu</a>
+        </div>
+    </div>
+</div>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/payment.css" />
+</head>

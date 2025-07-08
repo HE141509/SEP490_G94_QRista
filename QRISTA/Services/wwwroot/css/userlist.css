@@ -1,0 +1,374 @@
+footer {
+    width: 100%;
+    background: #fff;
+    border-top: 1px solid #e0e6ed;
+    padding: 16px 0 10px 0;
+    position: relative;
+    left: 0;
+    z-index: 10;
+}
+.footer-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #888;
+    font-size: 15px;
+    font-weight: 500;
+    width: 100%;
+    min-height: 32px;
+}
+@media (max-width: 600px) {
+    .footer-content {
+        font-size: 13px;
+        padding: 0 8px;
+    }
+}
+/* UserList page custom styles */
+.dashboard-header.userlist-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0;
+}
+.userlist-add-btn {
+    background: #4285f4;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(66,133,244,0.08);
+    transition: background 0.2s, color 0.2s;
+}
+.userlist-add-btn:hover {
+    background: #1967d2;
+    color: #fff;
+}
+.userlist-modern {
+    margin-top: 0;
+    background: #fff;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding-bottom: 24px;
+}
+.userlist-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px 0 32px;
+}
+.userlist-toolbar-left label {
+    font-size: 15px;
+    margin-right: 8px;
+    color: #555;
+}
+.userlist-filter {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #e0e6ed;
+    font-size: 15px;
+    background: #f5f7fa;
+    color: #333;
+}
+.userlist-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.userlist-search {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #e0e6ed;
+    font-size: 15px;
+    background: #f5f7fa;
+    color: #333;
+    min-width: 220px;
+}
+.userlist-filter-btn {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+.userlist-table-modern {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 18px;
+    background: #fff;
+}
+.userlist-table-modern th, .userlist-table-modern td {
+    padding: 14px 10px;
+    border-bottom: 1px solid #e0e6ed;
+    text-align: left;
+    font-size: 15px;
+    background: #fff;
+}
+.userlist-table-modern th {
+    background: #f5f7fa;
+    font-weight: 600;
+    color: #2d3a4a;
+}
+.userlist-table-modern tr:last-child td {
+    border-bottom: none;
+}
+.userlist-avatar-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.userlist-avatar.userlist-avatar-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e0e6ed;
+    color: #4285f4;
+    font-weight: 600;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.userlist-info {
+    display: flex;
+    flex-direction: column;
+}
+.userlist-name {
+    font-weight: 500;
+    color: #222;
+    font-size: 16px;
+}
+.userlist-username {
+    font-size: 13px;
+    color: #888;
+}
+.userlist-email {
+    font-size: 15px;
+    color: #333;
+}
+.userlist-role, .userlist-permission {
+    font-size: 15px;
+    color: #555;
+}
+.userlist-action {
+    text-align: right;
+}
+.userlist-delete-btn {
+    background: none;
+    border: none;
+    color: #ea4335;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: color 0.2s;
+}
+.userlist-delete-btn:hover {
+    color: #b71c1c;
+}
+.userlist-card {
+    background: #fff;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin: 0;
+    padding: 0 0 24px 0;
+}
+.userlist-card-header {
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding: 20px 32px 12px 32px;
+    border-bottom: 1px solid #e0e6ed;
+    background: #f5f7fa;
+    border-radius: 12px 12px 0 0;
+    color: #2d3a4a;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.userlist-table-wrapper {
+    overflow-x: auto;
+    padding: 0;
+}
+.userlist-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    background: #fff;
+}
+.userlist-table th, .userlist-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e0e6ed;
+    text-align: left;
+    font-size: 15px;
+}
+.userlist-table th {
+    background: #f5f7fa;
+    font-weight: 600;
+    color: #2d3a4a;
+}
+.userlist-table tr:last-child td {
+    border-bottom: none;
+}
+.userlist-username {
+    font-weight: 500;
+    color: #4285f4;
+}
+.userlist-branch {
+    font-size: 13px;
+    color: #888;
+}
+.userlist-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+}
+.userlist-status.active {
+    background: #e6f4ea;
+    color: #34a853;
+}
+.userlist-status.inactive {
+    background: #fbe9e7;
+    color: #ea4335;
+}
+.userlist-pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 4px;
+    margin: 18px 12px 0 12px;
+    flex-wrap: wrap;
+}
+.userlist-pagination button {
+    min-width: 32px;
+    height: 32px;
+    border: none;
+    background: #f5f7fa;
+    color: #4285f4;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.userlist-pagination button.active, .userlist-pagination button:hover {
+    background: #4285f4;
+    color: #fff;
+}
+.userlist-pagination button[disabled] {
+    background: #eee;
+    color: #bbb;
+    cursor: not-allowed;
+}
+.userlist-pagination span {
+    padding: 0 6px;
+    color: #888;
+    font-size: 15px;
+}
+
+/* Popup thêm mới user đẹp, hiện đại */
+.userlist-add-modal-content {
+    background: #fff;
+    padding: 36px 32px 28px 32px;
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(66,133,244,0.13), 0 1.5px 8px rgba(0,0,0,0.08);
+    min-width: 350px;
+    max-width: 96vw;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    animation: userlistModalFadeIn 0.25s;
+}
+@keyframes userlistModalFadeIn {
+    from { transform: translateY(40px) scale(0.98); opacity: 0; }
+    to { transform: none; opacity: 1; }
+}
+.userlist-add-modal-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #4285f4;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.userlist-add-form-group {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.userlist-add-form-group label {
+    font-weight: 600;
+    color: #333;
+    font-size: 15px;
+    margin-bottom: 2px;
+}
+.userlist-add-form-group input,
+.userlist-add-form-group select {
+    padding: 9px 14px;
+    border-radius: 8px;
+    border: 1px solid #e0e6ed;
+    font-size: 15px;
+    background: #f5f7fa;
+    color: #222;
+    outline: none;
+    transition: border 0.2s;
+}
+.userlist-add-form-group input:focus,
+.userlist-add-form-group select:focus {
+    border: 1.5px solid #4285f4;
+    background: #fff;
+}
+.userlist-add-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 10px;
+}
+.userlist-add-cancel-btn {
+    background: #f5f7fa;
+    color: #333;
+    border: none;
+    padding: 9px 26px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+.userlist-add-cancel-btn:hover {
+    background: #e0e6ed;
+    color: #222;
+}
+.userlist-add-submit-btn {
+    background: #4285f4;
+    color: #fff;
+    border: none;
+    padding: 9px 26px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(66,133,244,0.08);
+    transition: background 0.2s, color 0.2s;
+}
+.userlist-add-submit-btn:hover {
+    background: #1967d2;
+    color: #fff;
+}
+@media (max-width: 600px) {
+    .userlist-add-modal-content {
+        padding: 18px 6vw 18px 6vw;
+        min-width: 0;
+    }
+}

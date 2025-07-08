@@ -1,0 +1,88 @@
+@page "/VnpayReturn"
+@model QRB.Pages.Vnpay.VnpayReturnModel
+@{
+    ViewData["Title"] = "Kết quả thanh toán";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0">
+                <div class="card-body text-center p-5">
+                    @if (Model.IsSuccess)
+                    {
+                        <div class="mb-4">
+                            <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                        </div>
+                        <h2 class="text-success mb-3">Thanh toán thành công!</h2>
+                        <p class="text-muted mb-4">@Model.Message</p>
+                        @if (!string.IsNullOrEmpty(Model.OrderId))
+                        {
+                            <p class="mb-4">
+                                <strong>Mã đơn hàng:</strong> <span class="text-primary">@Model.OrderId</span>
+                            </p>
+                        }
+                    }
+                    else
+                    {
+                        <div class="mb-4">
+                            <i class="fas fa-times-circle text-danger" style="font-size: 4rem;"></i>
+                        </div>
+                        <h2 class="text-danger mb-3">Thanh toán thất bại!</h2>
+                        <p class="text-muted mb-4">@Model.Message</p>
+                        @if (!string.IsNullOrEmpty(Model.OrderId))
+                        {
+                            <p class="mb-4">
+                                <strong>Mã đơn hàng:</strong> <span class="text-primary">@Model.OrderId</span>
+                            </p>
+                        }
+                    }
+                    
+                    <div class="mt-4">
+                        <a href="/Menu/Menu" class="btn btn-primary btn-lg px-4">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Quay lại menu
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tự động redirect về menu sau 5 giây
+    setTimeout(function() {
+        window.location.href = '/Menu/Menu';
+    }, 5000);
+    
+    // Countdown timer
+    let countdown = 5;
+    const countdownElement = document.createElement('div');
+    countdownElement.className = 'text-muted mt-3';
+    countdownElement.innerHTML = `<small>Tự động chuyển về menu trong <span id="countdown">${countdown}</span> giây...</small>`;
+    document.querySelector('.card-body').appendChild(countdownElement);
+    
+    const countdownInterval = setInterval(function() {
+        countdown--;
+        document.getElementById('countdown').textContent = countdown;
+        if (countdown <= 0) {
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
+</script>
+
+<style>
+    .card {
+        border-radius: 15px;
+    }
+    
+    .btn-lg {
+        border-radius: 25px;
+    }
+    
+    .fas {
+        line-height: 1;
+    }
+</style>
