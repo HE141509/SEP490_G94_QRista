@@ -38,9 +38,16 @@ namespace QRB.Pages.KhoSanPham
                 if (kho == null)
                     return new JsonResult(new { success = false, message = $"Không tìm thấy KhoSanPham với id: {input.id}" });
 
+                // Kiểm tra số lượng trước khi xóa
+                if (int.TryParse(kho.SoLuongConLai, out var soLuong) && soLuong > 0)
+                {
+                    return new JsonResult(new { success = false, message = $"Không thể xóa vì còn tồn kho {soLuong:N0} đơn vị. Vui lòng xuất hết hàng trước khi xóa." });
+                }
+
                 kho.IsDelete = true;
+                kho.UpdateTime = DateTime.Now;
                 await _context.SaveChangesAsync();
-                return new JsonResult(new { success = true });
+                return new JsonResult(new { success = true, message = "Xóa thành công!" });
             }
             catch (Exception ex)
             {
