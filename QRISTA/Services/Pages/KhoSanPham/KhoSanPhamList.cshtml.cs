@@ -27,15 +27,54 @@ namespace QRB.Pages.KhoSanPham
         }
 
         public List<KhoSanPhamViewModel> KhoSanPhamList { get; set; } = new();
+        public List<NguyenLieuViewModel> NguyenLieuList { get; set; } = new();
+        public List<ChiNhanhViewModel> ChiNhanhList { get; set; } = new();
+        public string Status { get; set; } = "active";
+        
+        public class NguyenLieuViewModel
+        {
+            public Guid ID { get; set; }
+            public string TenNguyenLieu { get; set; } = string.Empty;
+        }
+        
+        public class ChiNhanhViewModel
+        {
+            public Guid ID { get; set; }
+            public string TenChiNhanh { get; set; } = string.Empty;
+        }
         public void OnGet(string? status = "active")
         {
+            Status = status ?? "active";
+            
+            // Lấy danh sách nguyên liệu
+            NguyenLieuList = _context.NguyenLieus
+                .Where(n => !n.IsDelete)
+                .Select(n => new NguyenLieuViewModel
+                {
+                    ID = n.ID,
+                    TenNguyenLieu = n.TenNguyenLieu
+                })
+                .OrderBy(n => n.TenNguyenLieu)
+                .ToList();
+                
+            // Lấy danh sách chi nhánh
+            ChiNhanhList = _context.ChiNhanhs
+                .Where(c => !c.IsDelete)
+                .Select(c => new ChiNhanhViewModel
+                {
+                    ID = c.ID,
+                    TenChiNhanh = c.TenChiNhanh
+                })
+                .OrderBy(c => c.TenChiNhanh)
+                .ToList();
+            
             var query = _context.KhoSanPhams
                 .Join(_context.NguyenLieus, k => k.IDNguyenLieu, n => n.ID, (k, n) => new { k, n })
                 .Join(_context.ChiNhanhs, kn => kn.k.IDChiNhanh, c => c.ID, (kn, c) => new { kn.k, kn.n, c });
 
-            if (status == "active")
+            if (Status == "active")
                 query = query.Where(x => !x.k.IsDelete);
-            else if (status == "inactive")
+            else if (Status == "inactive")
                 query = query.Where(x => x.k.IsDelete);
 
             KhoSanPhamList = query

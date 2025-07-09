@@ -1,0 +1,972 @@
+@page
+@model QRB.Pages.DeXuatMuaSam.DeXuatMuaSamListModel
+@{
+    ViewData["Title"] = "Danh sách đề xuất mua sắm";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/userlist.css" />
+    
+    @* Anti-forgery token *@
+    @Html.AntiForgeryToken()
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .status-pending { color: #ff9800; font-weight: 600; }
+        .status-accepted { color: #4caf50; font-weight: 600; }
+        .status-rejected { color: #f44336; font-weight: 600; }
+        .status-received { color: #2196f3; font-weight: 600; }
+        .status-deleted { color: #9e9e9e; font-weight: 600; }
+        .row-deleted { background-color: #f5f5f5; opacity: 0.7; }
+    </style>
+</head>
+<body>
+    @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
+    <div class="main-container">
+        @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml", Model)
+        <main class="main-content">
+            <div class="dashboard-header userlist-header-flex">
+                <h1 class="page-title">Danh sách đề xuất mua sắm</h1>
+                <button type="button" class="userlist-add-btn" onclick="showAddDeXuatMuaSamModal()">
+                    <i class="fas fa-plus"></i> Thêm đề xuất mới
+                </button>
+                <!-- Modal thêm mới -->
+                <div id="addDeXuatMuaSamModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                    <div class="modal-content userlist-add-modal-content">
+                        <div class="userlist-add-modal-title"><i class="fas fa-file-invoice"></i> Thêm đề xuất mua sắm mới</div>
+                        <form id="addDeXuatMuaSamForm" autocomplete="off">
+                            <!-- Hàng đầu tiên: Mã đề xuất, Người gửi, Chi nhánh gửi -->
+                            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                                <div class="userlist-add-form-group" style="flex: 1;">
+                                    <label for="addMaDeXuat">Mã đề xuất</label>
+                                    <input type="text" id="addMaDeXuat" name="MaDeXuat" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                                </div>
+                                <div class="userlist-add-form-group" style="flex: 1;">
+                                    <label for="addIDNguoiGui">Người gửi</label>
+                                    <div class="searchable-select">
+                                        <input type="text" id="addIDNguoiGui" 
+                                               placeholder="Người gửi..." 
+                                               data-selected-id="@Model.CurrentUserId" 
+                                               class="userlist-input" readonly style="background-color: #f5f5f5;" autocomplete="off" />
+                                        <div class="searchable-options" id="addIDNguoiGuiOptions" style="display: none;">
+                                            @foreach (var nguoiDung in Model.AllNguoiDungList)
+                                            {
+                                                <div class="searchable-option" data-value="@nguoiDung.ID">@nguoiDung.TenHienThi</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="userlist-add-form-group" style="flex: 1;">
+                                    <label for="addIDChiNhanhGui">Chi nhánh gửi</label>
+                                    <div class="searchable-select">
+                                        <input type="text" id="addIDChiNhanhGui" 
+                                               placeholder="Chi nhánh gửi..." 
+                                               data-selected-id="@Model.CurrentUserBranchId" 
+                                               class="userlist-input" readonly style="background-color: #f5f5f5;" autocomplete="off" />
+                                        <div class="searchable-options" id="addIDChiNhanhGuiOptions" style="display: none;">
+                                            @foreach (var chiNhanh in Model.AllChiNhanhList)
+                                            {
+                                                <div class="searchable-option" data-value="@chiNhanh.ID">@chiNhanh.TenChiNhanh</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Các trường còn lại -->
+                            <div class="userlist-add-form-group">
+                                <label for="addTieuDe">Tiêu đề</label>
+                                <input type="text" id="addTieuDe" name="TieuDe" class="userlist-input" required />
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addNoiDungDeXuat">Nội dung đề xuất</label>
+                                <textarea id="addNoiDungDeXuat" name="NoiDungDeXuat" class="userlist-input" rows="4" required></textarea>
+                            </div>
+                            <!-- Hàng chi nhánh nhận và người nhận -->
+                            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                                <div class="userlist-add-form-group" style="flex: 1;">
+                                    <label for="addIDChiNhanhNhan">Chi nhánh nhận <small style="color: #666;">(không bao gồm chi nhánh gửi)</small></label>
+                                    <div class="searchable-select">
+                                        <input type="text" id="addIDChiNhanhNhan" 
+                                               placeholder="Tìm kiếm chi nhánh nhận..." 
+                                               data-selected-id="" 
+                                               class="userlist-input" autocomplete="off" />
+                                        <div class="searchable-options" id="addIDChiNhanhNhanOptions">
+                                            @foreach (var chiNhanh in Model.ChiNhanhList)
+                                            {
+                                                <div class="searchable-option" data-value="@chiNhanh.ID">@chiNhanh.TenChiNhanh</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="userlist-add-form-group" style="flex: 1;">
+                                    <label for="addIDNguoiNhan">Người nhận <small style="color: #666;">(chọn chi nhánh trước)</small></label>
+                                    <div class="searchable-select">
+                                        <input type="text" id="addIDNguoiNhan" 
+                                               placeholder="Vui lòng chọn chi nhánh trước..." 
+                                               data-selected-id="" 
+                                               class="userlist-input" autocomplete="off" disabled />
+                                        <div class="searchable-options" id="addIDNguoiNhanOptions">
+                                            <!-- Options sẽ được load qua JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="userlist-add-modal-actions">
+                                <button type="button" onclick="closeAddDeXuatMuaSamModal()" class="userlist-add-cancel-btn">Hủy</button>
+                                <button type="submit" class="userlist-add-submit-btn">Thêm mới</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="userlist-card userlist-modern">
+                <div class="userlist-toolbar">
+                    <div class="userlist-toolbar-left">
+                        <label for="filterDeXuatStatus">Trạng thái:</label>
+                        <select id="filterDeXuatStatus" class="userlist-filter" onchange="filterDeXuatByStatus()">
+                            <option value="all">Tất cả</option>
+                            <option value="pending">Chờ duyệt</option>
+                            <option value="accepted">Đã duyệt</option>
+                            <option value="rejected">Từ chối</option>
+                            <option value="received">Đã nhận</option>
+                            <option value="deleted">Đã xóa</option>
+                        </select>
+                    </div>
+                    <div class="userlist-toolbar-right">
+                        <label for="deXuatPageSize" style="font-size:15px;margin-right:8px;color:#555;">Hiển thị:</label>
+                        <select id="deXuatPageSize" class="userlist-filter" style="width:auto;min-width:60px;" onchange="changeDeXuatPageSize()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterDeXuatList()" style="margin-left:12px;" />
+                    </div>
+                </div>
+                <div class="userlist-table-wrapper">
+                    <table class="userlist-table userlist-table-modern" id="deXuatMuaSamListTable">
+                            <thead>
+                                <tr>
+                                    <th>Mã đề xuất</th>
+                                    <th>Tiêu đề</th>
+                                    <th>Người gửi</th>
+                                    <th>Chi nhánh gửi</th>
+                                    <th>Người nhận</th>
+                                    <th>Chi nhánh nhận</th>
+                                    <th>Trạng thái</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.DeXuatMuaSamList)
+                                {
+                                    <tr class="@(item.IsDelete ? "row-deleted" : "")">
+                                        <td>@item.MaDeXuat</td>
+                                        <td>
+                                            @if (!item.IsDelete && item.Status == "pending")
+                                            {
+                                                <a href="javascript:void(0)" onclick="showUpdateDeXuatMuaSamModal('@item.ID')" style="color: #007bff; text-decoration: none; cursor: pointer;">
+                                                    @item.TieuDe
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span>@item.TieuDe</span>
+                                            }
+                                        </td>
+                                        <td>@item.TenNguoiGui</td>
+                                        <td>@item.TenChiNhanhGui</td>
+                                        <td>@item.TenNguoiNhan</td>
+                                        <td>@item.TenChiNhanhNhan</td>
+                                        <td>
+                                            @if (item.IsDelete)
+                                            {
+                                                <span class="status-deleted">Đã xóa</span>
+                                            }
+                                            else
+                                            {
+                                                @switch (item.Status)
+                                                {
+                                                    case "pending":
+                                                        <span class="status-pending">Chờ duyệt</span>
+                                                        break;
+                                                    case "accepted":
+                                                        <span class="status-accepted">Đã duyệt</span>
+                                                        break;
+                                                    case "rejected":
+                                                        <span class="status-rejected">Từ chối</span>
+                                                        break;
+                                                    case "received":
+                                                        <span class="status-received">Đã nhận</span>
+                                                        break;
+                                                    default:
+                                                        <span>@item.Status</span>
+                                                        break;
+                                                }
+                                            }
+                                        </td>
+                                        <td>@item.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                        <td>
+                                            @if (!item.IsDelete)
+                                            {
+                                                <button type="button" class="userlist-delete-btn" onclick="showDeleteDeXuatMuaSamModal('@item.ID')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div id="deXuatMuaSamPagination" class="userlist-pagination">
+                            @if (Model.TotalPages > 1)
+                            {
+                                @if (Model.CurrentPage > 1)
+                                {
+                                    <a href="?pageNumber=1&pageSize=@Model.PageSize" class="userlist-pagination-btn">«</a>
+                                    <a href="?pageNumber=@(Model.CurrentPage - 1)&pageSize=@Model.PageSize" class="userlist-pagination-btn">‹</a>
+                                }
+
+                                @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                                {
+                                    if (i == Model.CurrentPage)
+                                    {
+                                        <span class="userlist-pagination-btn active">@i</span>
+                                    }
+                                    else
+                                    {
+                                        <a href="?pageNumber=@i&pageSize=@Model.PageSize" class="userlist-pagination-btn">@i</a>
+                                    }
+                                }
+
+                                @if (Model.CurrentPage < Model.TotalPages)
+                                {
+                                    <a href="?pageNumber=@(Model.CurrentPage + 1)&pageSize=@Model.PageSize" class="userlist-pagination-btn">›</a>
+                                    <a href="?pageNumber=@Model.TotalPages&pageSize=@Model.PageSize" class="userlist-pagination-btn">»</a>
+                                }
+                            }
+                        </div>
+                        <div class="userlist-pagination-info">
+                            Hiển thị @((Model.CurrentPage - 1) * Model.PageSize + 1) - @(Math.Min(Model.CurrentPage * Model.PageSize, Model.TotalRecords)) của @Model.TotalRecords bản ghi
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal xác nhận xóa Đề xuất Mua sắm -->
+    <div id="deleteDeXuatMuaSamModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+        <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:320px;max-width:90vw;text-align:center;">
+            <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa đề xuất mua sắm</div>
+            <div style="font-size:16px;color:#333;margin-bottom:24px;">Bạn có chắc chắn muốn xóa đề xuất mua sắm này không?</div>
+            <div style="display:flex;justify-content:center;gap:18px;">
+                <button onclick="deleteDeXuatMuaSam()" style="background:#ea4335;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Xác nhận</button>
+                <button onclick="closeDeleteDeXuatMuaSamModal()" style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal cập nhật Đề xuất Mua sắm -->
+    <div id="updateDeXuatMuaSamModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+        <div class="modal-content userlist-add-modal-content">
+            <div class="userlist-add-modal-title"><i class="fas fa-edit"></i> Cập nhật đề xuất mua sắm</div>
+            <form id="updateDeXuatMuaSamForm" autocomplete="off">
+                <input type="hidden" id="updateDeXuatId" />
+                <!-- Hàng đầu tiên: Mã đề xuất, Người gửi, Chi nhánh gửi -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label for="updateMaDeXuat">Mã đề xuất</label>
+                        <input type="text" id="updateMaDeXuat" name="MaDeXuat" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                    </div>
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label for="updateIDNguoiGui">Người gửi</label>
+                        <input type="text" id="updateNguoiGuiDisplay" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                        <input type="hidden" id="updateIDNguoiGui" />
+                    </div>
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label for="updateIDChiNhanhGui">Chi nhánh gửi</label>
+                        <input type="text" id="updateChiNhanhGuiDisplay" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                        <input type="hidden" id="updateIDChiNhanhGui" />
+                    </div>
+                </div>
+                <!-- Các trường còn lại -->
+                <div class="userlist-add-form-group">
+                    <label for="updateTieuDe">Tiêu đề</label>
+                    <input type="text" id="updateTieuDe" name="TieuDe" class="userlist-input" required />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="updateNoiDungDeXuat">Nội dung đề xuất</label>
+                    <textarea id="updateNoiDungDeXuat" name="NoiDungDeXuat" class="userlist-input" rows="4" required></textarea>
+                </div>
+                <!-- Hàng chi nhánh nhận và người nhận -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label for="updateIDChiNhanhNhan">Chi nhánh nhận <small style="color: #666;">(không bao gồm chi nhánh gửi)</small></label>
+                        <div class="searchable-select">
+                            <input type="text" id="updateIDChiNhanhNhan" 
+                                   placeholder="Tìm kiếm chi nhánh nhận..." 
+                                   data-selected-id="" 
+                                   class="userlist-input" autocomplete="off" />
+                            <div class="searchable-options" id="updateIDChiNhanhNhanOptions">
+                                @foreach (var chiNhanh in Model.ChiNhanhList)
+                                {
+                                    <div class="searchable-option" data-value="@chiNhanh.ID">@chiNhanh.TenChiNhanh</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label for="updateIDNguoiNhan">Người nhận <small style="color: #666;">(chọn chi nhánh trước)</small></label>
+                        <div class="searchable-select">
+                            <input type="text" id="updateIDNguoiNhan" 
+                                   placeholder="Vui lòng chọn chi nhánh trước..." 
+                                   data-selected-id="" 
+                                   class="userlist-input" autocomplete="off" disabled />
+                            <div class="searchable-options" id="updateIDNguoiNhanOptions">
+                                <!-- Options sẽ được load qua JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="updateStatus">Trạng thái</label>
+                    <input type="text" id="updateStatusDisplay" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                    <input type="hidden" id="updateStatus" name="Status" />
+                    <small style="color: #666; font-size: 12px;">* Trạng thái không thể thay đổi khi chỉnh sửa</small>
+                </div>
+                <div class="userlist-add-modal-actions">
+                    <button type="button" onclick="closeUpdateDeXuatMuaSamModal()" class="userlist-add-cancel-btn">Hủy</button>
+                    <button type="submit" class="userlist-add-submit-btn">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentDeleteId = null;
+        
+        // Thông tin chi nhánh của user hiện tại
+        const currentUserBranchCode = '@Model.CurrentUserBranchCode';
+        const currentUserId = '@Model.CurrentUserId';
+        const currentUserBranchId = '@Model.CurrentUserBranchId';
+        
+        // Hàm tạo mã đề xuất tự động
+        function generateDeXuatCode() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            // Format: DXMS_ddmmyyyyhhMMss_+ mã chi nhánh
+            const timeString = `${day}${month}${year}${hours}${minutes}${seconds}`;
+            return `DXMS_${timeString}_${currentUserBranchCode}`;
+        }
+        
+        // Hàm lấy tên hiển thị theo ID
+        function getDisplayTextById(optionsId, selectedId) {
+            const options = document.querySelectorAll(`#${optionsId} .searchable-option`);
+            for (let option of options) {
+                if (option.getAttribute('data-value') === selectedId) {
+                    return option.textContent;
+                }
+            }
+            return '';
+        }
+
+        // Set initial page size
+        document.addEventListener('DOMContentLoaded', function() {
+            const pageSize = @Model.PageSize;
+            const pageSizeSelect = document.getElementById('deXuatPageSize');
+            if (pageSizeSelect) {
+                pageSizeSelect.value = pageSize;
+            }
+        });
+
+        // Change page size
+        function changeDeXuatPageSize() {
+            const pageSize = document.getElementById('deXuatPageSize').value;
+            window.location.href = `?pageNumber=1&pageSize=${pageSize}`;
+        }
+
+        // Filter by status (client-side for current page)
+        function filterDeXuatByStatus() {
+            const status = document.getElementById('filterDeXuatStatus').value;
+            const rows = document.querySelectorAll('#deXuatMuaSamListTable tbody tr');
+            
+            rows.forEach(row => {
+                if (status === 'all') {
+                    row.style.display = '';
+                } else if (status === 'deleted') {
+                    // Lọc theo hàng có class "row-deleted"
+                    const isDeleted = row.classList.contains('row-deleted');
+                    row.style.display = isDeleted ? '' : 'none';
+                } else {
+                    const statusCell = row.querySelector('td:nth-child(7)');
+                    if (statusCell) {
+                        const statusText = statusCell.textContent.trim();
+                        let shouldShow = false;
+                        
+                        // Chỉ hiển thị nếu không phải hàng đã xóa
+                        const isDeleted = row.classList.contains('row-deleted');
+                        if (!isDeleted) {
+                            switch (status) {
+                                case 'pending':
+                                    shouldShow = statusText === 'Chờ duyệt';
+                                    break;
+                                case 'accepted':
+                                    shouldShow = statusText === 'Đã duyệt';
+                                    break;
+                                case 'rejected':
+                                    shouldShow = statusText === 'Từ chối';
+                                    break;
+                                case 'received':
+                                    shouldShow = statusText === 'Đã nhận';
+                                    break;
+                            }
+                        }
+                        
+                        row.style.display = shouldShow ? '' : 'none';
+                    }
+                }
+            });
+        }
+
+        // Search function (client-side for current page)
+        function filterDeXuatList() {
+            const searchText = event.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#deXuatMuaSamListTable tbody tr');
+            
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let shouldShow = false;
+                
+                // Search in MaDeXuat, TieuDe, TenNguoiGui, TenNguoiNhan
+                for (let i = 0; i < 6; i++) {
+                    if (cells[i] && cells[i].textContent.toLowerCase().includes(searchText)) {
+                        shouldShow = true;
+                        break;
+                    }
+                }
+                
+                row.style.display = shouldShow ? '' : 'none';
+            });
+        }
+
+        // Xử lý form thêm mới đề xuất mua sắm
+        document.getElementById('addDeXuatMuaSamForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                MaDeXuat: document.getElementById('addMaDeXuat').value,
+                TieuDe: document.getElementById('addTieuDe').value,
+                NoiDungDeXuat: document.getElementById('addNoiDungDeXuat').value,
+                IDNguoiGui: getSelectedValue('addIDNguoiGui'),
+                IDChiNhanhGui: getSelectedValue('addIDChiNhanhGui'),
+                IDNguoiNhan: getSelectedValue('addIDNguoiNhan'),
+                IDChiNhanhNhan: getSelectedValue('addIDChiNhanhNhan')
+            };
+            
+            // Chỉ kiểm tra chi nhánh nhận vì người nhận sẽ được chọn sau khi chọn chi nhánh
+            if (!formData.IDChiNhanhNhan) {
+                alert('Vui lòng chọn chi nhánh nhận!');
+                return;
+            }
+            if (!formData.IDNguoiNhan) {
+                alert('Vui lòng chọn người nhận!');
+                return;
+            }
+            
+            // Kiểm tra không được gửi cho chi nhánh của mình
+            if (formData.IDChiNhanhNhan === currentUserBranchId) {
+                alert('Không thể gửi đề xuất cho chi nhánh của mình!');
+                return;
+            }
+            
+            fetch('/DeXuatMuaSam/AddDeXuatMuaSam?handler=Add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            });
+        });
+
+        // Hiển thị modal thêm đề xuất mua sắm
+        function showAddDeXuatMuaSamModal() {
+            // Tự động sinh mã đề xuất
+            document.getElementById('addMaDeXuat').value = generateDeXuatCode();
+            
+            // Tự động điền người gửi và chi nhánh gửi
+            const nguoiGuiInput = document.getElementById('addIDNguoiGui');
+            const chiNhanhGuiInput = document.getElementById('addIDChiNhanhGui');
+            
+            // Điền tên người gửi
+            nguoiGuiInput.value = getDisplayTextById('addIDNguoiGuiOptions', currentUserId);
+            nguoiGuiInput.setAttribute('data-selected-id', currentUserId);
+            
+            // Điền tên chi nhánh gửi
+            chiNhanhGuiInput.value = getDisplayTextById('addIDChiNhanhGuiOptions', currentUserBranchId);
+            chiNhanhGuiInput.setAttribute('data-selected-id', currentUserBranchId);
+            
+            // Reset người nhận
+            const nguoiNhanInput = document.getElementById('addIDNguoiNhan');
+            nguoiNhanInput.disabled = true;
+            nguoiNhanInput.placeholder = 'Vui lòng chọn chi nhánh trước...';
+            nguoiNhanInput.value = '';
+            nguoiNhanInput.setAttribute('data-selected-id', '');
+            
+            document.getElementById('addDeXuatMuaSamModal').style.display = 'flex';
+            // Init dropdown cho chi nhánh nhận
+            initSearchableDropdown('addIDChiNhanhNhan');
+            // Setup event listener cho chi nhánh nhận
+            setupChiNhanhNhanListener();
+        }
+
+        // Đóng modal thêm đề xuất mua sắm
+        function closeAddDeXuatMuaSamModal() {
+            document.getElementById('addDeXuatMuaSamModal').style.display = 'none';
+            document.getElementById('addDeXuatMuaSamForm').reset();
+            resetSearchableDropdowns();
+            // Reset lại mã đề xuất
+            document.getElementById('addMaDeXuat').value = '';
+        }
+
+        // Hiển thị modal xóa đề xuất mua sắm
+        function showDeleteDeXuatMuaSamModal(id) {
+            currentDeleteId = id;
+            document.getElementById('deleteDeXuatMuaSamModal').style.display = 'flex';
+        }
+
+        // Đóng modal xóa đề xuất mua sắm
+        function closeDeleteDeXuatMuaSamModal() {
+            document.getElementById('deleteDeXuatMuaSamModal').style.display = 'none';
+            currentDeleteId = null;
+        }
+
+        // Xóa đề xuất mua sắm
+        function deleteDeXuatMuaSam() {
+            if (!currentDeleteId) return;
+            
+            fetch('/DeXuatMuaSam/DeleteDeXuatMuaSam?handler=Delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: currentDeleteId })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Xóa thành công!');
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            });
+        }
+
+        // Hiển thị modal cập nhật đề xuất mua sắm
+        function showUpdateDeXuatMuaSamModal(id) {
+            // Gọi API để lấy thông tin đề xuất mua sắm
+            fetch(`/DeXuatMuaSam/DeXuatMuaSamList?handler=GetDeXuatDetail&id=${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const deXuat = data.data;
+                        
+                        // Điền thông tin vào form
+                        document.getElementById('updateDeXuatId').value = deXuat.id;
+                        document.getElementById('updateMaDeXuat').value = deXuat.maDeXuat;
+                        document.getElementById('updateTieuDe').value = deXuat.tieuDe;
+                        document.getElementById('updateNoiDungDeXuat').value = deXuat.noiDungDeXuat;
+                        
+                        // Hiển thị thông tin readonly
+                        document.getElementById('updateNguoiGuiDisplay').value = deXuat.tenNguoiGui;
+                        document.getElementById('updateIDNguoiGui').value = deXuat.idNguoiGui;
+                        document.getElementById('updateChiNhanhGuiDisplay').value = deXuat.tenChiNhanhGui;
+                        document.getElementById('updateIDChiNhanhGui').value = deXuat.idChiNhanhGui;
+                        
+                        // Hiển thị trạng thái (readonly)
+                        const statusText = getStatusText(deXuat.status);
+                        document.getElementById('updateStatusDisplay').value = statusText;
+                        document.getElementById('updateStatus').value = deXuat.status;
+                        
+                        // Set giá trị cho chi nhánh nhận và người nhận
+                        const updateChiNhanhNhanInput = document.getElementById('updateIDChiNhanhNhan');
+                        const updateNguoiNhanInput = document.getElementById('updateIDNguoiNhan');
+                        
+                        updateChiNhanhNhanInput.value = deXuat.tenChiNhanhNhan;
+                        updateChiNhanhNhanInput.setAttribute('data-selected-id', deXuat.idChiNhanhNhan);
+                        
+                        // Load người nhận theo chi nhánh hiện tại
+                        loadUpdateNguoiNhanByChiNhanh(deXuat.idChiNhanhNhan, deXuat.idNguoiNhan, deXuat.tenNguoiNhan);
+                        
+                        // Hiển thị modal
+                        document.getElementById('updateDeXuatMuaSamModal').style.display = 'flex';
+                        
+                        // Init dropdown cho chi nhánh nhận
+                        initSearchableDropdown('updateIDChiNhanhNhan');
+                        // Setup event listener cho chi nhánh nhận
+                        setupUpdateChiNhanhNhanListener();
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading data:', error);
+                    alert('Có lỗi khi tải thông tin đề xuất');
+                });
+        }
+
+        // Hàm chuyển đổi status code thành text
+        function getStatusText(status) {
+            switch (status) {
+                case 'pending': return 'Chờ duyệt';
+                case 'accepted': return 'Đã duyệt';
+                case 'rejected': return 'Từ chối';
+                case 'received': return 'Đã nhận';
+                default: return status;
+            }
+        }
+
+        // Setup listener cho chi nhánh nhận trong modal update
+        function setupUpdateChiNhanhNhanListener() {
+            const chiNhanhNhanInput = document.getElementById('updateIDChiNhanhNhan');
+            const nguoiNhanInput = document.getElementById('updateIDNguoiNhan');
+            
+            // Lắng nghe khi chọn chi nhánh
+            const chiNhanhOptions = document.querySelectorAll('#updateIDChiNhanhNhanOptions .searchable-option');
+            chiNhanhOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const selectedBranchId = this.getAttribute('data-value');
+                    
+                    // Reset người nhận
+                    nguoiNhanInput.value = '';
+                    nguoiNhanInput.setAttribute('data-selected-id', '');
+                    
+                    // Load danh sách người nhận theo chi nhánh
+                    loadUpdateNguoiNhanByChiNhanh(selectedBranchId);
+                });
+            });
+        }
+
+        // Load danh sách người nhận theo chi nhánh cho modal update
+        function loadUpdateNguoiNhanByChiNhanh(branchId, selectedUserId = null, selectedUserName = null) {
+            const nguoiNhanInput = document.getElementById('updateIDNguoiNhan');
+            const nguoiNhanOptions = document.getElementById('updateIDNguoiNhanOptions');
+            
+            if (!branchId) {
+                nguoiNhanInput.disabled = true;
+                nguoiNhanInput.placeholder = 'Vui lòng chọn chi nhánh trước...';
+                nguoiNhanOptions.innerHTML = '';
+                return;
+            }
+            
+            // Call API để lấy danh sách người dùng theo chi nhánh
+            fetch(`/DeXuatMuaSam/DeXuatMuaSamList?handler=GetUsersByBranch&branchId=${branchId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(users => {
+                    // Clear existing options
+                    nguoiNhanOptions.innerHTML = '';
+                    
+                    // Add new options
+                    users.forEach(user => {
+                        // Không hiển thị user hiện tại
+                        if (user.id !== currentUserId) {
+                            const optionDiv = document.createElement('div');
+                            optionDiv.className = 'searchable-option';
+                            optionDiv.setAttribute('data-value', user.id);
+                            optionDiv.textContent = user.tenHienThi;
+                            nguoiNhanOptions.appendChild(optionDiv);
+                        }
+                    });
+                    
+                    // Enable input và setup dropdown
+                    nguoiNhanInput.disabled = false;
+                    nguoiNhanInput.placeholder = 'Tìm kiếm người nhận...';
+                    
+                    // Set giá trị đã chọn nếu có
+                    if (selectedUserId && selectedUserName) {
+                        nguoiNhanInput.value = selectedUserName;
+                        nguoiNhanInput.setAttribute('data-selected-id', selectedUserId);
+                    }
+                    
+                    // Re-initialize dropdown cho người nhận
+                    initSearchableDropdown('updateIDNguoiNhan');
+                })
+                .catch(error => {
+                    console.error('Error loading users:', error);
+                    alert('Có lỗi khi tải danh sách người nhận');
+                    nguoiNhanInput.disabled = true;
+                    nguoiNhanInput.placeholder = 'Lỗi khi tải danh sách';
+                    nguoiNhanOptions.innerHTML = '';
+                });
+        }
+
+        // Đóng modal cập nhật đề xuất mua sắm
+        function closeUpdateDeXuatMuaSamModal() {
+            document.getElementById('updateDeXuatMuaSamModal').style.display = 'none';
+            document.getElementById('updateDeXuatMuaSamForm').reset();
+        }
+
+        // Xử lý form cập nhật đề xuất mua sắm
+        document.getElementById('updateDeXuatMuaSamForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Lấy giá trị chi nhánh nhận và người nhận
+            const chiNhanhNhanInput = document.getElementById('updateIDChiNhanhNhan');
+            const nguoiNhanInput = document.getElementById('updateIDNguoiNhan');
+            
+            const formData = {
+                id: document.getElementById('updateDeXuatId').value,
+                tieuDe: document.getElementById('updateTieuDe').value,
+                noiDungDeXuat: document.getElementById('updateNoiDungDeXuat').value,
+                idChiNhanhNhan: chiNhanhNhanInput.getAttribute('data-selected-id') || '',
+                idNguoiNhan: nguoiNhanInput.getAttribute('data-selected-id') || ''
+            };
+            
+            if (!formData.tieuDe || !formData.noiDungDeXuat || !formData.idChiNhanhNhan || !formData.idNguoiNhan) {
+                alert('Vui lòng nhập đầy đủ thông tin!');
+                return;
+            }
+            
+            // Lấy anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            // Tạo FormData
+            const form = new FormData();
+            form.append('id', formData.id);
+            form.append('tieuDe', formData.tieuDe);
+            form.append('noiDungDeXuat', formData.noiDungDeXuat);
+            form.append('idChiNhanhNhan', formData.idChiNhanhNhan);
+            form.append('idNguoiNhan', formData.idNguoiNhan);
+            form.append('__RequestVerificationToken', token);
+            
+            fetch('/DeXuatMuaSam/UpdateDeXuatMuaSam', {
+                method: 'POST',
+                body: form
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Cập nhật thành công!');
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            });
+        });
+
+        // Searchable dropdown functions
+        function getSelectedValue(inputId) {
+            const input = document.getElementById(inputId);
+            return input.getAttribute('data-selected-id') || '';
+        }
+
+        function initSearchableDropdown(inputId) {
+            const input = document.getElementById(inputId);
+            const optionsContainer = document.getElementById(inputId + 'Options');
+            const options = optionsContainer.querySelectorAll('.searchable-option');
+
+            input.addEventListener('focus', function() {
+                optionsContainer.style.display = 'block';
+            });
+
+            input.addEventListener('input', function() {
+                const searchText = this.value.toLowerCase();
+                options.forEach(option => {
+                    const text = option.textContent.toLowerCase();
+                    option.style.display = text.includes(searchText) ? 'block' : 'none';
+                });
+            });
+
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent;
+                    input.value = text;
+                    input.setAttribute('data-selected-id', value);
+                    optionsContainer.style.display = 'none';
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!input.contains(e.target) && !optionsContainer.contains(e.target)) {
+                    optionsContainer.style.display = 'none';
+                }
+            });
+        }
+
+        function resetSearchableDropdowns() {
+            // Chi nhánh nhận
+            const chiNhanhNhanInput = document.getElementById('addIDChiNhanhNhan');
+            if (chiNhanhNhanInput) {
+                chiNhanhNhanInput.value = '';
+                chiNhanhNhanInput.setAttribute('data-selected-id', '');
+                const chiNhanhOptions = document.getElementById('addIDChiNhanhNhanOptions');
+                if (chiNhanhOptions) chiNhanhOptions.style.display = 'none';
+            }
+            
+            // Người nhận - reset và disable
+            const nguoiNhanInput = document.getElementById('addIDNguoiNhan');
+            if (nguoiNhanInput) {
+                nguoiNhanInput.value = '';
+                nguoiNhanInput.setAttribute('data-selected-id', '');
+                nguoiNhanInput.disabled = true;
+                nguoiNhanInput.placeholder = 'Vui lòng chọn chi nhánh trước...';
+                const nguoiNhanOptions = document.getElementById('addIDNguoiNhanOptions');
+                if (nguoiNhanOptions) {
+                    nguoiNhanOptions.style.display = 'none';
+                    nguoiNhanOptions.innerHTML = ''; // Clear options
+                }
+            }
+        }
+
+        // Setup listener cho chi nhánh nhận để load người nhận
+        function setupChiNhanhNhanListener() {
+            const chiNhanhNhanInput = document.getElementById('addIDChiNhanhNhan');
+            const nguoiNhanInput = document.getElementById('addIDNguoiNhan');
+            const nguoiNhanOptions = document.getElementById('addIDNguoiNhanOptions');
+            
+            // Lắng nghe khi chọn chi nhánh
+            const chiNhanhOptions = document.querySelectorAll('#addIDChiNhanhNhanOptions .searchable-option');
+            chiNhanhOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const selectedBranchId = this.getAttribute('data-value');
+                    
+                    // Reset người nhận
+                    nguoiNhanInput.value = '';
+                    nguoiNhanInput.setAttribute('data-selected-id', '');
+                    
+                    // Load danh sách người nhận theo chi nhánh
+                    loadNguoiNhanByChiNhanh(selectedBranchId);
+                });
+            });
+        }
+
+        // Load danh sách người nhận theo chi nhánh
+        function loadNguoiNhanByChiNhanh(branchId) {
+            const nguoiNhanInput = document.getElementById('addIDNguoiNhan');
+            const nguoiNhanOptions = document.getElementById('addIDNguoiNhanOptions');
+            
+            if (!branchId) {
+                nguoiNhanInput.disabled = true;
+                nguoiNhanInput.placeholder = 'Vui lòng chọn chi nhánh trước...';
+                nguoiNhanOptions.innerHTML = '';
+                return;
+            }
+            
+            // Call API để lấy danh sách người dùng theo chi nhánh
+            fetch(`/DeXuatMuaSam/DeXuatMuaSamList?handler=GetUsersByBranch&branchId=${branchId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(users => {
+                    // Clear existing options
+                    nguoiNhanOptions.innerHTML = '';
+                    
+                    // Add new options
+                    users.forEach(user => {
+                        // Không hiển thị user hiện tại
+                        if (user.id !== currentUserId) {
+                            const optionDiv = document.createElement('div');
+                            optionDiv.className = 'searchable-option';
+                            optionDiv.setAttribute('data-value', user.id);
+                            optionDiv.textContent = user.tenHienThi;
+                            nguoiNhanOptions.appendChild(optionDiv);
+                        }
+                    });
+                    
+                    // Enable input và setup dropdown
+                    nguoiNhanInput.disabled = false;
+                    nguoiNhanInput.placeholder = 'Tìm kiếm người nhận...';
+                    
+                    // Re-initialize dropdown cho người nhận
+                    initSearchableDropdown('addIDNguoiNhan');
+                })
+                .catch(error => {
+                    console.error('Error loading users:', error);
+                    alert('Có lỗi khi tải danh sách người nhận');
+                    nguoiNhanInput.disabled = true;
+                    nguoiNhanInput.placeholder = 'Lỗi khi tải danh sách';
+                    nguoiNhanOptions.innerHTML = '';
+                });
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            const modals = ['addDeXuatMuaSamModal', 'deleteDeXuatMuaSamModal', 'updateDeXuatMuaSamModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+        </main>
+    </div>
+</body>
+</html>
