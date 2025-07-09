@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Data;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 
@@ -32,33 +31,12 @@ namespace QRB.Pages.KhoSanPham
                 if (input.id == Guid.Empty)
                     return new JsonResult(new { success = false, message = $"ID rỗng hoặc không hợp lệ! Body: {body}" });
 
-                // Lấy thông tin chi nhánh của user đang đăng nhập
-                var userId = HttpContext.Session.GetString("UserId");
-                if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid userGuid))
-                {
-                    return new JsonResult(new { success = false, message = "Vui lòng đăng nhập lại." });
-                }
-
-                var currentUser = await _context.NguoiDungs
-                    .Where(u => u.ID == userGuid && !u.IsDelete)
-                    .FirstOrDefaultAsync();
-                
-                if (currentUser == null)
-                {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy thông tin người dùng." });
-                }
-
-                var userBranchId = currentUser.IDChiNhanh;
+                // Trả về id nhận được để debug
+                // return new JsonResult(new { success = false, message = $"ID nhận được: {input.id}" });
 
                 var kho = await _context.KhoSanPhams.FindAsync(input.id);
                 if (kho == null)
                     return new JsonResult(new { success = false, message = $"Không tìm thấy KhoSanPham với id: {input.id}" });
-
-                // Kiểm tra quyền: chỉ được xóa kho sản phẩm thuộc chi nhánh của mình
-                if (kho.IDChiNhanh != userBranchId)
-                {
-                    return new JsonResult(new { success = false, message = "Bạn không có quyền xóa kho sản phẩm này." });
-                }
 
                 // Kiểm tra số lượng trước khi xóa
                 if (int.TryParse(kho.SoLuongConLai, out var soLuong) && soLuong > 0)

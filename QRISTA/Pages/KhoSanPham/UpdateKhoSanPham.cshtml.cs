@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Models;
 using QRB.Data;
-using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Text.Json;
 
@@ -53,28 +52,10 @@ namespace QRB.Pages.KhoSanPham
         {
             try
             {
-                if (data?.Id == null || data.IDNguyenLieu == null || data.SoLuongConLai <= 0)
+                if (data?.Id == null || data.IDNguyenLieu == null || data.SoLuongConLai <= 0 || data.IDChiNhanh == null)
                 {
                     return new JsonResult(new { success = false, message = "Vui lòng nhập đầy đủ thông tin và số lượng phải > 0." });
                 }
-
-                // Lấy thông tin chi nhánh của user đang đăng nhập
-                var userId = HttpContext.Session.GetString("UserId");
-                if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid userGuid))
-                {
-                    return new JsonResult(new { success = false, message = "Vui lòng đăng nhập lại." });
-                }
-
-                var currentUser = await _context.NguoiDungs
-                    .Where(u => u.ID == userGuid && !u.IsDelete)
-                    .FirstOrDefaultAsync();
-                
-                if (currentUser == null)
-                {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy thông tin người dùng." });
-                }
-
-                var userBranchId = currentUser.IDChiNhanh;
 
                 var kho = await _context.KhoSanPhams.FindAsync(data.Id);
                 if (kho == null || kho.IsDelete)
@@ -82,15 +63,9 @@ namespace QRB.Pages.KhoSanPham
                     return new JsonResult(new { success = false, message = "Không tìm thấy kho sản phẩm hoặc đã bị xóa." });
                 }
 
-                // Kiểm tra quyền: chỉ được cập nhật kho sản phẩm thuộc chi nhánh của mình
-                if (kho.IDChiNhanh != userBranchId)
-                {
-                    return new JsonResult(new { success = false, message = "Bạn không có quyền cập nhật kho sản phẩm này." });
-                }
-
                 kho.IDNguyenLieu = data.IDNguyenLieu.Value;
                 kho.SoLuongConLai = data.SoLuongConLai.ToString();
-                // Giữ nguyên IDChiNhanh (không cho phép thay đổi)
+                kho.IDChiNhanh = data.IDChiNhanh.Value;
                 kho.UpdateTime = DateTime.Now;
                 
                 await _context.SaveChangesAsync();
@@ -108,5 +83,6 @@ namespace QRB.Pages.KhoSanPham
         public Guid? Id { get; set; }
         public Guid? IDNguyenLieu { get; set; }
         public int SoLuongConLai { get; set; }
+        public Guid? IDChiNhanh { get; set; }
     }
 }

@@ -161,15 +161,6 @@ namespace QRB.Models
         [Required]
         public Guid IDChiNhanh { get; set; }
 
-        // Thêm các trường cho hệ thống phân quyền
-        [StringLength(50)]
-        public string VaiTro { get; set; } = "Staff";
-
-        public bool TrangThaiHoatDong { get; set; } = true;
-
-        [StringLength(100)]
-        public string? Email { get; set; }
-
         public bool IsDelete { get; set; } = false;
 
         public DateTime CreateTime { get; set; } = DateTime.Now;
@@ -226,9 +217,7 @@ namespace QRB.Models
 
         public DateTime? NgayThanhToan { get; set; }
 
-        public int? SoBan { get; set; }
-
-        public bool? DaTraDon { get; set; }
+        public int? SoBan { get; set; } // Thêm trường số bàn
 
         // Navigation properties
         [ForeignKey("IDKhachHang")]
@@ -434,25 +423,31 @@ namespace QRB.Models
 
         [Required]
         [StringLength(50)]
-        public string Status { get; set; } = string.Empty;
+        public string Status { get; set; } = "PENDING";
+
+        public bool IsDelete { get; set; } = false;
 
         public DateTime CreateTime { get; set; } = DateTime.Now;
 
         public DateTime? AcceptTime { get; set; }
 
-        public DateTime? RejectTime { get; set; }
-
         public DateTime? ReceiveTime { get; set; }
 
         public DateTime? UpdateTime { get; set; }
 
-        public bool IsDelete { get; set; } = false;
+        // Navigation properties
+        [ForeignKey("IDNguoiGui")]
+        public virtual NguoiDung NguoiGui { get; set; } = null!;
 
-        // Navigation properties (nếu cần)
-        public virtual NguyenLieu? NguoiGui { get; set; }
-        public virtual ChiNhanh? ChiNhanhGui { get; set; }
-        public virtual NguyenLieu? NguoiNhan { get; set; }
-        public virtual ChiNhanh? ChiNhanhNhan { get; set; }
+        [ForeignKey("IDChiNhanhGui")]
+        public virtual ChiNhanh ChiNhanhGui { get; set; } = null!;
+
+        [ForeignKey("IDNguoiNhan")]
+        public virtual NguoiDung NguoiNhan { get; set; } = null!;
+
+        [ForeignKey("IDChiNhanhNhan")]
+        public virtual ChiNhanh ChiNhanhNhan { get; set; } = null!;
+
         public virtual ICollection<ChiTietDonDeXuat> ChiTietDonDeXuats { get; set; } = new List<ChiTietDonDeXuat>();
     }
 

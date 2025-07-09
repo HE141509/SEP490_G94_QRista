@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Data;
 using QRB.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,16 +17,8 @@ namespace QRB.Pages.NguyenLieu
 
         public List<QRB.Models.NguyenLieu> NguyenLieuList { get; set; } = new List<QRB.Models.NguyenLieu>();
 
-        public IActionResult OnGet(string? status)
+        public void OnGet(string? status)
         {
-            // Kiểm tra đăng nhập - bắt buộc phải đăng nhập mới được truy cập
-            var userId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid userGuid))
-            {
-                // Chưa đăng nhập, redirect về trang login
-                return RedirectToPage("/Login");
-            }
-
             if (string.IsNullOrEmpty(status) || status == "active")
             {
                 NguyenLieuList = _context.NguyenLieus.Where(nl => !nl.IsDelete).ToList();
@@ -40,31 +30,6 @@ namespace QRB.Pages.NguyenLieu
             else
             {
                 NguyenLieuList = _context.NguyenLieus.ToList();
-            }
-
-            return Page();
-        }
-
-        public IActionResult OnGetActiveNguyenLieu()
-        {
-            try
-            {
-                var activeNguyenLieu = _context.NguyenLieus
-                    .Where(nl => !nl.IsDelete)
-                    .Select(nl => new {
-                        id = nl.ID.ToString(),
-                        tenNguyenLieu = nl.TenNguyenLieu,
-                        maNguyenLieu = nl.MaNguyenLieu,
-                        donViTinh = nl.DonViTinh
-                    })
-                    .OrderBy(nl => nl.tenNguyenLieu)
-                    .ToList();
-
-                return new JsonResult(activeNguyenLieu);
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new { error = ex.Message }) { StatusCode = 500 };
             }
         }
     }

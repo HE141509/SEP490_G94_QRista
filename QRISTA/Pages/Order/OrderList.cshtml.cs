@@ -6,7 +6,6 @@ using QRB.Data;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using System.IO;
 
 namespace QRB.Pages.Order
 {
@@ -45,16 +44,8 @@ namespace QRB.Pages.Order
             return new JsonResult(new { id = kh.ID, name = kh.TenKhachHang, maUuDaiList, maUuDaiMacDinh, tienGiamDict });
         }
 
-        public IActionResult OnGet()
+        public void OnGet()
         {
-            // Kiểm tra đăng nhập - bắt buộc phải đăng nhập mới được truy cập
-            var userId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid userGuid))
-            {
-                // Chưa đăng nhập, redirect về trang login
-                return RedirectToPage("/Login");
-            }
-
             Orders = _context.DonHangs
                 .Where(x => !x.IsDelete)
                 .OrderByDescending(x => x.CreateTime)
@@ -83,8 +74,6 @@ namespace QRB.Pages.Order
             {
                 DisplayName = "";
             }
-
-            return Page();
         }
         // API tìm kiếm sản phẩm cho AJAX
         public JsonResult OnGetSearchProduct(string keyword)
@@ -139,191 +128,6 @@ namespace QRB.Pages.Order
                 return new JsonResult(type);
             else
                 return new JsonResult(new { });
-        }
-
-        // API lấy chi tiết hóa đơn
-        public async Task<JsonResult> OnGetGetOrderDetailAsync(Guid id)
-        {
-            try
-            {
-                // Kiểm tra đăng nhập
-                var userId = HttpContext.Session.GetString("UserId");
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
-                }
-
-                // Lấy thông tin hóa đơn
-                var order = await _context.DonHangs
-                    .Include(d => d.KhachHang)
-                    .Include(d => d.NhanVien)
-                    .Include(d => d.ChiNhanh)
-                    .FirstOrDefaultAsync(d => d.ID == id && !d.IsDelete);
-
-                if (order == null)
-                {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy hóa đơn" });
-                }
-
-                // Lấy chi tiết hóa đơn
-                var orderDetails = await (from ct in _context.ChiTietDonHangs
-                                         join sp in _context.SanPhams on ct.IDSanPham equals sp.ID
-                                         join lsp in _context.LoaiSanPhams on ct.IDLoaiSanPham equals lsp.ID
-                                         where ct.IDDonHang == id && !ct.IsDelete && !sp.IsDelete && !lsp.IsDelete
-                                         select new
-                                         {
-                                             id = ct.ID,
-                                             idSanPham = sp.ID,
-                                             idLoaiSanPham = lsp.ID,
-                                             tenSanPham = sp.TenSanPham,
-                                             tenLoaiSanPham = lsp.TenLoai,
-                                             donGia = lsp.DonGia,
-                                             soLuong = ct.SoLuong,
-                                             thanhTien = ct.ThanhTien
-                                         })
-                                         .ToListAsync();
-
-                var result = new
-                {
-                    success = true,
-                    data = new
-                    {
-                        id = order.ID,
-                        maDonHang = order.MaDonHang,
-                        idKhachHang = order.IDKhachHang,
-                        tenKhachHang = order.KhachHang?.TenKhachHang ?? "",
-                        sdtKhachHang = order.KhachHang?.SDT ?? "",
-                        idNhanVien = order.IDNhanVien,
-                        tenNhanVien = order.NhanVien?.TenHienThi ?? "",
-                        idChiNhanh = order.IDChiNhanh,
-                        tenChiNhanh = order.ChiNhanh?.TenChiNhanh ?? "",
-                        maUuDai = order.MaUuDai ?? "",
-                        tienUuDai = order.TienUuDai ?? "0",
-                        tongTien = order.TongTien,
-                        trangThaiThanhToan = order.TrangThaiThanhToan,
-                        createTime = order.CreateTime.ToString("dd/MM/yyyy HH:mm"),
-                        soBan = order.SoBan,
-                        chiTiet = orderDetails
-                    }
-                };
-
-                return new JsonResult(result);
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new { success = false, message = "Có lỗi khi lấy chi tiết hóa đơn: " + ex.Message });
-            }
-        }
-
-        // API cập nhật hóa đơn
-        public async Task<JsonResult> OnPostUpdateOrderAsync()
-        {
-            try
-            {
-                // Kiểm tra đăng nhập
-                var userId = HttpContext.Session.GetString("UserId");
-                if (string.IsNullOrEmpty(userId))
-                {
-                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
-                }
-
-                // Đọc dữ liệu từ body
-                string body;
-                using (var reader = new StreamReader(Request.Body))
-                {
-                    body = await reader.ReadToEndAsync();
-                }
-
-                var data = System.Text.Json.JsonSerializer.Deserialize<OrderUpdateRequest>(body);
-                if (data == null || !Guid.TryParse(data.ID, out Guid orderId))
-                {
-                    return new JsonResult(new { success = false, message = "Dữ liệu không hợp lệ" });
-                }
-
-                // Tìm hóa đơn
-                var order = await _context.DonHangs.FirstOrDefaultAsync(d => d.ID == orderId && !d.IsDelete);
-                if (order == null)
-                {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy hóa đơn" });
-                }
-
-                // Cập nhật thông tin hóa đơn
-                if (!string.IsNullOrEmpty(data.MaUuDai))
-                    order.MaUuDai = data.MaUuDai;
-                if (!string.IsNullOrEmpty(data.TienUuDai))
-                    order.TienUuDai = data.TienUuDai;
-                if (!string.IsNullOrEmpty(data.TongTien))
-                    order.TongTien = data.TongTien;
-                
-                order.TrangThaiThanhToan = data.TrangThaiThanhToan;
-                order.UpdateTime = DateTime.Now;
-
-                if (data.TrangThaiThanhToan && !order.NgayThanhToan.HasValue)
-                {
-                    order.NgayThanhToan = DateTime.Now;
-                }
-
-                await _context.SaveChangesAsync();
-
-                return new JsonResult(new { success = true, message = "Cập nhật hóa đơn thành công" });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new { success = false, message = "Có lỗi khi cập nhật hóa đơn: " + ex.Message });
-            }
-        }
-
-        // Cập nhật trạng thái giao hàng
-        public async Task<IActionResult> OnPostUpdateDeliveryStatus()
-        {
-            try
-            {
-                var json = await new StreamReader(Request.Body).ReadToEndAsync();
-                var data = System.Text.Json.JsonSerializer.Deserialize<UpdateDeliveryStatusRequest>(json);
-                
-                if (data == null || string.IsNullOrEmpty(data.OrderId) || !Guid.TryParse(data.OrderId, out Guid orderId))
-                {
-                    return new JsonResult(new { success = false, message = "Dữ liệu không hợp lệ" });
-                }
-
-                var order = await _context.DonHangs.FindAsync(orderId);
-                if (order == null)
-                {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy đơn hàng" });
-                }
-
-                // Chỉ cho phép cập nhật nếu đơn hàng đã thanh toán
-                if (!order.TrangThaiThanhToan)
-                {
-                    return new JsonResult(new { success = false, message = "Chỉ có thể cập nhật trạng thái giao hàng cho đơn hàng đã thanh toán" });
-                }
-
-                order.DaTraDon = data.Delivered;
-                order.UpdateTime = DateTime.Now;
-
-                await _context.SaveChangesAsync();
-
-                return new JsonResult(new { success = true, message = "Cập nhật trạng thái giao hàng thành công" });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new { success = false, message = "Có lỗi khi cập nhật trạng thái giao hàng: " + ex.Message });
-            }
-        }
-
-        public class OrderUpdateRequest
-        {
-            public string ID { get; set; } = string.Empty;
-            public string MaUuDai { get; set; } = string.Empty;
-            public string TienUuDai { get; set; } = string.Empty;
-            public string TongTien { get; set; } = string.Empty;
-            public bool TrangThaiThanhToan { get; set; }
-        }
-
-        public class UpdateDeliveryStatusRequest
-        {
-            public string OrderId { get; set; } = string.Empty;
-            public bool Delivered { get; set; }
         }
     }
 }
