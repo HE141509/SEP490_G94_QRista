@@ -51,33 +51,6 @@
     </div>
 </div>
 
-<<<<<<< HEAD
-<!-- Debug info (chỉ hiển thị trong môi trường phát triển) -->
-@if (ViewContext.HttpContext.Request.Headers.ContainsKey("Host") && 
-     ViewContext.HttpContext.Request.Headers["Host"].ToString().Contains("localhost"))
-{
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Debug Info (Development Only)</h5>
-                    </div>
-                    <div class="card-body">
-                        <h6>Tất cả tham số:</h6>
-                        <pre class="bg-light p-3 rounded">@string.Join("\n", Model.AllParams.Select(x => $"{x.Key}: {x.Value}"))</pre>
-                        
-                        <h6 class="mt-3">Tham số VNPAY:</h6>
-                        <pre class="bg-light p-3 rounded">@string.Join("\n", Model.VnpParams.Select(x => $"{x.Key}: {x.Value}"))</pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
 <script>
     // Tự động redirect về menu sau 5 giây
     setTimeout(function() {
@@ -112,13 +85,4 @@
     .fas {
         line-height: 1;
     }
-<<<<<<< HEAD
-    
-    pre {
-        font-size: 12px;
-        max-height: 200px;
-        overflow-y: auto;
-    }
-=======
->>>>>>> 3e51f1e6948c36b59c2b16ce5d81c44b11ab7c9c
 </style>

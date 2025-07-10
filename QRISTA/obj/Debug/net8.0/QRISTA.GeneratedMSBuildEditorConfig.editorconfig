@@ -56,12 +56,44 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/DeXuatMuaSam/AddDeXuatMuaSam.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXEFkZERlWHVhdE11YVNhbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/DeXuatMuaSam/DeleteDeXuatMuaSam.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXERlbGV0ZURlWHVhdE11YVNhbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/DeXuatMuaSam/DeXuatMuaSamList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXERlWHVhdE11YVNhbUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/DeXuatMuaSam/UpdateDeXuatMuaSam.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXFVwZGF0ZURlWHVhdE11YVNhbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/KhoSanPham/AddKhoSanPham.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxBZGRLaG9TYW5QaGFtLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/KhoSanPham/DeleteKhoSanPham.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxEZWxldGVLaG9TYW5QaGFtLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/KhoSanPham/KhoSanPhamList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxLaG9TYW5QaGFtTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/KhoSanPham/UpdateKhoSanPham.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxVcGRhdGVLaG9TYW5QaGFtLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Login.cshtml]
