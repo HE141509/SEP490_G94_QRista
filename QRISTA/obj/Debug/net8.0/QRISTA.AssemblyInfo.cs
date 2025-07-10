@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("QRISTA")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+710e0acfb666c677183820e55e6ea331f1481a0a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8a36317d4c548d2869ca6fe9cc19d3a1f8777f93")]
 [assembly: System.Reflection.AssemblyProductAttribute("QRISTA")]
 [assembly: System.Reflection.AssemblyTitleAttribute("QRISTA")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
