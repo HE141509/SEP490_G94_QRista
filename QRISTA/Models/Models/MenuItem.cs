@@ -429,6 +429,8 @@ namespace QRB.Models
 
         public DateTime? AcceptTime { get; set; }
 
+        public DateTime? RejectTime { get; set; }
+
         public DateTime? ReceiveTime { get; set; }
 
         public DateTime? UpdateTime { get; set; }

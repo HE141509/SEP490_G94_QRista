@@ -25,6 +25,7 @@ namespace QRB.Pages.DeXuatMuaSam
             public string TenChiNhanhNhan { get; set; } = string.Empty;
             public string Status { get; set; } = string.Empty;
             public DateTime CreateTime { get; set; }
+            public DateTime? ReceiveTime { get; set; }
             public Guid IDNguoiGui { get; set; }
             public Guid IDChiNhanhGui { get; set; }
             public Guid IDNguoiNhan { get; set; }
@@ -106,13 +107,13 @@ namespace QRB.Pages.DeXuatMuaSam
                 DaNhanCount = await _context.DeXuatMuaSams
                     .CountAsync(dx => dx.Status == "pending" && dx.IDNguoiNhan == CurrentUserId && !dx.IsDelete);
 
-                // Tab "Đã duyệt": status = accepted và người nhận = người đăng nhập
+                // Tab "Đã duyệt": status = accepted và (người nhận = người đăng nhập HOẶC người gửi = người đăng nhập)
                 DaDuyetCount = await _context.DeXuatMuaSams
-                    .CountAsync(dx => dx.Status == "accepted" && dx.IDNguoiNhan == CurrentUserId && !dx.IsDelete);
+                    .CountAsync(dx => dx.Status == "accepted" && (dx.IDNguoiNhan == CurrentUserId || dx.IDNguoiGui == CurrentUserId) && !dx.IsDelete);
 
-                // Tab "Đã từ chối": status = rejected và người nhận = người đăng nhập
+                // Tab "Đã từ chối": status = rejected và (người nhận = người đăng nhập HOẶC người gửi = người đăng nhập)
                 DaTuChoiCount = await _context.DeXuatMuaSams
-                    .CountAsync(dx => dx.Status == "rejected" && dx.IDNguoiNhan == CurrentUserId && !dx.IsDelete);
+                    .CountAsync(dx => dx.Status == "rejected" && (dx.IDNguoiNhan == CurrentUserId || dx.IDNguoiGui == CurrentUserId) && !dx.IsDelete);
 
                 // Tab "Đã xóa": IsDelete = true và người gửi = người đăng nhập
                 DaXoaCount = await _context.DeXuatMuaSams
@@ -144,6 +145,7 @@ namespace QRB.Pages.DeXuatMuaSam
                                              TenChiNhanhNhan = chiNhanhNhan != null ? chiNhanhNhan.TenChiNhanh : "N/A",
                                              Status = dx.Status,
                                              CreateTime = dx.CreateTime,
+                                             ReceiveTime = dx.ReceiveTime,
                                              IDNguoiGui = dx.IDNguoiGui,
                                              IDChiNhanhGui = dx.IDChiNhanhGui,
                                              IDNguoiNhan = dx.IDNguoiNhan,
@@ -322,9 +324,18 @@ namespace QRB.Pages.DeXuatMuaSam
                     return new JsonResult(new { success = false, message = "Chỉ có thể xử lý đề xuất ở trạng thái 'Chờ duyệt'" });
                 }
 
-                // Cập nhật trạng thái
+                // Cập nhật trạng thái và thời gian tương ứng
                 deXuat.Status = newStatus;
                 deXuat.UpdateTime = DateTime.Now;
+                
+                if (newStatus == "accepted")
+                {
+                    deXuat.AcceptTime = DateTime.Now;
+                }
+                else if (newStatus == "rejected")
+                {
+                    deXuat.RejectTime = DateTime.Now;
+                }
 
                 await _context.SaveChangesAsync();
 
@@ -334,6 +345,65 @@ namespace QRB.Pages.DeXuatMuaSam
             catch (Exception ex)
             {
                 return new JsonResult(new { success = false, message = "Có lỗi khi cập nhật trạng thái: " + ex.Message });
+            }
+        }
+
+        // Handler để cập nhật thời gian nhận hàng
+        public async Task<IActionResult> OnPostReceiveOrderAsync()
+        {
+            try
+            {
+                // Đọc dữ liệu từ form
+                var idString = Request.Form["id"].ToString();
+                
+                if (string.IsNullOrEmpty(idString) || !Guid.TryParse(idString, out Guid deXuatId))
+                {
+                    return new JsonResult(new { success = false, message = "ID đề xuất không hợp lệ" });
+                }
+
+                // Lấy thông tin user hiện tại
+                var currentUserId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(currentUserId) || !Guid.TryParse(currentUserId, out Guid userId))
+                {
+                    return new JsonResult(new { success = false, message = "Vui lòng đăng nhập lại" });
+                }
+
+                // Tìm đề xuất mua sắm
+                var deXuat = await _context.DeXuatMuaSams.FirstOrDefaultAsync(dx => dx.ID == deXuatId && !dx.IsDelete);
+                if (deXuat == null)
+                {
+                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
+                }
+
+                // Kiểm tra quyền: chỉ người tạo đơn mới được nhận hàng
+                if (deXuat.IDNguoiGui != userId)
+                {
+                    return new JsonResult(new { success = false, message = "Bạn không có quyền thực hiện thao tác này" });
+                }
+
+                // Kiểm tra trạng thái phải là "accepted"
+                if (deXuat.Status != "accepted")
+                {
+                    return new JsonResult(new { success = false, message = "Chỉ có thể nhận hàng khi đề xuất đã được phê duyệt" });
+                }
+
+                // Kiểm tra đã nhận hàng chưa
+                if (deXuat.ReceiveTime.HasValue)
+                {
+                    return new JsonResult(new { success = false, message = "Đề xuất này đã được nhận hàng" });
+                }
+
+                // Cập nhật thời gian nhận hàng
+                deXuat.ReceiveTime = DateTime.Now;
+                deXuat.UpdateTime = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+
+                return new JsonResult(new { success = true, message = "Đã xác nhận nhận hàng thành công" });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = "Có lỗi khi cập nhật: " + ex.Message });
             }
         }
     }

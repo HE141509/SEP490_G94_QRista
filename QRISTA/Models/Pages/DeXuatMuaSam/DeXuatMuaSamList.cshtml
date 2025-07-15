@@ -380,6 +380,12 @@
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         }
+                                        @if (item.Status == "accepted" && item.IDNguoiGui == Model.CurrentUserId && !item.ReceiveTime.HasValue)
+                                        {
+                                            <button type="button" class="userlist-add-submit-btn" onclick="receiveOrder('@item.ID')" style="margin-left: 5px;">
+                                                <i class="fas fa-hand-holding"></i> Nhận hàng
+                                            </button>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -722,10 +728,12 @@
                         shouldShow = rowStatus === 'pending' && !isDeleted && nguoiNhan === currentUserId;
                         break;
                     case 'accepted':
-                        shouldShow = rowStatus === 'accepted' && !isDeleted;
+                        // Tab "Đã duyệt": status = accepted và (người nhận = người đăng nhập HOẶC người gửi = người đăng nhập)
+                        shouldShow = rowStatus === 'accepted' && !isDeleted && (nguoiNhan === currentUserId || nguoiGui === currentUserId);
                         break;
                     case 'rejected':
-                        shouldShow = rowStatus === 'rejected' && !isDeleted;
+                        // Tab "Từ chối": status = rejected và (người nhận = người đăng nhập HOẶC người gửi = người đăng nhập)
+                        shouldShow = rowStatus === 'rejected' && !isDeleted && (nguoiNhan === currentUserId || nguoiGui === currentUserId);
                         break;
                     case 'deleted':
                         shouldShow = isDeleted;
@@ -838,24 +846,13 @@
                         matchesTab = rowStatus === 'pending' && !isDeleted && nguoiNhan === currentUserId;
                         break;
                     case 'accepted':
-                        matchesTab = rowStatus === 'accepted' && !isDeleted;
+                        matchesTab = rowStatus === 'accepted' && !isDeleted && (nguoiNhan === currentUserId || nguoiGui === currentUserId);
                         break;
                     case 'rejected':
-                        matchesTab = rowStatus === 'rejected' && !isDeleted;
+                        matchesTab = rowStatus === 'rejected' && !isDeleted && (nguoiNhan === currentUserId || nguoiGui === currentUserId);
                         break;
                     case 'deleted':
                         matchesTab = isDeleted;
-                        break;
-                    case 'accepted':
-                        matchesTab = rowStatus === 'accepted' && !isDeleted;
-                        break;
-                    case 'rejected':
-                        matchesTab = rowStatus === 'rejected' && !isDeleted;
-                        break;
-                    case 'received':
-                        matchesTab = rowStatus === 'received' && !isDeleted;
-                        break;
-                    case 'deleted':
                         matchesTab = isDeleted;
                         break;
                 }
@@ -1542,6 +1539,49 @@
                     nguoiNhanInput.placeholder = 'Lỗi khi tải danh sách';
                     nguoiNhanOptions.innerHTML = '';
                 });
+        }
+
+        // Hàm nhận hàng
+        function receiveOrder(id) {
+            // Lấy anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            // Tạo FormData
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('__RequestVerificationToken', token);
+            
+            fetch('/DeXuatMuaSam/DeXuatMuaSamList?handler=ReceiveOrder', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    return response.text().then(text => {
+                        console.log('Response text:', text);
+                        throw new Error('Server không trả về JSON. Response: ' + text.substring(0, 200));
+                    });
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            });
         }
 
         // Close modals when clicking outside
