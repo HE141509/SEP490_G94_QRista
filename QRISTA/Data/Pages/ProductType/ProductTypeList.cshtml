@@ -1,0 +1,483 @@
+@page
+@model QRB.Pages.ProductType.ProductTypeListModel
+@{
+    ViewData["Title"] = "Danh sách loại sản phẩm";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/userlist.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
+    <div class="main-container">
+        @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml", Model)
+        <main class="main-content">
+            <div class="dashboard-header userlist-header-flex">
+                <h1 class="page-title">Danh sách loại sản phẩm</h1>
+                <button class="userlist-add-btn" type="button" onclick="openAddProductTypeModal()">
+                    <i class="fas fa-plus"></i> Thêm mới
+                </button>
+            </div>
+            <div class="userlist-card userlist-modern">
+                <div class="userlist-toolbar">
+                    <div class="userlist-toolbar-left">
+                        <label for="filterProductTypeStatus">Trạng thái:</label>
+                        <select id="filterProductTypeStatus" class="userlist-filter" onchange="filterProductTypeList()">
+                            <option value="active">Đang kinh doanh</option>
+                            <option value="inactive">Ngừng kinh doanh</option>
+                        </select>
+                    </div>
+                    <div class="userlist-toolbar-right">
+                        <label for="productTypePageSize" style="font-size:15px;margin-right:8px;color:#555;">Hiển thị:</label>
+                        <select id="productTypePageSize" class="userlist-filter" style="width:auto;min-width:60px;" onchange="changeProductTypePageSize()">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterProductTypeList()" style="margin-left:12px;" />
+                    </div>
+                </div>
+                <div class="userlist-table-wrapper">
+                    <table class="userlist-table userlist-table-modern" id="productTypeListTable">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên loại</th>
+                                <th>Mã loại</th>
+                                <th>Đơn giá</th>
+                                <th>Sản phẩm</th>
+                                <th>Chi nhánh</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th>Ngày cập nhật</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @if (Model.LoaiSanPhams != null && Model.LoaiSanPhams.Count > 0)
+                        {
+                            int stt = 1;
+                            foreach (var lsp in Model.LoaiSanPhams)
+                            {
+                                var status = lsp.IsDelete ? "Ngừng kinh doanh" : "Đang kinh doanh";
+                                <tr data-index="@stt" data-status="@(lsp.IsDelete ? "inactive" : "active")" data-id="@lsp.ID">
+                                    <td>@stt</td>
+                                    <td><a href="#" class="edit-producttype-link" data-id="@lsp.ID" data-tenloai="@lsp.TenLoai">@lsp.TenLoai</a></td>
+                                    <td>@lsp.MaLoai</td>
+                                    <td>@lsp.DonGia</td>
+                                    <td>@lsp.TenSanPham</td>
+                                    <td>@lsp.TenChiNhanh</td>
+                                    <td class="product-status">@status</td>
+                                    <td>@lsp.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td>@(lsp.UpdateTime?.ToString("dd/MM/yyyy HH:mm") ?? "")</td>
+                                    <td>
+                                        <button class="userlist-delete-btn" type="button" title="Xóa" onclick="openDeleteProductTypeModal('@lsp.ID', '@lsp.TenLoai')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                stt++;
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="10">Không có dữ liệu loại sản phẩm.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+                <div id="producttype-pagination"></div>
+            </div>
+        </main>
+    </div>
+    <!-- Popup xác nhận xóa loại sản phẩm -->
+    <div id="deleteProductTypeModal" class="modal" style="display:none;position:fixed;z-index:4000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+        <div class="modal-content userlist-add-modal-content" style="max-width:400px;">
+            <div class="userlist-add-modal-title"><i class="fas fa-trash"></i> Xóa loại sản phẩm</div>
+            <div style="margin:18px 0 24px 0;font-size:16px;color:#333;">
+                Bạn có chắc chắn muốn xóa loại sản phẩm <span id="deleteProductTypeName" style="font-weight:600;color:#c00;"></span> không?
+            </div>
+            <div class="userlist-add-modal-actions">
+                <button type="button" onclick="closeDeleteProductTypeModal()" class="userlist-add-cancel-btn">Hủy</button>
+                <button type="button" id="confirmDeleteProductTypeBtn" class="userlist-add-submit-btn" style="background:#c00;">Xóa</button>
+            </div>
+        </div>
+    </div>
+    <!-- Popup thêm loại sản phẩm -->
+    <div id="addProductTypeModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+        <div class="modal-content userlist-add-modal-content">
+            <div class="userlist-add-modal-title"><i class="fas fa-box"></i> Thêm loại sản phẩm mới</div>
+            <form id="addProductTypeForm" autocomplete="off">
+                <div class="userlist-add-form-group">
+                    <label for="addIDChiNhanh">Chi nhánh</label>
+                    <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required onchange="loadSanPhamByChiNhanh(this.value)">
+                        <option value="">-- Chọn chi nhánh --</option>
+                        @foreach (var cn in Model.ChiNhanhs)
+                        {
+                            <option value="@cn.ID">@cn.TenChiNhanh</option>
+                        }
+                    </select>
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addIDSanPham">Sản phẩm</label>
+                    <select id="addIDSanPham" name="IDSanPham" class="userlist-input" required>
+                        <option value="">-- Chọn sản phẩm --</option>
+                    </select>
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addTenLoai">Tên loại</label>
+                    <input type="text" id="addTenLoai" name="TenLoai" class="userlist-input" required />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addMaLoai">Mã loại</label>
+                    <input type="text" id="addMaLoai" name="MaLoai" class="userlist-input" required />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addDonGia">Đơn giá</label>
+                    <input type="text" id="addDonGia" name="DonGia" class="userlist-input" required oninput="formatDonGiaInput(this)" />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addIsDelete">Trạng thái</label>
+                    <select id="addIsDelete" name="IsDelete" class="userlist-input">
+                        <option value="false">Đang kinh doanh</option>
+                        <option value="true">Ngừng kinh doanh</option>
+                    </select>
+                </div>
+                <div class="userlist-add-modal-actions">
+                    <button type="button" onclick="closeAddProductTypeModal()" class="userlist-add-cancel-btn">Hủy</button>
+                    <button type="submit" class="userlist-add-submit-btn">Thêm mới</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Popup sửa loại sản phẩm -->
+    <div id="editProductTypeModal" class="modal" style="display:none;position:fixed;z-index:3500;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+        <div class="modal-content userlist-add-modal-content" id="editProductTypeModalContent" style="min-width:420px;max-width:540px;width:100%;box-sizing:border-box;">
+            <form id="editProductTypeForm" autocomplete="off">
+                <input type="hidden" name="ID" id="editID" />
+                <div class="userlist-add-form-group">
+                    <label for="editIDChiNhanh">Chi nhánh</label>
+                    <input type="text" id="editIDChiNhanh" class="userlist-input" readonly />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editIDSanPham">Sản phẩm</label>
+                    <input type="text" id="editIDSanPham" class="userlist-input" readonly />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editTenLoai">Tên loại</label>
+                    <input type="text" id="editTenLoai" name="TenLoai" class="userlist-input" required />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editMaLoai">Mã loại</label>
+                    <input type="text" id="editMaLoai" class="userlist-input" readonly />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editDonGia">Đơn giá</label>
+                    <input type="text" id="editDonGia" name="DonGia" class="userlist-input" required oninput="formatDonGiaInput(this)" />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editIsDelete">Trạng thái</label>
+                    <select id="editIsDelete" name="IsDelete" class="userlist-input">
+                        <option value="false">Đang kinh doanh</option>
+                        <option value="true">Ngừng kinh doanh</option>
+                    </select>
+                </div>
+                <div class="userlist-add-modal-actions">
+                    <button type="button" onclick="closeEditProductTypeModal()" class="userlist-add-cancel-btn">Hủy</button>
+                    <button type="submit" class="userlist-add-submit-btn">Cập nhật</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="footer-content">
+            <span>© 2025 QRB - Hệ thống quán cafe thông minh. All rights reserved.</span>
+        </div>
+    </footer>
+</body>
+</html>
+<script>
+// PHÂN TRANG + SEARCH + FILTER LOẠI SẢN PHẨM
+let productTypeCurrentPage = 1;
+let productTypePageSize = 10;
+let productTypeCurrentFilter = 'active';
+let productTypeCurrentSearch = '';
+
+function getAllProductTypeRows() {
+    return Array.from(document.querySelectorAll('#productTypeListTable tbody tr')).filter(function(row) {
+        return row.querySelectorAll('td').length > 1;
+    });
+}
+function getFilteredProductTypeRows() {
+    let rows = getAllProductTypeRows();
+    // Lọc theo trạng thái bằng data-status
+    rows = rows.filter(function(row) {
+        var status = row.getAttribute('data-status');
+        if (productTypeCurrentFilter === 'active') return status === 'active';
+        if (productTypeCurrentFilter === 'inactive') return status === 'inactive';
+        return true;
+    });
+    // Lọc theo search
+    if (productTypeCurrentSearch) {
+        rows = rows.filter(function(row) {
+            var name = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+            var ma = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
+            var sanpham = row.querySelector('td:nth-child(5)')?.textContent.toLowerCase() || '';
+            return name.includes(productTypeCurrentSearch) || ma.includes(productTypeCurrentSearch) || sanpham.includes(productTypeCurrentSearch);
+        });
+    }
+    return rows;
+}
+function renderProductTypePagination() {
+    let rows = getFilteredProductTypeRows();
+    let total = rows.length;
+    let totalPages = Math.ceil(total / productTypePageSize);
+    let pag = document.getElementById('producttype-pagination');
+    if (!pag) return;
+    if (totalPages <= 1) {
+        pag.innerHTML = '';
+        return;
+    }
+    let html = '';
+    html += `<button onclick="gotoProductTypePage(1)" ${productTypeCurrentPage==1?'disabled':''}>&laquo;</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || Math.abs(i-productTypeCurrentPage)<=2) {
+            html += `<button onclick="gotoProductTypePage(${i})" ${i==productTypeCurrentPage?'class="active"':''}>${i}</button>`;
+        } else if (i === productTypeCurrentPage-3 || i === productTypeCurrentPage+3) {
+            html += '<span>...</span>';
+        }
+    }
+    html += `<button onclick="gotoProductTypePage(${totalPages})" ${productTypeCurrentPage==totalPages?'disabled':''}>&raquo;</button>`;
+    pag.className = 'userlist-pagination';
+    pag.innerHTML = html;
+}
+function updateProductTypePagination() {
+    let allRows = getAllProductTypeRows();
+    let rows = getFilteredProductTypeRows();
+    let total = rows.length;
+    let totalPages = Math.ceil(total / productTypePageSize);
+    if (productTypeCurrentPage > totalPages) productTypeCurrentPage = totalPages || 1;
+    allRows.forEach(function(row) { row.style.display = 'none'; });
+    rows.forEach(function(row, idx) {
+        if (idx >= (productTypeCurrentPage-1)*productTypePageSize && idx < productTypeCurrentPage*productTypePageSize) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    let pag = document.getElementById('producttype-pagination');
+    if (rows.length === 0) {
+        if (pag) pag.innerHTML = '';
+        return;
+    }
+    renderProductTypePagination();
+}
+function gotoProductTypePage(page) {
+    productTypeCurrentPage = page;
+    updateProductTypePagination();
+}
+function changeProductTypePageSize() {
+    productTypePageSize = parseInt(document.getElementById('productTypePageSize').value);
+    productTypeCurrentPage = 1;
+    updateProductTypePagination();
+}
+function filterProductTypeList() {
+    productTypeCurrentFilter = document.getElementById('filterProductTypeStatus').value;
+    productTypeCurrentSearch = document.querySelector('.userlist-search').value.toLowerCase();
+    productTypeCurrentPage = 1;
+    updateProductTypePagination();
+}
+function openAddProductTypeModal() {
+    document.getElementById('addProductTypeModal').style.display = 'flex';
+}
+function closeAddProductTypeModal() {
+    document.getElementById('addProductTypeModal').style.display = 'none';
+    document.getElementById('addProductTypeForm').reset();
+}
+function formatDonGiaInput(input) {
+    // Chỉ cho nhập số, làm tròn xuống hàng nghìn và định dạng xxx,000 (dấu phẩy)
+    let value = input.value.replace(/[^\d]/g, '');
+    if (value === '') {
+        input.value = '';
+        return;
+    }
+    let num = Math.floor(parseInt(value, 10) / 1000) * 1000;
+    // Cho phép nhập 0 hoặc các số nhỏ hơn 1000 (sẽ để trống)
+    if (num > 0) {
+        input.value = num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    } else if (value.length < 4) {
+        // Nếu người dùng đang nhập số nhỏ hơn 1000, cho phép hiển thị số đó (chưa làm tròn)
+        input.value = value;
+    } else {
+        input.value = '';
+    }
+}
+
+// Xóa loại sản phẩm
+let deleteProductTypeId = null;
+function openDeleteProductTypeModal(id, name) {
+    deleteProductTypeId = id;
+    document.getElementById('deleteProductTypeName').textContent = name;
+    document.getElementById('deleteProductTypeModal').style.display = 'flex';
+}
+function closeDeleteProductTypeModal() {
+    deleteProductTypeId = null;
+    document.getElementById('deleteProductTypeModal').style.display = 'none';
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('confirmDeleteProductTypeBtn');
+    if (btn) {
+        btn.onclick = function() {
+            if (!deleteProductTypeId) return;
+            fetch('/ProductType/DeleteProductType', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: deleteProductTypeId })
+            })
+            .then(res => res.json())
+            .then(function(data) {
+                if (data.success) {
+                    alert('Xóa loại sản phẩm thành công!');
+                    closeDeleteProductTypeModal();
+                    location.reload();
+                } else {
+                    alert(data.message || 'Xóa loại sản phẩm thất bại!');
+                }
+            })
+            .catch(() => {
+                alert('Có lỗi xảy ra khi xóa loại sản phẩm!');
+            });
+        }
+    }
+});
+
+window.addEventListener('DOMContentLoaded', function() {
+    productTypePageSize = parseInt(document.getElementById('productTypePageSize').value) || 10;
+    setTimeout(updateProductTypePagination, 0);
+
+    // Xử lý submit form thêm loại sản phẩm bằng AJAX
+    const addForm = document.getElementById('addProductTypeForm');
+    if (addForm) {
+        addForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(addForm);
+            // Đảm bảo gửi đúng tên trường cho Razor Page
+            formData.set('IsDeletePost', formData.get('IsDelete'));
+            // Gửi AJAX
+            fetch('/ProductType/AddProductType?handler=Add', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Thêm loại sản phẩm thành công!');
+                    closeAddProductTypeModal();
+                    location.reload();
+                } else {
+                    alert(data.message || 'Thêm loại sản phẩm thất bại!');
+                }
+            })
+            .catch(() => {
+                alert('Có lỗi xảy ra khi thêm loại sản phẩm!');
+            });
+        });
+    }
+
+    // Sửa loại sản phẩm (popup)
+    document.querySelectorAll('.edit-producttype-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            fetch(`/ProductType/UpdateProductType?id=${id}`)
+                .then(res => res.json())
+                .then(function(data) {
+                    if (data && data.success !== false) {
+                        openEditProductTypeModal(data);
+                    } else {
+                        alert(data.message || 'Không lấy được dữ liệu loại sản phẩm!');
+                    }
+                })
+                .catch(() => alert('Có lỗi xảy ra khi tải dữ liệu loại sản phẩm!'));
+        });
+    });
+    // Xử lý submit form sửa loại sản phẩm
+    const editForm = document.getElementById('editProductTypeForm');
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Đảm bảo DonGia gửi về là số nguyên
+            let donGiaInput = editForm.querySelector('[name="DonGia"]');
+            if (donGiaInput) {
+                let raw = donGiaInput.value.replace(/[^\d]/g, '');
+                donGiaInput.value = raw;
+            }
+            var formData = new FormData();
+            formData.append('ID', document.getElementById('editID').value);
+            formData.append('TenLoai', document.getElementById('editTenLoai').value);
+            formData.append('DonGia', document.getElementById('editDonGia').value);
+            formData.append('IsDelete', document.getElementById('editIsDelete').value);
+            fetch(`/ProductType/UpdateProductType?id=${document.getElementById('editID').value}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(function(data) {
+                if (data.success) {
+                    alert('Cập nhật loại sản phẩm thành công!');
+                    closeEditProductTypeModal();
+                    location.reload();
+                } else {
+                    alert(data.message || 'Cập nhật loại sản phẩm thất bại!');
+                }
+            })
+            .catch(() => {
+                alert('Có lỗi xảy ra khi cập nhật loại sản phẩm!');
+            });
+        });
+    }
+});
+function loadSanPhamByChiNhanh(chiNhanhId) {
+    const sanPhamSelect = document.getElementById('addIDSanPham');
+    sanPhamSelect.innerHTML = '<option value="">-- Chọn sản phẩm --</option>'; // Reset sản phẩm
+
+    if (!chiNhanhId) return; // Nếu chưa chọn chi nhánh thì không làm gì
+
+    fetch(`/ProductType/ProductTypeList?handler=SanPhamByChiNhanh&chiNhanhId=${chiNhanhId}`)
+        .then(res => res.json())
+        .then(function(data) {
+            if (data && Array.isArray(data)) {
+                data.forEach(sp => {
+                    const option = document.createElement('option');
+                    option.value = sp.id;
+                    option.textContent = sp.tenSanPham;
+                    sanPhamSelect.appendChild(option);
+                });
+            }
+        })
+        .catch(() => {
+            alert('Có lỗi xảy ra khi tải danh sách sản phẩm!');
+        });
+}
+function openEditProductTypeModal(data) {
+    document.getElementById('editID').value = data.id;
+    document.getElementById('editIDChiNhanh').value = data.tenChiNhanh || '';
+    document.getElementById('editIDSanPham').value = data.tenSanPham || '';
+    document.getElementById('editTenLoai').value = data.tenLoai || '';
+    document.getElementById('editMaLoai').value = data.maLoai || '';
+    document.getElementById('editDonGia').value = data.donGia || '';
+    document.getElementById('editIsDelete').value = data.isDelete ? 'true' : 'false';
+    document.getElementById('editProductTypeModal').style.display = 'flex';
+}
+function closeEditProductTypeModal() {
+    document.getElementById('editProductTypeModal').style.display = 'none';
+}
+</script>

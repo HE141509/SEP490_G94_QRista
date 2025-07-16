@@ -1,0 +1,36 @@
+/* CSS cho trang danh sách khách hàng */
+.customer-list-page .toolbar {
+    gap: 10px;
+}
+.customer-list-page h2 {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+#customerTable th, #customerTable td {
+    vertical-align: middle;
+    text-align: center;
+}
+#customerTable td {
+    white-space: nowrap;
+}
+#customerTable .btn {
+    min-width: 32px;
+}
+#customerTableBody tr[style*="display: none"] {
+    display: none !important;
+}
+@media (max-width: 768px) {
+    .customer-list-page .col-md-2 {
+        display: none;
+    }
+    .customer-list-page .col-md-10 {
+        width: 100%;
+    }
+    #customerTable th, #customerTable td {
+        font-size: 13px;
+        padding: 6px;
+    }
+    .customer-list-page h2 {
+        font-size: 20px;
+    }
+}
