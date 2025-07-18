@@ -1,45 +1,4 @@
 /* QRB Menu Custom Styles */
-
-/* Override menu.css styles for consistent item sizing */
-.menu-items {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    align-items: stretch !important;
-    gap: 20px !important;
-    padding: 24px !important;
-    flex: 1 !important;
-    width: 100% !important;
-    align-content: flex-start !important;
-}
-
-/* Override default menu-item styles */
-.menu-item {
-    background: #fff !important;
-    border-radius: 12px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-    padding: 16px !important;
-    text-align: center !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    width: calc(33.333% - 20px) !important;
-    min-width: 280px !important;
-    max-width: calc(33.333% - 20px) !important;
-    min-height: 320px !important;
-    overflow: hidden !important;
-    margin-bottom: 0 !important;
-    box-sizing: border-box !important;
-    justify-content: space-between !important;
-    transition: transform 0.2s, box-shadow 0.2s !important;
-}
-
-.menu-item:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* QR Code popup styles */
 .qr-popup {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
@@ -165,89 +124,56 @@
     justify-content: center; /* Center items horizontally */
     gap: 24px; /* Maintain spacing between items */
     margin-bottom: 24px;
-    align-items: stretch; /* Stretch items to have equal height */
+    align-items: center; /* Center items vertically */
 }
 .menu-item {
     flex: 1 1 calc(33.333% - 24px); /* Ensure 3 items per row */
-    width: calc(33.333% - 24px); /* Fixed width for consistency */
-    min-width: 280px; /* Minimum width for readability */
     max-width: calc(33.333% - 24px);
-    min-height: 320px; /* Fixed minimum height for consistency */
+    height: auto; /* Allow dynamic height */
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distribute content evenly */
+    justify-content: center; /* Center content vertically */
     align-items: center; /* Center content horizontally */
     box-sizing: border-box;
     padding: 16px;
     margin: 0; /* Remove margin to avoid misalignment */
     background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.menu-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .menu-item-img {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 120px; /* Fixed height for consistency */
-    width: 100%;
-    overflow: hidden;
+    height: 100px; /* Đảm bảo chiều cao hình ảnh đồng đều */
 }
 .menu-item-img img {
     max-width: 100px;
     max-height: 100px;
     object-fit: contain;
-    border-radius: 8px;
-}
-.menu-item-img .img-placeholder {
-    width: 100px;
-    height: 100px;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-    font-size: 0.9rem;
+    margin-bottom: 10px;
 }
 .menu-item-info {
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center; /* Căn giữa nội dung */
-    justify-content: space-between;
-    flex: 1; /* Take remaining space */
+    justify-content: center;
 }
 .menu-item-title {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: 700;
     text-align: center;
-    margin-bottom: 6px;
-    color: #333;
-    line-height: 1.3;
-    min-height: 42px; /* Ensure consistent title height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin-bottom: 8px;
 }
 .menu-item-code {
     width: 100%;
     text-align: center;
-    font-size: 0.9rem;
-    color: #666;
-    margin-bottom: 12px;
-    font-weight: 500;
-}
-.menu-item-types-container {
-    width: 100%;
-    margin-top: auto; /* Push to bottom of card */
+    font-size: 0.98rem;
+    color: #555;
+    margin-bottom: 4px;
 }
 .menu-item-type-row {
     display: flex;
@@ -333,44 +259,23 @@
     padding: 2px 8px;
     font-size: 0.98rem;
 }
-@media screen and (max-width: 1200px) {
-    .menu-item {
-        flex: 1 1 calc(50% - 20px) !important;
-        width: calc(50% - 20px) !important;
-        max-width: calc(50% - 20px) !important;
-        min-width: 300px !important;
-    }
-}
-
 @media screen and (max-width: 768px) {
-    .menu-items {
-        gap: 16px !important;
-        padding: 16px !important;
-    }
-
     .menu-items-row {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 16px;
     }
 
     .menu-item {
-        width: 100% !important;
-        max-width: 400px !important;
-        min-width: unset !important;
-        margin-bottom: 0 !important;
-        flex: 1 1 100% !important;
-        min-height: 280px !important;
-    }
-
-    .menu-item-img {
-        height: 100px;
+        width: 100%;
+        margin-bottom: 16px;
+        flex: 1 1 100%; /* Đảm bảo 1 sản phẩm/hàng */
+        max-width: 100%;
     }
 
     .menu-item-img img {
-        max-width: 80px;
-        max-height: 80px;
+        max-width: 100%;
+        height: auto;
     }
 
     .menu-item-info {
@@ -378,24 +283,25 @@
     }
 
     .menu-item-title {
-        font-size: 1.1rem;
-        min-height: 36px;
-    }
-
-    .menu-item-code {
-        font-size: 0.9rem;
-        margin-bottom: 10px;
-    }
-
-    .menu-item-qty button {
-        width: 32px;
-        height: 32px;
         font-size: 1.2rem;
     }
 
-    .menu-item-qty .quantity {
-        width: 32px;
-        height: 32px;
+    .menu-item-code {
         font-size: 1rem;
+        margin-top: 8px;
+    }
+
+    .menu-item-price {
+        font-size: 1rem;
+        margin-top: 8px;
+    }
+
+    .menu-item-qty {
+        margin-top: 8px;
+    }
+
+    .menu-items {
+        flex-direction: column;
+        gap: 15px;
     }
 }

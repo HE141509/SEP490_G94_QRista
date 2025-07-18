@@ -694,6 +694,14 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Nút cập nhật danh sách nguyên liệu -->
+                    <div style="margin-top: 15px; text-align: center;">
+                        <button type="button" onclick="updateNguyenLieuList()" 
+                                class="userlist-add-submit-btn" style="padding: 8px 24px;">
+                            <i class="fas fa-save"></i> Cập nhật danh sách nguyên liệu
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="userlist-add-form-group">
@@ -841,12 +849,12 @@
             background: #c82333;
         }
         
-        #addNguyenLieuTableContainer, #updateNguyenLieuTableContainer {
+        #addNguyenLieuTableContainer {
             max-height: 250px;
             overflow-y: auto;
         }
         
-        #addNguyenLieuTable tbody tr:hover, #updateNguyenLieuTable tbody tr:hover {
+        #addNguyenLieuTable tbody tr:hover {
             background-color: #f8f9fa;
         }
         
@@ -1616,10 +1624,8 @@
                         
                         // Tải danh sách nguyên liệu hiện tại và thiết lập dropdown
                         loadCurrentNguyenLieuList(deXuat.id);
-                        // Load dropdown options trước, sau đó khởi tạo dropdown
-                        loadUpdateNguyenLieuOptions().then(() => {
-                            initSearchableDropdown('updateNguyenLieuSearch');
-                        });
+                        loadUpdateNguyenLieuOptions();
+                        initSearchableDropdown('updateNguyenLieuSearch');
                     } else {
                         alert('Lỗi: ' + data.message);
                     }
@@ -1759,17 +1765,11 @@
                 alert('Vui lòng nhập đầy đủ thông tin!');
                 return;
             }
-
-            // Kiểm tra có ít nhất một nguyên liệu
-            if (updateSelectedNguyenLieuList.length === 0) {
-                alert('Vui lòng thêm ít nhất một nguyên liệu vào đề xuất!');
-                return;
-            }
             
             // Lấy anti-forgery token
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
             
-            // Tạo FormData cho thông tin cơ bản
+            // Tạo FormData
             const form = new FormData();
             form.append('id', formData.id);
             form.append('tieuDe', formData.tieuDe);
@@ -1778,7 +1778,6 @@
             form.append('idNguoiNhan', formData.idNguoiNhan);
             form.append('__RequestVerificationToken', token);
             
-            // Cập nhật thông tin cơ bản trước
             fetch('/DeXuatMuaSam/UpdateDeXuatMuaSam', {
                 method: 'POST',
                 body: form
@@ -1791,34 +1790,10 @@
             })
             .then(data => {
                 if (data.success) {
-                    // Sau khi cập nhật thông tin cơ bản thành công, cập nhật nguyên liệu
-                    const nguyenLieuData = updateSelectedNguyenLieuList.map(item => ({
-                        Id: item.id,
-                        Name: item.name,
-                        SoLuong: item.soLuong,
-                        DonViTinh: item.donViTinh
-                    }));
-
-                    const nguyenLieuForm = new FormData();
-                    nguyenLieuForm.append('idDeXuat', formData.id);
-                    nguyenLieuForm.append('NguyenLieuList', JSON.stringify(nguyenLieuData));
-                    nguyenLieuForm.append('__RequestVerificationToken', token);
-
-                    return fetch('/Pages/DeXuatMuaSam/UpdateDeXuatMuaSam?handler=UpdateNguyenLieu', {
-                        method: 'POST',
-                        body: nguyenLieuForm
-                    });
-                } else {
-                    throw new Error(data.message || 'Lỗi cập nhật thông tin cơ bản');
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Cập nhật đề xuất mua sắm thành công!');
+                    alert('Cập nhật thành công!');
                     window.location.reload();
                 } else {
-                    alert('Lỗi cập nhật nguyên liệu: ' + (data.message || 'Không xác định'));
+                    alert('Lỗi: ' + data.message);
                 }
             })
             .catch(error => {
@@ -2113,9 +2088,10 @@
             const soLuongInput = document.getElementById('updateNguyenLieuSoLuong');
             
             const nguyenLieuId = nguyenLieuInput.getAttribute('data-selected-id');
+            const nguyenLieuName = nguyenLieuInput.value;
             const soLuong = getNumberValue(soLuongInput);
             
-            if (!nguyenLieuId) {
+            if (!nguyenLieuId || !nguyenLieuName) {
                 alert('Vui lòng chọn nguyên liệu!');
                 return;
             }
@@ -2126,15 +2102,9 @@
                 return;
             }
             
-            // Lấy thông tin nguyên liệu từ dropdown option được chọn
+            // Lấy thông tin đơn vị tính từ dropdown option được chọn
             const selectedOption = document.querySelector(`#updateNguyenLieuSearchOptions .searchable-option[data-value="${nguyenLieuId}"]`);
-            if (!selectedOption) {
-                alert('Không tìm thấy thông tin nguyên liệu!');
-                return;
-            }
-            
-            const nguyenLieuName = selectedOption.getAttribute('data-name');
-            const donViTinh = selectedOption.getAttribute('data-donvi');
+            const donViTinh = selectedOption ? selectedOption.getAttribute('data-donvi') : '';
             
             // Kiểm tra xem nguyên liệu đã có trong danh sách chưa
             const existingIndex = updateSelectedNguyenLieuList.findIndex(item => item.id === nguyenLieuId);
@@ -2241,36 +2211,82 @@
 
         // Tải danh sách nguyên liệu cho modal cập nhật
         function loadUpdateNguyenLieuOptions() {
-            return new Promise((resolve, reject) => {
-                const optionsContainer = document.getElementById('updateNguyenLieuSearchOptions');
-                
-                fetch('/NguyenLieu/NguyenLieuList?handler=ActiveNguyenLieu')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        optionsContainer.innerHTML = '';
-                        
-                        if (data && Array.isArray(data)) {
-                            data.forEach(nguyenLieu => {
-                                const optionDiv = document.createElement('div');
-                                optionDiv.className = 'searchable-option';
-                                optionDiv.setAttribute('data-value', nguyenLieu.id);
-                                optionDiv.setAttribute('data-name', nguyenLieu.tenNguyenLieu);
-                                optionDiv.setAttribute('data-donvi', nguyenLieu.donViTinh || '');
-                                optionDiv.textContent = `${nguyenLieu.tenNguyenLieu} (${nguyenLieu.maNguyenLieu})`;
-                                optionsContainer.appendChild(optionDiv);
-                            });
-                        }
-                        resolve();
-                    })
-                    .catch(error => {
-                        console.error('Error loading nguyên liệu options:', error);
-                        reject(error);
-                    });
+            const optionsContainer = document.getElementById('updateNguyenLieuSearchOptions');
+            
+            fetch('/NguyenLieu/NguyenLieuList?handler=ActiveNguyenLieu')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    optionsContainer.innerHTML = '';
+                    
+                    if (data && Array.isArray(data)) {
+                        data.forEach(nguyenLieu => {
+                            const optionDiv = document.createElement('div');
+                            optionDiv.className = 'searchable-option';
+                            optionDiv.setAttribute('data-value', nguyenLieu.id);
+                            optionDiv.setAttribute('data-donvi', nguyenLieu.donViTinh || '');
+                            optionDiv.textContent = nguyenLieu.tenNguyenLieu;
+                            optionsContainer.appendChild(optionDiv);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading nguyên liệu options:', error);
+                });
+        }
+
+        // Cập nhật danh sách nguyên liệu
+        function updateNguyenLieuList() {
+            const deXuatId = document.getElementById('updateDeXuatId').value;
+            
+            if (!deXuatId) {
+                alert('Không tìm thấy ID đề xuất!');
+                return;
+            }
+
+            if (updateSelectedNguyenLieuList.length === 0) {
+                alert('Vui lòng thêm ít nhất một nguyên liệu!');
+                return;
+            }
+
+            // Chuẩn bị dữ liệu
+            const nguyenLieuData = updateSelectedNguyenLieuList.map(item => ({
+                Id: item.id,
+                Name: item.name,
+                SoLuong: item.soLuong,
+                DonViTinh: item.donViTinh
+            }));
+
+            // Tạo FormData
+            const formData = new FormData();
+            formData.append('idDeXuat', deXuatId);
+            formData.append('NguyenLieuList', JSON.stringify(nguyenLieuData));
+
+            // Gửi request
+            fetch('/Pages/DeXuatMuaSam/UpdateDeXuatMuaSam?handler=UpdateNguyenLieu', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Cập nhật danh sách nguyên liệu thành công!');
+                    // Tải lại danh sách
+                    location.reload();
+                } else {
+                    alert('Có lỗi xảy ra: ' + (data.message || 'Không xác định'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi cập nhật danh sách nguyên liệu!');
             });
         }
     </script>

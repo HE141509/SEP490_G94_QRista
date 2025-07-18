@@ -74,32 +74,13 @@ namespace QRB.Pages.Vnpay
                             {
                                 order.TrangThaiThanhToan = true;
                                 order.NgayThanhToan = DateTime.Now;
-                                order.UpdateTime = DateTime.Now;
-                                
-                                // Lưu thông tin giao dịch VNPAY
-                                if (VnpParams.ContainsKey("vnp_TransactionNo"))
-                                {
-                                    // Có thể lưu mã giao dịch VNPAY vào một trường riêng nếu cần
-                                    Console.WriteLine($"VNPAY Transaction: {VnpParams["vnp_TransactionNo"]}");
-                                }
-                                
                                 _context.SaveChanges();
-                                Message = $"Thanh toán thành công! Mã đơn hàng: {OrderId}";
-                            }
-                            else
-                            {
-                                Message = $"Thanh toán thành công nhưng không tìm thấy đơn hàng {OrderId} trong hệ thống.";
                             }
                         }
                         catch (Exception ex)
                         {
                             Console.WriteLine($"Error updating order: {ex}");
-                            Message = "Thanh toán thành công nhưng có lỗi khi cập nhật đơn hàng.";
                         }
-                    }
-                    else
-                    {
-                        Message = "Thanh toán thành công nhưng không có thông tin đơn hàng.";
                     }
                 }
                 else

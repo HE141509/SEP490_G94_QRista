@@ -22,6 +22,7 @@ namespace QRB.Pages.Menu
 
         public void OnGet()
         {
+            // Kiểm tra trạng thái đăng nhập
             IsLoggedIn = !string.IsNullOrEmpty(HttpContext.Session.GetString("UserId"));
             if (IsLoggedIn)
             {
@@ -29,20 +30,24 @@ namespace QRB.Pages.Menu
                 ChiNhanhName = HttpContext.Session.GetString("ChiNhanhName") ?? "Chi nhánh";
             }
 
+            // Lấy danh sách nhóm sản phẩm từ DB (chỉ lấy nhóm chưa xóa)
             ProductGroups = _context.NhomSanPhams
                 .Where(x => !x.IsDelete)
                 .OrderBy(x => x.TenNhom)
                 .ToList();
         }
 
+        // API: Lấy sản phẩm và loại sản phẩm theo nhóm (Razor Pages: ?handler=GetProductsByGroup&maNhom=...)
         public JsonResult OnGetGetProductsByGroup(string maNhom)
         {
+            // Nếu maNhom là "all" thì lấy tất cả sản phẩm chưa xóa
             var query = _context.SanPhams.Where(x => !x.IsDelete);
             if (!string.IsNullOrEmpty(maNhom) && maNhom != "all")
             {
                 query = query.Where(x => x.NhomSanPham.MaNhom == maNhom);
             }
 
+            // Lấy loại sản phẩm thuộc các sản phẩm này
             var productTypes = _context.LoaiSanPhams
                 .Where(x => !x.IsDelete && query.Select(p => p.ID).Contains(x.IDSanPham))
                 .Select(x => new
@@ -51,19 +56,20 @@ namespace QRB.Pages.Menu
                     x.MaLoai,
                     x.TenLoai,
                     x.IDSanPham,
-                    DonGiaRaw = Microsoft.EntityFrameworkCore.EF.Property<object>(x, "DonGia")
+                    // DonGiaRaw = Microsoft.EntityFrameworkCore.EF.Property<object>(x, "DonGia")
                 })
-                .AsEnumerable()
+                .AsEnumerable() // chuyển sang LINQ to Objects để xử lý logic C#
                 .Select(x => new
                 {
                     x.ID,
                     x.MaLoai,
                     x.TenLoai,
                     x.IDSanPham,
-                    DonGia = TryParseDonGia(x.DonGiaRaw)
+                    // DonGia = TryParseDonGia(x.DonGiaRaw)
                 })
                 .ToList();
 
+            // Lọc ra các sản phẩm có ít nhất 1 loại sản phẩm
             var productIdsWithTypes = productTypes.Select(x => x.IDSanPham).Distinct().ToHashSet();
             var products = query.Where(x => productIdsWithTypes.Contains(x.ID)).Select(x => new
             {
@@ -75,6 +81,7 @@ namespace QRB.Pages.Menu
                 x.IDChiNhanh
             }).ToList();
 
+            // Hàm parse DonGia an toàn
             static decimal? TryParseDonGia(object donGiaObj)
             {
                 if (donGiaObj == null) return null;
@@ -85,7 +92,9 @@ namespace QRB.Pages.Menu
                 if (donGiaObj is long l) return l;
                 var str = donGiaObj.ToString();
                 if (string.IsNullOrWhiteSpace(str)) return null;
+                // Loại bỏ dấu phẩy, dấu cách, .00, ký tự lạ
                 str = str.Replace(",", "").Replace(".00", "").Replace(" ", "").Trim();
+                // Giữ lại ký tự số
                 str = new string(str.Where(char.IsDigit).ToArray());
                 if (string.IsNullOrWhiteSpace(str)) return null;
                 if (decimal.TryParse(str, out var result)) return result;
@@ -94,36 +103,5 @@ namespace QRB.Pages.Menu
 
             return new JsonResult(new { products, productTypes });
         }
-
-        public JsonResult OnPostSaveOrderDetails([FromBody] SaveOrderRequest request)
-        {
-            try
-            {
-                HttpContext.Session.SetString("CartData", request.CartData ?? "");
-                HttpContext.Session.SetString("PhoneNumber", request.PhoneNumber ?? "");
-                HttpContext.Session.SetString("OrderTotalAmount", request.TotalAmount.ToString());
-                HttpContext.Session.SetString("OrderDiscountAmount", request.DiscountAmount.ToString());
-                
-                return new JsonResult(new { success = true, message = "Đã lưu thông tin đơn hàng" });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new { success = false, message = $"Lỗi khi lưu thông tin: {ex.Message}" });
-            }
-        }
-
-        public JsonResult OnGetGetPhoneNumberFromSession()
-        {
-            var phoneNumber = HttpContext.Session.GetString("PhoneNumber");
-            return new JsonResult(new { phoneNumber });
-        }
-    }
-
-    public class SaveOrderRequest
-    {
-        public string? CartData { get; set; }
-        public string? PhoneNumber { get; set; }
-        public int TotalAmount { get; set; }
-        public int DiscountAmount { get; set; }
     }
 }

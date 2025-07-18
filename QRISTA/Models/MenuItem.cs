@@ -217,9 +217,7 @@ namespace QRB.Models
 
         public DateTime? NgayThanhToan { get; set; }
 
-        public int? SoBan { get; set; }
-
-        public bool? DaTraDon { get; set; }
+        public int? SoBan { get; set; } // Thêm trường số bàn
 
         // Navigation properties
         [ForeignKey("IDKhachHang")]
