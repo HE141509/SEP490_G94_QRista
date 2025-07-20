@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Data;
 using QRB.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,6 +32,29 @@ namespace QRB.Pages.NguyenLieu
             else
             {
                 NguyenLieuList = _context.NguyenLieus.ToList();
+            }
+        }
+
+        public IActionResult OnGetActiveNguyenLieu()
+        {
+            try
+            {
+                var activeNguyenLieu = _context.NguyenLieus
+                    .Where(nl => !nl.IsDelete)
+                    .Select(nl => new {
+                        id = nl.ID.ToString(),
+                        tenNguyenLieu = nl.TenNguyenLieu,
+                        maNguyenLieu = nl.MaNguyenLieu,
+                        donViTinh = nl.DonViTinh
+                    })
+                    .OrderBy(nl => nl.tenNguyenLieu)
+                    .ToList();
+
+                return new JsonResult(activeNguyenLieu);
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { error = ex.Message }) { StatusCode = 500 };
             }
         }
     }

@@ -79,6 +79,29 @@ namespace QRB.Pages.DeXuatMuaSam
                 };
                 
                 _context.DeXuatMuaSams.Add(deXuat);
+                
+                // Lưu chi tiết nguyên liệu nếu có
+                if (data.NguyenLieuList != null && data.NguyenLieuList.Any())
+                {
+                    foreach (var nguyenLieu in data.NguyenLieuList)
+                    {
+                        if (Guid.TryParse(nguyenLieu.Id, out Guid nguyenLieuId))
+                        {
+                            var chiTiet = new ChiTietDonDeXuat
+                            {
+                                ID = Guid.NewGuid(),
+                                IDDeXuatMuaSam = deXuat.ID,
+                                IDNguyenLieu = nguyenLieuId,
+                                SoLuong = nguyenLieu.SoLuong,
+                                CreateTime = DateTime.Now,
+                                IsDelete = false
+                            };
+                            
+                            _context.ChiTietDonDeXuats.Add(chiTiet);
+                        }
+                    }
+                }
+                
                 await _context.SaveChangesAsync();
                 return new JsonResult(new { success = true, message = "Thêm đề xuất mua sắm thành công!" });
             }
@@ -98,5 +121,14 @@ namespace QRB.Pages.DeXuatMuaSam
         public Guid? IDChiNhanhGui { get; set; }
         public Guid? IDNguoiNhan { get; set; }
         public Guid? IDChiNhanhNhan { get; set; }
+        public List<NguyenLieuDeXuatItem>? NguyenLieuList { get; set; }
+    }
+
+    public class NguyenLieuDeXuatItem
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public int SoLuong { get; set; }
+        public string? DonViTinh { get; set; }
     }
 }

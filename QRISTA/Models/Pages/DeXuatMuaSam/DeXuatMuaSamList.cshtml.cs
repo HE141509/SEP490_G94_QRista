@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Data;
+using QRB.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace QRB.Pages.DeXuatMuaSam
@@ -351,6 +352,7 @@ namespace QRB.Pages.DeXuatMuaSam
         // Handler để cập nhật thời gian nhận hàng
         public async Task<IActionResult> OnPostReceiveOrderAsync()
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 // Đọc dữ liệu từ form
@@ -397,13 +399,97 @@ namespace QRB.Pages.DeXuatMuaSam
                 deXuat.ReceiveTime = DateTime.Now;
                 deXuat.UpdateTime = DateTime.Now;
 
-                await _context.SaveChangesAsync();
+                // Lấy danh sách nguyên liệu trong đơn đề xuất
+                var chiTietNguyenLieu = await _context.ChiTietDonDeXuats
+                    .Where(ct => ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete)
+                    .ToListAsync();
 
-                return new JsonResult(new { success = true, message = "Đã xác nhận nhận hàng thành công" });
+                if (chiTietNguyenLieu == null || !chiTietNguyenLieu.Any())
+                {
+                    return new JsonResult(new { success = false, message = "Không tìm thấy nguyên liệu nào trong đề xuất" });
+                }
+
+                // Cập nhật số lượng trong kho sản phẩm
+                int updatedCount = 0;
+                int createdCount = 0;
+                
+                foreach (var chiTiet in chiTietNguyenLieu)
+                {
+                    // Tìm bản ghi trong KhoSanPham theo IDNguyenLieu và IDChiNhanh (chi nhánh của người tạo đề xuất)
+                    var khoSanPham = await _context.KhoSanPhams
+                        .FirstOrDefaultAsync(ksp => ksp.IDNguyenLieu == chiTiet.IDNguyenLieu 
+                                          && ksp.IDChiNhanh == deXuat.IDChiNhanhGui 
+                                          && !ksp.IsDelete);
+
+                    if (khoSanPham != null)
+                    {
+                        // Cập nhật số lượng: số hiện tại + số trong phiếu
+                        var soLuongHienTai = int.TryParse(khoSanPham.SoLuongConLai, out int currentQty) ? currentQty : 0;
+                        var soLuongMoi = soLuongHienTai + chiTiet.SoLuong;
+                        
+                        khoSanPham.SoLuongConLai = soLuongMoi.ToString();
+                        khoSanPham.UpdateTime = DateTime.Now;
+                        
+                        // Update trong database
+                        _context.KhoSanPhams.Update(khoSanPham);
+                        updatedCount++;
+                    }
+                    else
+                    {
+                        // Nếu chưa có bản ghi, tạo mới cho chi nhánh của người tạo đề xuất
+                        var khoSanPhamMoi = new QRB.Models.KhoSanPham
+                        {
+                            ID = Guid.NewGuid(),
+                            IDNguyenLieu = chiTiet.IDNguyenLieu,
+                            IDChiNhanh = deXuat.IDChiNhanhGui,
+                            SoLuongConLai = chiTiet.SoLuong.ToString(),
+                            IsDelete = false,
+                            CreateTime = DateTime.Now
+                        };
+                        
+                        await _context.KhoSanPhams.AddAsync(khoSanPhamMoi);
+                        createdCount++;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return new JsonResult(new { 
+                    success = true, 
+                    message = $"Đã xác nhận nhận hàng và cập nhật kho thành công. Cập nhật: {updatedCount}, Tạo mới: {createdCount}" 
+                });
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 return new JsonResult(new { success = false, message = "Có lỗi khi cập nhật: " + ex.Message });
+            }
+        }
+
+        // Handler method để lấy chi tiết nguyên liệu của đề xuất mua sắm
+        public async Task<JsonResult> OnGetGetNguyenLieuDetailAsync(Guid deXuatId)
+        {
+            try
+            {
+                var nguyenLieuDetails = await (from ct in _context.ChiTietDonDeXuats
+                                             join nl in _context.NguyenLieus on ct.IDNguyenLieu equals nl.ID
+                                             where ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete && !nl.IsDelete
+                                             select new
+                                             {
+                                                 id = nl.ID.ToString(),
+                                                 tenNguyenLieu = nl.TenNguyenLieu,
+                                                 maNguyenLieu = nl.MaNguyenLieu,
+                                                 donViTinh = nl.DonViTinh,
+                                                 soLuong = ct.SoLuong
+                                             })
+                                             .ToListAsync();
+
+                return new JsonResult(new { success = true, data = nguyenLieuDetails });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = "Có lỗi khi lấy chi tiết nguyên liệu: " + ex.Message });
             }
         }
     }
