@@ -44,8 +44,16 @@ namespace QRB.Pages.Order
             return new JsonResult(new { id = kh.ID, name = kh.TenKhachHang, maUuDaiList, maUuDaiMacDinh, tienGiamDict });
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            // Kiểm tra đăng nhập - bắt buộc phải đăng nhập mới được truy cập
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid userGuid))
+            {
+                // Chưa đăng nhập, redirect về trang login
+                return RedirectToPage("/Login");
+            }
+
             Orders = _context.DonHangs
                 .Where(x => !x.IsDelete)
                 .OrderByDescending(x => x.CreateTime)
@@ -74,6 +82,8 @@ namespace QRB.Pages.Order
             {
                 DisplayName = "";
             }
+
+            return Page();
         }
         // API tìm kiếm sản phẩm cho AJAX
         public JsonResult OnGetSearchProduct(string keyword)

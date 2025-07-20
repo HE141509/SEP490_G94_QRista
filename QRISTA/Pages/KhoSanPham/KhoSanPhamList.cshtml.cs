@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Data;
 using QRB.Models;
@@ -46,13 +47,20 @@ namespace QRB.Pages.KhoSanPham
             public Guid ID { get; set; }
             public string TenChiNhanh { get; set; } = string.Empty;
         }
-        public async Task OnGetAsync(string? status = "active")
+        public async Task<IActionResult> OnGetAsync(string? status = "active")
         {
+            // Kiểm tra đăng nhập - bắt buộc phải đăng nhập mới được truy cập
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid userGuid))
+            {
+                // Chưa đăng nhập, redirect về trang login
+                return RedirectToPage("/Login");
+            }
+
             Status = status ?? "active";
             
             // Lấy thông tin chi nhánh của user đang đăng nhập
-            var userId = HttpContext.Session.GetString("UserId");
-            if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out Guid userGuid))
+            if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out userGuid))
             {
                 var currentUser = await _context.NguoiDungs
                     .Where(u => u.ID == userGuid && !u.IsDelete)
@@ -111,6 +119,8 @@ namespace QRB.Pages.KhoSanPham
                     IDChiNhanh = x.k.IDChiNhanh
                 })
                 .ToListAsync();
+
+            return Page();
         }
     }
 }

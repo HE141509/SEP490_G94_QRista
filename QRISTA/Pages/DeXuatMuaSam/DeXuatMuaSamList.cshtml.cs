@@ -70,33 +70,42 @@ namespace QRB.Pages.DeXuatMuaSam
         public int DaTuChoiCount { get; set; } = 0;
         public int DaXoaCount { get; set; } = 0;
 
-        public async Task OnGetAsync(int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> OnGetAsync(int pageNumber = 1, int pageSize = 10)
         {
             try
             {
+                // Kiểm tra đăng nhập - bắt buộc phải đăng nhập mới được truy cập
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid userGuid))
+                {
+                    // Chưa đăng nhập, redirect về trang login
+                    return RedirectToPage("/Login");
+                }
+
                 CurrentPage = pageNumber < 1 ? 1 : pageNumber;
                 PageSize = pageSize < 5 ? 10 : (pageSize > 100 ? 100 : pageSize);
 
                 // Lấy thông tin chi nhánh của user đang đăng nhập
-                var userId = HttpContext.Session.GetString("UserId");
-                if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out Guid userGuid))
+                CurrentUserId = userGuid;
+                    
+                var currentUser = await _context.NguoiDungs
+                    .Where(u => u.ID == userGuid && !u.IsDelete)
+                    .Join(_context.ChiNhanhs, u => u.IDChiNhanh, c => c.ID, (u, c) => new { u, c })
+                    .FirstOrDefaultAsync();
+                
+                if (currentUser != null)
                 {
-                    CurrentUserId = userGuid;
+                    CurrentUserBranchId = currentUser.c.ID;
                     
-                    var currentUser = await _context.NguoiDungs
-                        .Where(u => u.ID == userGuid && !u.IsDelete)
-                        .Join(_context.ChiNhanhs, u => u.IDChiNhanh, c => c.ID, (u, c) => new { u, c })
-                        .FirstOrDefaultAsync();
-                    
-                    if (currentUser != null)
-                    {
-                        CurrentUserBranchId = currentUser.c.ID;
-                        
-                        // Ưu tiên MaChiNhanh, nếu không có thì dùng 3 ký tự đầu của TenChiNhanh
-                        CurrentUserBranchCode = !string.IsNullOrWhiteSpace(currentUser.c.MaChiNhanh) 
-                            ? currentUser.c.MaChiNhanh 
-                            : (currentUser.c.TenChiNhanh.Length >= 3 ? currentUser.c.TenChiNhanh.Substring(0, 3).ToUpper() : currentUser.c.TenChiNhanh.ToUpper());
-                    }
+                    // Ưu tiên MaChiNhanh, nếu không có thì dùng 3 ký tự đầu của TenChiNhanh
+                    CurrentUserBranchCode = !string.IsNullOrWhiteSpace(currentUser.c.MaChiNhanh) 
+                        ? currentUser.c.MaChiNhanh 
+                        : (currentUser.c.TenChiNhanh.Length >= 3 ? currentUser.c.TenChiNhanh.Substring(0, 3).ToUpper() : currentUser.c.TenChiNhanh.ToUpper());
+                }
+                else
+                {
+                    // Nếu không tìm thấy thông tin user, redirect về login
+                    return RedirectToPage("/Login");
                 }
 
                 // Đếm số lượng cho từng tab theo logic mới
@@ -209,6 +218,8 @@ namespace QRB.Pages.DeXuatMuaSam
                 AllChiNhanhList = new List<ChiNhanhViewModel>();
                 // Log error if needed
             }
+
+            return Page();
         }
 
         // Handler method để lấy danh sách người dùng theo chi nhánh
@@ -216,6 +227,13 @@ namespace QRB.Pages.DeXuatMuaSam
         {
             try
             {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
+                }
+
                 var users = await _context.NguoiDungs
                     .Where(u => u.IDChiNhanh == branchId && !u.IsDelete)
                     .Select(u => new
@@ -238,6 +256,12 @@ namespace QRB.Pages.DeXuatMuaSam
         {
             try
             {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
+                }
                 var deXuat = await (from dx in _context.DeXuatMuaSams
                                    join nguoiGui in _context.NguoiDungs on dx.IDNguoiGui equals nguoiGui.ID into nguoiGuiGroup
                                    from nguoiGui in nguoiGuiGroup.DefaultIfEmpty()
@@ -285,6 +309,13 @@ namespace QRB.Pages.DeXuatMuaSam
         {
             try
             {
+                // Kiểm tra đăng nhập
+                var sessionUserId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(sessionUserId) || !Guid.TryParse(sessionUserId, out Guid userGuid))
+                {
+                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
+                }
+
                 // Đọc dữ liệu từ form thay vì JSON
                 var idString = Request.Form["id"].ToString();
                 var newStatus = Request.Form["status"].ToString();
@@ -355,6 +386,13 @@ namespace QRB.Pages.DeXuatMuaSam
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                // Kiểm tra đăng nhập
+                var sessionUserId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(sessionUserId) || !Guid.TryParse(sessionUserId, out Guid userGuid))
+                {
+                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
+                }
+
                 // Đọc dữ liệu từ form
                 var idString = Request.Form["id"].ToString();
                 
@@ -472,6 +510,13 @@ namespace QRB.Pages.DeXuatMuaSam
         {
             try
             {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
+                }
+
                 var nguyenLieuDetails = await (from ct in _context.ChiTietDonDeXuats
                                              join nl in _context.NguyenLieus on ct.IDNguyenLieu equals nl.ID
                                              where ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete && !nl.IsDelete
