@@ -34,7 +34,7 @@ namespace QRB.Pages
                 Response.Redirect("/Dashboard");
             }
         }
-
+        //kiem tra cac thu
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)

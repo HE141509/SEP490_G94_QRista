@@ -5,6 +5,7 @@ namespace QRB.Pages
 {
     public class LogoutModel : PageModel
     {
+        //kiem tra cac thu
         public IActionResult OnGet()
         {
             // Clear session
