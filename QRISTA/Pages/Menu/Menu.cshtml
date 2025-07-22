@@ -79,24 +79,50 @@ function changeQuantityType(button, change) {
 
 // Cập nhật lại số lượng hiển thị trên UI cho từng loại
 function updateMenuItemQtyUI() {
+    // Ensure cart exists
+    if (!window.qrbMenuState.cart) {
+        window.qrbMenuState.cart = {};
+    }
+    
     document.querySelectorAll('.menu-item').forEach((itemDiv) => {
-        // Nếu có nhiều loại
-        const typeRows = itemDiv.querySelectorAll('.menu-item-type-row');
-        if (typeRows.length > 0) {
-            typeRows.forEach(typeRow => {
-                const name = itemDiv.querySelector('.menu-item-title').innerText;
-                const maLoai = typeRow.querySelector('.quantity').dataset.maloai;
-                const key = name + '_' + maLoai;
-                const qty = window.qrbMenuState.cart[key]?.qty || 0;
-                typeRow.querySelector('.quantity').innerText = qty;
-            });
-        } else {
-            // Sản phẩm không có loại
-            const name = itemDiv.querySelector('.menu-item-title').innerText;
-            const key = name;
-            const qty = window.qrbMenuState.cart[key]?.qty || 0;
-            const qtySpan = itemDiv.querySelector('.quantity');
-            if (qtySpan) qtySpan.innerText = qty;
+        try {
+            // Nếu có nhiều loại
+            const typeRows = itemDiv.querySelectorAll('.menu-item-type-row');
+            if (typeRows.length > 0) {
+                typeRows.forEach(typeRow => {
+                    try {
+                        const titleElement = itemDiv.querySelector('.menu-item-title');
+                        const quantityElement = typeRow.querySelector('.quantity');
+                        
+                        if (titleElement && quantityElement && quantityElement.dataset) {
+                            const name = titleElement.innerText || '';
+                            const maLoai = quantityElement.dataset.maloai || '';
+                            const key = name + '_' + maLoai;
+                            const qty = (window.qrbMenuState.cart[key] && window.qrbMenuState.cart[key].qty) ? window.qrbMenuState.cart[key].qty : 0;
+                            quantityElement.innerText = qty;
+                        }
+                    } catch (error) {
+                        console.warn('Error updating type row quantity:', error);
+                    }
+                });
+            } else {
+                // Sản phẩm không có loại
+                try {
+                    const titleElement = itemDiv.querySelector('.menu-item-title');
+                    const qtySpan = itemDiv.querySelector('.quantity');
+                    
+                    if (titleElement && qtySpan) {
+                        const name = titleElement.innerText || '';
+                        const key = name;
+                        const qty = (window.qrbMenuState.cart[key] && window.qrbMenuState.cart[key].qty) ? window.qrbMenuState.cart[key].qty : 0;
+                        qtySpan.innerText = qty;
+                    }
+                } catch (error) {
+                    console.warn('Error updating single item quantity:', error);
+                }
+            }
+        } catch (error) {
+            console.warn('Error processing menu item:', error);
         }
     });
 }
@@ -107,15 +133,8 @@ function renderMenuItems(items) {
         section.innerHTML = '<div style="padding:32px 0;text-align:center;color:#888;">Không có sản phẩm nào.</div>';
         return;
     }
-    // Render từng sản phẩm, nếu có nhiều loại thì hiển thị từng loại riêng biệt
-    // Hiển thị 3 sản phẩm trên 1 hàng
-    let rowDiv = null;
+    // Render từng sản phẩm với layout grid đồng đều
     items.forEach((item, idx) => {
-        if (idx % 3 === 0) {
-            rowDiv = document.createElement('div');
-            rowDiv.className = 'menu-items-row';
-            section.appendChild(rowDiv);
-        }
         const div = document.createElement('div');
         div.className = 'menu-item';
         div.dataset.category = item.IdNhomSanPham;
@@ -148,17 +167,24 @@ function renderMenuItems(items) {
                 </div>
             `;
         }
+        
+        const imageHtml = item.HinhAnh 
+            ? `<img src="data:image/png;base64,${item.HinhAnh}" alt="${item.TenSanPham}" />` 
+            : '<div class="img-placeholder">Không có hình</div>';
+            
         div.innerHTML = `
             <div class="menu-item-img">
-                ${item.HinhAnh ? `<img src="data:image/png;base64,${item.HinhAnh}" alt="${item.TenSanPham}" />` : '<div class="img-placeholder"></div>'}
+                ${imageHtml}
             </div>
-        <div class="menu-item-info">
-            <div class="menu-item-title">${item.TenSanPham}</div>
-            <div class="menu-item-code" style="width:100%;text-align:center;">Mã: ${item.MaSanPham}</div>
-            ${typesHtml}
+            <div class="menu-item-info">
+                <div class="menu-item-title">${item.TenSanPham}</div>
+                <div class="menu-item-code">Mã: ${item.MaSanPham}</div>
+                <div class="menu-item-types-container">
+                    ${typesHtml}
+                </div>
             </div>
         `;
-        if (rowDiv) rowDiv.appendChild(div);
+        section.appendChild(div);
     });
 }
 
@@ -349,24 +375,50 @@ function updateCartSummary() {
 }
 
 function updateMenuItemQtyUI() {
+    // Ensure cart exists
+    if (!window.qrbMenuState.cart) {
+        window.qrbMenuState.cart = {};
+    }
+    
     document.querySelectorAll('.menu-item').forEach((itemDiv) => {
-        // Nếu có nhiều loại
-        const typeRows = itemDiv.querySelectorAll('.menu-item-type-row');
-        if (typeRows.length > 0) {
-            typeRows.forEach(typeRow => {
-                const name = itemDiv.querySelector('.menu-item-title').innerText;
-                const maLoai = typeRow.querySelector('.quantity').dataset.maloai;
-                const key = name + '_' + maLoai;
-                const qty = window.qrbMenuState.cart[key]?.qty || 0;
-                typeRow.querySelector('.quantity').innerText = qty;
-            });
-        } else {
-            // Sản phẩm không có loại
-            const name = itemDiv.querySelector('.menu-item-title').innerText;
-            const key = name;
-            const qty = window.qrbMenuState.cart[key]?.qty || 0;
-            const qtySpan = itemDiv.querySelector('.quantity');
-            if (qtySpan) qtySpan.innerText = qty;
+        try {
+            // Nếu có nhiều loại
+            const typeRows = itemDiv.querySelectorAll('.menu-item-type-row');
+            if (typeRows.length > 0) {
+                typeRows.forEach(typeRow => {
+                    try {
+                        const titleElement = itemDiv.querySelector('.menu-item-title');
+                        const quantityElement = typeRow.querySelector('.quantity');
+                        
+                        if (titleElement && quantityElement && quantityElement.dataset) {
+                            const name = titleElement.innerText || '';
+                            const maLoai = quantityElement.dataset.maloai || '';
+                            const key = name + '_' + maLoai;
+                            const qty = (window.qrbMenuState.cart[key] && window.qrbMenuState.cart[key].qty) ? window.qrbMenuState.cart[key].qty : 0;
+                            quantityElement.innerText = qty;
+                        }
+                    } catch (error) {
+                        console.warn('Error updating type row quantity:', error);
+                    }
+                });
+            } else {
+                // Sản phẩm không có loại
+                try {
+                    const titleElement = itemDiv.querySelector('.menu-item-title');
+                    const qtySpan = itemDiv.querySelector('.quantity');
+                    
+                    if (titleElement && qtySpan) {
+                        const name = titleElement.innerText || '';
+                        const key = name;
+                        const qty = (window.qrbMenuState.cart[key] && window.qrbMenuState.cart[key].qty) ? window.qrbMenuState.cart[key].qty : 0;
+                        qtySpan.innerText = qty;
+                    }
+                } catch (error) {
+                    console.warn('Error updating single item quantity:', error);
+                }
+            }
+        } catch (error) {
+            console.warn('Error processing menu item:', error);
         }
     });
 }
@@ -376,46 +428,63 @@ function getPrice(size) {
 }
 
 function changeQuantity(button, change) {
-    const itemDiv = button.closest('.menu-item');
-    const name = itemDiv.querySelector('.menu-item-title').innerText;
-    let price = 30000; // mặc định
-    let key = name;
-    // Nếu có badge (sản phẩm có loại), lấy theo loại
-    const priceDiv = button.closest('.menu-item-price');
-    if (priceDiv && priceDiv.querySelector('.badge')) {
-        const size = priceDiv.querySelector('.badge').innerText.trim();
-        key = name + '_' + size;
-        price = getPrice(size);
-        if (!price || price <= 0) price = 30000;
-    } else {
-        // Nếu có thẻ span giá, lấy giá hiển thị
-        const priceSpan = itemDiv.querySelector('.menu-item-price span');
-        let gia = 0;
-        if (priceSpan) {
-            gia = parseInt(priceSpan.innerText.replace(/\D/g, ''));
-        }
-        if (!isNaN(gia) && gia > 0) {
-            price = gia;
+    try {
+        const itemDiv = button.closest('.menu-item');
+        if (!itemDiv) return;
+        
+        const titleElement = itemDiv.querySelector('.menu-item-title');
+        if (!titleElement) return;
+        
+        const name = titleElement.innerText || '';
+        let price = 30000; // mặc định
+        let key = name;
+        
+        // Nếu có badge (sản phẩm có loại), lấy theo loại
+        const priceDiv = button.closest('.menu-item-price');
+        if (priceDiv && priceDiv.querySelector('.badge')) {
+            const badgeElement = priceDiv.querySelector('.badge');
+            const size = badgeElement ? badgeElement.innerText.trim() : '';
+            key = name + '_' + size;
+            price = getPrice(size);
+            if (!price || price <= 0) price = 30000;
         } else {
-            price = 30000;
+            // Nếu có thẻ span giá, lấy giá hiển thị
+            const priceSpan = itemDiv.querySelector('.menu-item-price span');
+            let gia = 0;
+            if (priceSpan) {
+                gia = parseInt(priceSpan.innerText.replace(/\D/g, ''));
+            }
+            if (!isNaN(gia) && gia > 0) {
+                price = gia;
+            } else {
+                price = 30000;
+            }
         }
-    }
-    // Ensure key is properly initialized and cart object is updated
-    if (!window.qrbMenuState.cart[key]) {
-        window.qrbMenuState.cart[key] = { name, qty: 0, price: 30000 }; // Default price
-    }
+        
+        // Ensure cart exists
+        if (!window.qrbMenuState.cart) {
+            window.qrbMenuState.cart = {};
+        }
+        
+        // Ensure key is properly initialized and cart object is updated
+        if (!window.qrbMenuState.cart[key]) {
+            window.qrbMenuState.cart[key] = { name, qty: 0, price: 30000 }; // Default price
+        }
 
-    // Update price and quantity
-    window.qrbMenuState.cart[key].price = price || 30000; // Default price if undefined
-    window.qrbMenuState.cart[key].qty = Math.max(0, (window.qrbMenuState.cart[key].qty || 0) + change);
+        // Update price and quantity
+        window.qrbMenuState.cart[key].price = price || 30000; // Default price if undefined
+        window.qrbMenuState.cart[key].qty = Math.max(0, (window.qrbMenuState.cart[key].qty || 0) + change);
 
-    // Remove item if quantity is zero
-    if (window.qrbMenuState.cart[key].qty === 0) {
-        delete window.qrbMenuState.cart[key];
+        // Remove item if quantity is zero
+        if (window.qrbMenuState.cart[key].qty === 0) {
+            delete window.qrbMenuState.cart[key];
+        }
+
+        updateCartSummary();
+        updateMenuItemQtyUI();
+    } catch (error) {
+        console.warn('Error in changeQuantity:', error);
     }
-
-    updateCartSummary();
-    updateMenuItemQtyUI();
 }
 
 function updatePagination() {
@@ -427,33 +496,58 @@ function updatePagination() {
 }
 
 function changePage(direction) {
-    const newPage = window.qrbMenuState.currentPage + direction;
-    if (newPage >= 1 && newPage <= window.qrbMenuState.totalPages) {
-        window.qrbMenuState.currentPage = newPage;
-        showPage();
-        updatePagination();
+    try {
+        if (!window.qrbMenuState) {
+            console.warn('qrbMenuState not initialized');
+            return;
+        }
+        
+        const newPage = window.qrbMenuState.currentPage + direction;
+        if (newPage >= 1 && newPage <= window.qrbMenuState.totalPages) {
+            window.qrbMenuState.currentPage = newPage;
+            showPage();
+            updatePagination();
+        }
+    } catch (error) {
+        console.warn('Error in changePage:', error);
     }
 }
 
 function showPage() {
-    const items = document.querySelectorAll('.menu-item');
-    let filteredIndexes = [];
-    items.forEach((item, idx) => {
-        const itemCategory = item.dataset.category;
-        const itemName = item.dataset.name;
-        const belongsToFilter = window.qrbMenuState.filteredItems.some(f => {
-            if (!f || !f.IdNhomSanPham || !f.TenSanPham) return false;
-            return f.IdNhomSanPham == itemCategory && f.TenSanPham === itemName;
+    try {
+        const items = document.querySelectorAll('.menu-item');
+        let filteredIndexes = [];
+        
+        if (!window.qrbMenuState.filteredItems) {
+            window.qrbMenuState.filteredItems = [];
+        }
+        
+        items.forEach((item, idx) => {
+            try {
+                const itemCategory = item.dataset.category;
+                const itemName = item.dataset.name;
+                const belongsToFilter = window.qrbMenuState.filteredItems.some(f => {
+                    if (!f || !f.IdNhomSanPham || !f.TenSanPham) return false;
+                    return f.IdNhomSanPham == itemCategory && f.TenSanPham === itemName;
+                });
+                if (belongsToFilter) filteredIndexes.push(idx);
+            } catch (error) {
+                console.warn('Error processing item in showPage:', error);
+            }
         });
-        if (belongsToFilter) filteredIndexes.push(idx);
-    });
-    items.forEach(item => { item.style.display = 'none'; });
-    const startIndex = (window.qrbMenuState.currentPage - 1) * window.qrbMenuState.itemsPerPage;
-    const endIndex = startIndex + window.qrbMenuState.itemsPerPage;
-    for (let i = startIndex; i < endIndex && i < filteredIndexes.length; i++) {
-        items[filteredIndexes[i]].style.display = 'flex';
+        
+        items.forEach(item => { item.style.display = 'none'; });
+        const startIndex = (window.qrbMenuState.currentPage - 1) * window.qrbMenuState.itemsPerPage;
+        const endIndex = startIndex + window.qrbMenuState.itemsPerPage;
+        for (let i = startIndex; i < endIndex && i < filteredIndexes.length; i++) {
+            if (items[filteredIndexes[i]]) {
+                items[filteredIndexes[i]].style.display = 'flex';
+            }
+        }
+        updateMenuItemQtyUI();
+    } catch (error) {
+        console.warn('Error in showPage:', error);
     }
-    updateMenuItemQtyUI();
 }
 
 function filterMenu(category) {
