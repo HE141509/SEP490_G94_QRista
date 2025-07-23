@@ -532,7 +532,7 @@
                                     <tr data-index="@stt" data-status="@(order.TrangThaiThanhToan ? "paid" : "unpaid")">
                                         <td>@stt</td>
                                         <td>
-                                            <a href="/Order/OrderDetail?id=@order.ID"
+                                            <a href="javascript:void(0)" onclick="showOrderDetail('@order.ID')"
                                                 style="color:#007bff;text-decoration:underline;cursor:pointer;">@order.MaDonHang</a>
                                         </td>
                                         <td>@order.KhachHang?.TenKhachHang</td>
@@ -541,13 +541,13 @@
                                         <td class="order-status">@status</td>
                                         <td>@order.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
                                         <td>
-                                            <form method="get" action="/Order/EditOrder" style="display:inline;">
+                                            @* <form method="get" action="/Order/EditOrder" style="display:inline;">
                                                 <input type="hidden" name="id" value="@order.ID" />
                                                 <button type="submit" class="userlist-edit-btn" title="Sửa"
                                                     style="margin-left:4px; background-color:#b6f5c6; color:#218838; border:none;">
                                                     <i class="fas fa-pen"></i>
                                                 </button>
-                                            </form>
+                                            </form> *@
                                             <button type="button" class="userlist-delete-btn" title="Xóa"
                                                 style="margin-left:4px;" onclick="showDeleteOrderConfirm('@order.ID')">
                                                 <i class="fas fa-trash"></i>
@@ -613,6 +613,104 @@
             <form id="antiForgeryFormOrder" style="display:none;">
                 @Html.AntiForgeryToken()
             </form>
+            
+            <!-- Popup chi tiết và chỉnh sửa hóa đơn -->
+            <div id="orderDetailModal" class="modal"
+                style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content userlist-add-modal-content" style="max-width:800px;max-height:90vh;overflow-y:auto;">
+                    <div class="userlist-add-modal-title"><i class="fas fa-file-invoice"></i> Chi tiết hóa đơn</div>
+                    <form id="orderDetailForm" autocomplete="off">
+                        <input type="hidden" id="detailOrderId" />
+                        
+                        <!-- Thông tin cơ bản -->
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Mã đơn hàng</label>
+                                <input type="text" id="detailMaDonHang" class="userlist-input" readonly />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Ngày tạo</label>
+                                <input type="text" id="detailCreateTime" class="userlist-input" readonly />
+                            </div>
+                        </div>
+
+                        <!-- Thông tin khách hàng -->
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Khách hàng</label>
+                                <input type="text" id="detailTenKhachHang" class="userlist-input" readonly />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Số điện thoại</label>
+                                <input type="text" id="detailSdtKhachHang" class="userlist-input" readonly />
+                            </div>
+                        </div>
+
+                        <!-- Thông tin nhân viên và chi nhánh -->
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Nhân viên</label>
+                                <input type="text" id="detailTenNhanVien" class="userlist-input" readonly />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Chi nhánh</label>
+                                <input type="text" id="detailTenChiNhanh" class="userlist-input" readonly />
+                            </div>
+                        </div>
+
+                        <!-- Chi tiết sản phẩm -->
+                        <div class="userlist-add-form-group">
+                            <label>Chi tiết sản phẩm</label>
+                            <table class="userlist-table userlist-table-modern" style="width:100%;margin-top:8px;">
+                                <thead>
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th>Loại</th>
+                                        <th>Đơn giá</th>
+                                        <th>Số lượng</th>
+                                        <th>Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orderDetailProductGrid">
+                                    <!-- Dữ liệu sẽ được thêm động -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Thông tin ưu đãi và thanh toán -->
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label for="detailMaUuDai">Mã ưu đãi</label>
+                                <input type="text" id="detailMaUuDai" class="userlist-input" />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label for="detailTienUuDai">Tiền ưu đãi</label>
+                                <input type="text" id="detailTienUuDai" class="userlist-input" />
+                            </div>
+                        </div>
+
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label for="detailTongTien">Tổng tiền</label>
+                                <input type="text" id="detailTongTien" class="userlist-input" />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label for="detailTrangThaiThanhToan">Trạng thái thanh toán</label>
+                                <select id="detailTrangThaiThanhToan" class="userlist-input">
+                                    <option value="false">Chưa thanh toán</option>
+                                    <option value="true">Đã thanh toán</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="userlist-add-modal-actions">
+                            <button type="button" onclick="closeOrderDetailModal()" class="userlist-add-cancel-btn">Đóng</button>
+                            <button type="submit" class="userlist-add-submit-btn">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
             <div id="deleteOrderModal" class="modal"
                 style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
                 <div class="modal-content"
@@ -729,6 +827,107 @@
                 window.addEventListener('DOMContentLoaded', function () {
                     orderPageSize = parseInt(document.getElementById('orderPageSize').value) || 10;
                     setTimeout(updateOrderPagination, 0);
+                });
+
+                // Hiển thị popup chi tiết hóa đơn
+                function showOrderDetail(orderId) {
+                    fetch(`/Order/OrderList?handler=GetOrderDetail&id=${orderId}`)
+                        .then(res => res.json())
+                        .then(response => {
+                            if (response.success && response.data) {
+                                const data = response.data;
+                                
+                                // Điền thông tin cơ bản
+                                document.getElementById('detailOrderId').value = data.id;
+                                document.getElementById('detailMaDonHang').value = data.maDonHang;
+                                document.getElementById('detailCreateTime').value = data.createTime;
+                                
+                                // Thông tin khách hàng
+                                document.getElementById('detailTenKhachHang').value = data.tenKhachHang;
+                                document.getElementById('detailSdtKhachHang').value = data.sdtKhachHang;
+                                
+                                // Thông tin nhân viên và chi nhánh
+                                document.getElementById('detailTenNhanVien').value = data.tenNhanVien;
+                                document.getElementById('detailTenChiNhanh').value = data.tenChiNhanh;
+                                
+                                // Thông tin ưu đãi và thanh toán
+                                document.getElementById('detailMaUuDai').value = data.maUuDai || '';
+                                document.getElementById('detailTienUuDai').value = data.tienUuDai || '0';
+                                document.getElementById('detailTongTien').value = data.tongTien || '0';
+                                document.getElementById('detailTrangThaiThanhToan').value = data.trangThaiThanhToan.toString();
+                                
+                                // Hiển thị chi tiết sản phẩm
+                                const productGrid = document.getElementById('orderDetailProductGrid');
+                                productGrid.innerHTML = '';
+                                if (data.chiTiet && Array.isArray(data.chiTiet)) {
+                                    data.chiTiet.forEach(item => {
+                                        const tr = document.createElement('tr');
+                                        tr.innerHTML = `
+                                            <td>${item.tenSanPham}</td>
+                                            <td>${item.tenLoaiSanPham}</td>
+                                            <td>${formatCurrency(item.donGia)}</td>
+                                            <td>${item.soLuong}</td>
+                                            <td>${formatCurrency(item.thanhTien)}</td>
+                                        `;
+                                        productGrid.appendChild(tr);
+                                    });
+                                }
+                                
+                                document.getElementById('orderDetailModal').style.display = 'flex';
+                            } else {
+                                alert(response.message || 'Không thể lấy chi tiết hóa đơn');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                            alert('Có lỗi khi tải chi tiết hóa đơn');
+                        });
+                }
+
+                function closeOrderDetailModal() {
+                    document.getElementById('orderDetailModal').style.display = 'none';
+                }
+
+                // Cập nhật hóa đơn
+                document.getElementById('orderDetailForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const orderId = document.getElementById('detailOrderId').value;
+                    if (!orderId) {
+                        alert('Không tìm thấy ID hóa đơn');
+                        return;
+                    }
+
+                    const updateData = {
+                        ID: orderId,
+                        MaUuDai: document.getElementById('detailMaUuDai').value,
+                        TienUuDai: document.getElementById('detailTienUuDai').value,
+                        TongTien: document.getElementById('detailTongTien').value,
+                        TrangThaiThanhToan: document.getElementById('detailTrangThaiThanhToan').value === 'true'
+                    };
+
+                    fetch('/Order/OrderList?handler=UpdateOrder', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('#antiForgeryFormOrder input[name=__RequestVerificationToken]').value
+                        },
+                        body: JSON.stringify(updateData)
+                    })
+                    .then(res => res.json())
+                    .then(response => {
+                        if (response.success) {
+                            alert('Cập nhật hóa đơn thành công');
+                            closeOrderDetailModal();
+                            location.reload(); // Reload để cập nhật danh sách
+                        } else {
+                            alert(response.message || 'Cập nhật hóa đơn thất bại');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        alert('Có lỗi khi cập nhật hóa đơn');
+                    });
                 });
             </script>
         </main>

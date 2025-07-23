@@ -155,6 +155,63 @@
             background: rgba(33, 37, 41, 0.1);
             color: #212529;
         }
+
+        /* Action buttons styling */
+        .action-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 140px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .approve-btn {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: 2px solid transparent;
+        }
+        .approve-btn:hover {
+            background: linear-gradient(135deg, #218838, #1fa584);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        .approve-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .reject-btn {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+            color: white;
+            border: 2px solid transparent;
+        }
+        .reject-btn:hover {
+            background: linear-gradient(135deg, #c82333, #d91a72);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+        .reject-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        /* Icon animation */
+        .action-btn i {
+            transition: transform 0.2s ease;
+        }
+        .action-btn:hover i {
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -265,9 +322,17 @@
                                     data-nguoi-nhan="@item.IDNguoiNhan">
                                     <td>@item.MaDeXuat</td>
                                     <td>
-                                        @if (!item.IsDelete && item.Status == "pending")
+                                        @if (!item.IsDelete && item.Status == "pending" && item.IDNguoiGui.ToString() == Model.CurrentUserId.ToString())
                                         {
+                                            <!-- Người gửi có thể chỉnh sửa khi status = pending -->
                                             <a href="javascript:void(0)" onclick="showUpdateDeXuatMuaSamModal('@item.ID')" style="color: #007bff; text-decoration: none; cursor: pointer;">
+                                                @item.TieuDe
+                                            </a>
+                                        }
+                                        else if (!item.IsDelete)
+                                        {
+                                            <!-- Người nhận hoặc trạng thái khác pending -> xem chi tiết -->
+                                            <a href="javascript:void(0)" onclick="showViewDeXuatMuaSamModal('@item.ID')" style="color: #28a745; text-decoration: none; cursor: pointer;">
                                                 @item.TieuDe
                                             </a>
                                         }
@@ -309,10 +374,16 @@
                                     </td>
                                     <td>@item.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
                                     <td>
-                                        @if (!item.IsDelete)
+                                        @if (!item.IsDelete && item.Status != "accepted" && item.Status != "rejected" && !(item.Status == "pending" && item.IDNguoiNhan == Model.CurrentUserId))
                                         {
                                             <button type="button" class="userlist-delete-btn" onclick="showDeleteDeXuatMuaSamModal('@item.ID')">
                                                 <i class="fas fa-trash"></i>
+                                            </button>
+                                        }
+                                        @if (item.Status == "accepted" && item.IDNguoiGui == Model.CurrentUserId && !item.ReceiveTime.HasValue)
+                                        {
+                                            <button type="button" class="userlist-add-submit-btn" onclick="receiveOrder('@item.ID')" style="margin-left: 5px;">
+                                                <i class="fas fa-hand-holding"></i> Nhận hàng
                                             </button>
                                         }
                                     </td>
@@ -429,6 +500,62 @@
                                     </div>
                                 </div>
                             </div>
+                            
+                            <!-- Phần quản lý nguyên liệu -->
+                            <div class="userlist-add-form-group">
+                                <label style="font-weight: 600; color: #333; margin-bottom: 15px; display: block;">
+                                    <i class="fas fa-leaf"></i> Danh sách nguyên liệu yêu cầu
+                                </label>
+                                
+                                <!-- Ô tìm kiếm và thêm nguyên liệu -->
+                                <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: end;">
+                                    <div style="flex: 1;">
+                                        <label for="addNguyenLieuSearch" style="font-size: 14px; color: #666;">Tìm kiếm nguyên liệu</label>
+                                        <div class="searchable-select">
+                                            <input type="text" id="addNguyenLieuSearch" 
+                                                   placeholder="Nhập tên nguyên liệu..." 
+                                                   data-selected-id="" 
+                                                   class="userlist-input" autocomplete="off" />
+                                            <div class="searchable-options" id="addNguyenLieuSearchOptions">
+                                                <!-- Options sẽ được load qua JavaScript -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <label for="addNguyenLieuSoLuong" style="font-size: 14px; color: #666;">Số lượng</label>
+                                        <input type="text" id="addNguyenLieuSoLuong" 
+                                               placeholder="Số lượng..." 
+                                               class="userlist-input"
+                                               oninput="formatNumberInput(this)"
+                                               onkeypress="return allowNumbersOnly(event)" />
+                                    </div>
+                                    <button type="button" onclick="addNguyenLieuToList()" 
+                                            class="userlist-add-submit-btn" style="padding: 8px 16px; white-space: nowrap;">
+                                        <i class="fas fa-plus"></i> Thêm
+                                    </button>
+                                </div>
+                                
+                                <!-- Bảng danh sách nguyên liệu đã chọn -->
+                                <div id="addNguyenLieuTableContainer" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                                    <table id="addNguyenLieuTable" style="width: 100%; border-collapse: collapse; background: #fff;">
+                                        <thead style="background: #f8f9fa;">
+                                            <tr>
+                                                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; font-weight: 600; width: 40%;">Tên nguyên liệu</th>
+                                                <th style="padding: 12px; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 600; width: 40%;">Số lượng</th>
+                                                <th style="padding: 12px; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 600; width: 20%;">Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="addNguyenLieuTableBody">
+                                            <tr id="addNguyenLieuEmptyRow">
+                                                <td colspan="3" style="padding: 20px; text-align: center; color: #999; font-style: italic;">
+                                                    Chưa có nguyên liệu nào được thêm
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
                             <div class="userlist-add-modal-actions">
                                 <button type="button" onclick="closeAddDeXuatMuaSamModal()" class="userlist-add-cancel-btn">Hủy</button>
                                 <button type="submit" class="userlist-add-submit-btn">Thêm mới</button>
@@ -513,6 +640,62 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Phần quản lý nguyên liệu -->
+                <div class="userlist-add-form-group">
+                    <label style="font-weight: 600; color: #333; margin-bottom: 15px; display: block;">
+                        <i class="fas fa-leaf"></i> Danh sách nguyên liệu yêu cầu
+                    </label>
+                    
+                    <!-- Ô tìm kiếm và thêm nguyên liệu -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px; align-items: end;">
+                        <div style="flex: 1;">
+                            <label for="updateNguyenLieuSearch" style="font-size: 14px; color: #666;">Tìm kiếm nguyên liệu</label>
+                            <div class="searchable-select">
+                                <input type="text" id="updateNguyenLieuSearch" 
+                                       placeholder="Nhập tên nguyên liệu..." 
+                                       data-selected-id="" 
+                                       class="userlist-input" autocomplete="off" />
+                                <div class="searchable-options" id="updateNguyenLieuSearchOptions">
+                                    <!-- Options sẽ được load qua JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="updateNguyenLieuSoLuong" style="font-size: 14px; color: #666;">Số lượng</label>
+                            <input type="text" id="updateNguyenLieuSoLuong" 
+                                   placeholder="Số lượng..." 
+                                   class="userlist-input"
+                                   oninput="formatNumberInput(this)"
+                                   onkeypress="return allowNumbersOnly(event)" />
+                        </div>
+                        <button type="button" onclick="updateAddNguyenLieuToList()" 
+                                class="userlist-add-submit-btn" style="padding: 8px 16px; white-space: nowrap;">
+                            <i class="fas fa-plus"></i> Thêm
+                        </button>
+                    </div>
+                    
+                    <!-- Bảng danh sách nguyên liệu đã chọn -->
+                    <div id="updateNguyenLieuTableContainer" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                        <table id="updateNguyenLieuTable" style="width: 100%; border-collapse: collapse; background: #fff;">
+                            <thead style="background: #f8f9fa;">
+                                <tr>
+                                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; font-weight: 600; width: 40%;">Tên nguyên liệu</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 600; width: 40%;">Số lượng</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 600; width: 20%;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="updateNguyenLieuTableBody">
+                                <tr id="updateNguyenLieuEmptyRow">
+                                    <td colspan="3" style="padding: 20px; text-align: center; color: #999; font-style: italic;">
+                                        Chưa có nguyên liệu nào được chọn
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
                 <div class="userlist-add-form-group">
                     <label for="updateStatus">Trạng thái</label>
                     <input type="text" id="updateStatusDisplay" class="userlist-input" readonly style="background-color: #f5f5f5;" />
@@ -526,6 +709,180 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal xem chi tiết Đề xuất Mua sắm -->
+    <div id="viewDeXuatMuaSamModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+        <div class="modal-content userlist-add-modal-content" style="max-width: 800px;">
+            <div class="userlist-add-modal-title"><i class="fas fa-eye"></i> Chi tiết đề xuất mua sắm</div>
+            <div id="viewDeXuatMuaSamContent">
+                <!-- Hàng đầu tiên: Mã đề xuất, Người gửi, Chi nhánh gửi -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label>Mã đề xuất</label>
+                        <input type="text" id="viewMaDeXuat" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                    </div>
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label>Người gửi</label>
+                        <input type="text" id="viewNguoiGui" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                    </div>
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label>Chi nhánh gửi</label>
+                        <input type="text" id="viewChiNhanhGui" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                    </div>
+                </div>
+                
+                <!-- Tiêu đề -->
+                <div class="userlist-add-form-group">
+                    <label>Tiêu đề</label>
+                    <input type="text" id="viewTieuDe" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                </div>
+                
+                <!-- Nội dung đề xuất -->
+                <div class="userlist-add-form-group">
+                    <label>Nội dung đề xuất</label>
+                    <textarea id="viewNoiDungDeXuat" class="userlist-input" rows="4" readonly style="background-color: #f5f5f5; resize: none;"></textarea>
+                </div>
+                
+                <!-- Hàng chi nhánh nhận và người nhận -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label>Chi nhánh nhận</label>
+                        <input type="text" id="viewChiNhanhNhan" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                    </div>
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label>Người nhận</label>
+                        <input type="text" id="viewNguoiNhan" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                    </div>
+                </div>
+                
+                <!-- Trạng thái và ngày tạo -->
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label>Trạng thái</label>
+                        <input type="text" id="viewStatus" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                    </div>
+                    <div class="userlist-add-form-group" style="flex: 1;">
+                        <label>Ngày tạo</label>
+                        <input type="text" id="viewCreateTime" class="userlist-input" readonly style="background-color: #f5f5f5;" />
+                    </div>
+                </div>
+                
+                <!-- Danh sách nguyên liệu yêu cầu -->
+                <div class="userlist-add-form-group">
+                    <label style="font-weight: 600; color: #333; margin-bottom: 15px; display: block;">
+                        <i class="fas fa-leaf"></i> Danh sách nguyên liệu yêu cầu
+                    </label>
+                    
+                    <div id="viewNguyenLieuTableContainer" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;">
+                        <table id="viewNguyenLieuTable" style="width: 100%; border-collapse: collapse; background: #fff;">
+                            <thead style="background: #f8f9fa;">
+                                <tr>
+                                    <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; font-weight: 600; width: 40%;">Tên nguyên liệu</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 600; width: 30%;">Mã nguyên liệu</th>
+                                    <th style="padding: 12px; text-align: center; border-bottom: 1px solid #e0e0e0; font-weight: 600; width: 30%;">Số lượng</th>
+                                </tr>
+                            </thead>
+                            <tbody id="viewNguyenLieuTableBody">
+                                <tr id="viewNguyenLieuEmptyRow">
+                                    <td colspan="3" style="padding: 20px; text-align: center; color: #999; font-style: italic;">
+                                        Đang tải danh sách nguyên liệu...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Action buttons for "Đã nhận" status -->
+                <div id="viewActionButtons" style="margin: 20px 0;">
+                    <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                        <h6 style="margin: 0 0 10px 0; color: #17a2b8; font-weight: 600;">
+                            <i class="fas fa-info-circle"></i> Thao tác xử lý đề xuất
+                        </h6>
+                        <p style="margin: 0 0 15px 0; color: #6c757d; font-size: 14px;">
+                            Vui lòng chọn một trong hai hành động dưới đây để xử lý đề xuất này:
+                        </p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <button type="button" id="approveBtn" class="action-btn approve-btn" onclick="approveDeXuat()">
+                                <i class="fas fa-check"></i> Phê duyệt
+                            </button>
+                            <button type="button" id="rejectBtn" class="action-btn reject-btn" onclick="rejectDeXuat()">
+                                <i class="fas fa-times"></i> Từ chối
+                            </button>
+                            <button type="button" onclick="closeViewDeXuatMuaSamModal()" class="userlist-add-cancel-btn">
+                                <i class="fas fa-times-circle"></i> Đóng
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <input type="hidden" id="viewDeXuatId" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden form for anti-forgery token -->
+    <form id="hiddenTokenForm" style="display: none;">
+        @Html.AntiForgeryToken()
+    </form>
+
+    <!-- Custom styles for nguyên liệu table -->
+    <style>
+        .userlist-delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .userlist-delete-btn:hover {
+            background: #c82333;
+        }
+        
+        #addNguyenLieuTableContainer, #updateNguyenLieuTableContainer {
+            max-height: 250px;
+            overflow-y: auto;
+        }
+        
+        #addNguyenLieuTable tbody tr:hover, #updateNguyenLieuTable tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .searchable-select {
+            position: relative;
+        }
+        
+        .searchable-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .searchable-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .searchable-option:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .searchable-option:last-child {
+            border-bottom: none;
+        }
+    </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -567,10 +924,12 @@
                         shouldShow = rowStatus === 'pending' && !isDeleted && nguoiNhan === currentUserId;
                         break;
                     case 'accepted':
-                        shouldShow = rowStatus === 'accepted' && !isDeleted;
+                        // Tab "Đã duyệt": status = accepted và (người nhận = người đăng nhập HOẶC người gửi = người đăng nhập)
+                        shouldShow = rowStatus === 'accepted' && !isDeleted && (nguoiNhan === currentUserId || nguoiGui === currentUserId);
                         break;
                     case 'rejected':
-                        shouldShow = rowStatus === 'rejected' && !isDeleted;
+                        // Tab "Từ chối": status = rejected và (người nhận = người đăng nhập HOẶC người gửi = người đăng nhập)
+                        shouldShow = rowStatus === 'rejected' && !isDeleted && (nguoiNhan === currentUserId || nguoiGui === currentUserId);
                         break;
                     case 'deleted':
                         shouldShow = isDeleted;
@@ -647,7 +1006,173 @@
             if (pendingTab) {
                 switchTab('pending', pendingTab);
             }
+            
+            // Load danh sách nguyên liệu cho dropdown
+            loadNguyenLieuList();
         });
+        
+        // Biến lưu danh sách nguyên liệu đã chọn
+        let selectedNguyenLieuList = [];
+        
+        // Hàm format số với dấu phẩy ngắt hàng nghìn (chuẩn Việt Nam)
+        function formatNumber(num) {
+            if (!num || isNaN(num)) return '';
+            return parseInt(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        
+        // Hàm chỉ cho phép nhập số
+        function allowNumbersOnly(event) {
+            const charCode = event.which ? event.which : event.keyCode;
+            // Cho phép số (0-9) và các phím điều khiển (backspace, delete, arrow keys, etc.)
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+            return true;
+        }
+        
+        // Hàm format input khi người dùng nhập
+        function formatNumberInput(input) {
+            let value = input.value.replace(/[^\d]/g, ''); // Chỉ giữ lại số
+            
+            if (value) {
+                // Format với dấu phẩy ngắt hàng nghìn
+                const formatted = value.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                input.value = formatted;
+            }
+        }
+        
+        // Hàm lấy giá trị số thực từ input đã format
+        function getNumberValue(input) {
+            if (!input.value) return 0;
+            // Xóa tất cả dấu phẩy để có số nguyên
+            return parseInt(input.value.replace(/,/g, '')) || 0;
+        }
+        
+        // Load danh sách nguyên liệu
+        function loadNguyenLieuList() {
+            fetch('/NguyenLieu/NguyenLieuList?handler=ActiveNguyenLieu')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const optionsContainer = document.getElementById('addNguyenLieuSearchOptions');
+                    optionsContainer.innerHTML = '';
+                    
+                    if (data && Array.isArray(data)) {
+                        data.forEach(nguyenLieu => {
+                            const optionDiv = document.createElement('div');
+                            optionDiv.className = 'searchable-option';
+                            optionDiv.setAttribute('data-value', nguyenLieu.id);
+                            optionDiv.setAttribute('data-name', nguyenLieu.tenNguyenLieu);
+                            optionDiv.setAttribute('data-donvi', nguyenLieu.donViTinh);
+                            optionDiv.textContent = `${nguyenLieu.tenNguyenLieu} (${nguyenLieu.maNguyenLieu})`;
+                            optionsContainer.appendChild(optionDiv);
+                        });
+                    }
+                    
+                    // Initialize dropdown cho nguyên liệu
+                    initSearchableDropdown('addNguyenLieuSearch');
+                })
+                .catch(error => {
+                    console.error('Error loading nguyên liệu:', error);
+                    alert('Không thể tải danh sách nguyên liệu. Vui lòng thử lại sau.');
+                });
+        }
+        
+        // Thêm nguyên liệu vào danh sách
+        function addNguyenLieuToList() {
+            const nguyenLieuInput = document.getElementById('addNguyenLieuSearch');
+            const soLuongInput = document.getElementById('addNguyenLieuSoLuong');
+            
+            const nguyenLieuId = nguyenLieuInput.getAttribute('data-selected-id');
+            const nguyenLieuName = nguyenLieuInput.value;
+            const soLuong = getNumberValue(soLuongInput);
+            
+            if (!nguyenLieuId || !nguyenLieuName) {
+                alert('Vui lòng chọn nguyên liệu!');
+                return;
+            }
+            
+            if (!soLuong || soLuong <= 0) {
+                alert('Vui lòng nhập số lượng hợp lệ!');
+                soLuongInput.focus();
+                return;
+            }
+            
+            // Lấy thông tin đơn vị tính từ dropdown option được chọn
+            const selectedOption = document.querySelector(`#addNguyenLieuSearchOptions .searchable-option[data-value="${nguyenLieuId}"]`);
+            const donViTinh = selectedOption ? selectedOption.getAttribute('data-donvi') : '';
+            
+            // Kiểm tra xem nguyên liệu đã có trong danh sách chưa
+            const existingIndex = selectedNguyenLieuList.findIndex(item => item.id === nguyenLieuId);
+            if (existingIndex !== -1) {
+                // Cập nhật số lượng nếu đã có
+                selectedNguyenLieuList[existingIndex].soLuong = soLuong;
+            } else {
+                // Thêm mới vào danh sách
+                selectedNguyenLieuList.push({
+                    id: nguyenLieuId,
+                    name: nguyenLieuName,
+                    soLuong: soLuong,
+                    donViTinh: donViTinh
+                });
+            }
+            
+            // Cập nhật bảng hiển thị
+            updateNguyenLieuTable();
+            
+            // Reset form
+            nguyenLieuInput.value = '';
+            nguyenLieuInput.setAttribute('data-selected-id', '');
+            soLuongInput.value = '';
+        }
+        
+        // Cập nhật bảng hiển thị nguyên liệu
+        function updateNguyenLieuTable() {
+            const tableBody = document.getElementById('addNguyenLieuTableBody');
+            const emptyRow = document.getElementById('addNguyenLieuEmptyRow');
+            
+            if (selectedNguyenLieuList.length === 0) {
+                emptyRow.style.display = '';
+                // Xóa các dòng khác
+                const rows = tableBody.querySelectorAll('tr:not(#addNguyenLieuEmptyRow)');
+                rows.forEach(row => row.remove());
+            } else {
+                emptyRow.style.display = 'none';
+                
+                // Xóa các dòng cũ
+                const rows = tableBody.querySelectorAll('tr:not(#addNguyenLieuEmptyRow)');
+                rows.forEach(row => row.remove());
+                
+                // Thêm các dòng mới
+                selectedNguyenLieuList.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="padding: 10px; border-bottom: 1px solid #f0f0f0; width: 40%;">
+                            ${item.name}
+                            ${item.donViTinh ? `<small style="color: #666; display: block; font-size: 12px;">Đơn vị: ${item.donViTinh}</small>` : ''}
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #f0f0f0; text-align: center; width: 40%;">${formatNumber(item.soLuong)}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #f0f0f0; text-align: center; width: 20%;">
+                            <button type="button" onclick="removeNguyenLieuFromList('${item.id}')" 
+                                    class="userlist-delete-btn" style="padding: 4px 8px; font-size: 12px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+        
+        // Xóa nguyên liệu khỏi danh sách
+        function removeNguyenLieuFromList(nguyenLieuId) {
+            selectedNguyenLieuList = selectedNguyenLieuList.filter(item => item.id !== nguyenLieuId);
+            updateNguyenLieuTable();
+        }
 
         // Change page size
         function changeDeXuatPageSize() {
@@ -683,24 +1208,13 @@
                         matchesTab = rowStatus === 'pending' && !isDeleted && nguoiNhan === currentUserId;
                         break;
                     case 'accepted':
-                        matchesTab = rowStatus === 'accepted' && !isDeleted;
+                        matchesTab = rowStatus === 'accepted' && !isDeleted && (nguoiNhan === currentUserId || nguoiGui === currentUserId);
                         break;
                     case 'rejected':
-                        matchesTab = rowStatus === 'rejected' && !isDeleted;
+                        matchesTab = rowStatus === 'rejected' && !isDeleted && (nguoiNhan === currentUserId || nguoiGui === currentUserId);
                         break;
                     case 'deleted':
                         matchesTab = isDeleted;
-                        break;
-                    case 'accepted':
-                        matchesTab = rowStatus === 'accepted' && !isDeleted;
-                        break;
-                    case 'rejected':
-                        matchesTab = rowStatus === 'rejected' && !isDeleted;
-                        break;
-                    case 'received':
-                        matchesTab = rowStatus === 'received' && !isDeleted;
-                        break;
-                    case 'deleted':
                         matchesTab = isDeleted;
                         break;
                 }
@@ -741,7 +1255,8 @@
                 IDNguoiGui: getSelectedValue('addIDNguoiGui'),
                 IDChiNhanhGui: getSelectedValue('addIDChiNhanhGui'),
                 IDNguoiNhan: getSelectedValue('addIDNguoiNhan'),
-                IDChiNhanhNhan: getSelectedValue('addIDChiNhanhNhan')
+                IDChiNhanhNhan: getSelectedValue('addIDChiNhanhNhan'),
+                NguyenLieuList: selectedNguyenLieuList  // Thêm danh sách nguyên liệu
             };
             
             // Chỉ kiểm tra chi nhánh nhận vì người nhận sẽ được chọn sau khi chọn chi nhánh
@@ -757,6 +1272,12 @@
             // Kiểm tra không được gửi cho chi nhánh của mình
             if (formData.IDChiNhanhNhan === currentUserBranchId) {
                 alert('Không thể gửi đề xuất cho chi nhánh của mình!');
+                return;
+            }
+            
+            // Kiểm tra có ít nhất một nguyên liệu
+            if (selectedNguyenLieuList.length === 0) {
+                alert('Vui lòng thêm ít nhất một nguyên liệu vào đề xuất!');
                 return;
             }
             
@@ -825,6 +1346,9 @@
             resetSearchableDropdowns();
             // Reset lại mã đề xuất
             document.getElementById('addMaDeXuat').value = '';
+            // Reset danh sách nguyên liệu
+            selectedNguyenLieuList = [];
+            updateNguyenLieuTable();
         }
 
         // Hiển thị modal xóa đề xuất mua sắm
@@ -861,6 +1385,177 @@
                     alert('Xóa thành công!');
                     window.location.reload();
                 } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            });
+        }
+
+        // Hiển thị modal xem chi tiết đề xuất mua sắm
+        function showViewDeXuatMuaSamModal(id) {
+            // Gọi API để lấy thông tin đề xuất mua sắm
+            fetch(`/DeXuatMuaSam/DeXuatMuaSamList?handler=GetDeXuatDetail&id=${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const deXuat = data.data;
+                        
+                        // Điền thông tin vào các trường readonly
+                        document.getElementById('viewDeXuatId').value = deXuat.id;
+                        document.getElementById('viewMaDeXuat').value = deXuat.maDeXuat;
+                        document.getElementById('viewTieuDe').value = deXuat.tieuDe;
+                        document.getElementById('viewNoiDungDeXuat').value = deXuat.noiDungDeXuat;
+                        document.getElementById('viewNguoiGui').value = deXuat.tenNguoiGui;
+                        document.getElementById('viewChiNhanhGui').value = deXuat.tenChiNhanhGui;
+                        document.getElementById('viewChiNhanhNhan').value = deXuat.tenChiNhanhNhan;
+                        document.getElementById('viewNguoiNhan').value = deXuat.tenNguoiNhan;
+                        document.getElementById('viewStatus').value = getStatusText(deXuat.status);
+                        
+                        // Format ngày tạo
+                        const createDate = new Date(deXuat.createTime);
+                        document.getElementById('viewCreateTime').value = createDate.toLocaleString('vi-VN');
+                        
+                        // Hiển thị và enable/disable action buttons dựa trên điều kiện
+                        const actionButtons = document.getElementById('viewActionButtons');
+                        const approveBtn = document.getElementById('approveBtn');
+                        const rejectBtn = document.getElementById('rejectBtn');
+                        
+                        console.log('Debug info:', {
+                            status: deXuat.status,
+                            idNguoiNhan: deXuat.idNguoiNhan,
+                            currentUserId: currentUserId,
+                            shouldEnable: deXuat.status === 'pending' && deXuat.idNguoiNhan.toLowerCase() === currentUserId.toLowerCase()
+                        });
+                        
+                        if (deXuat.status === 'pending' && deXuat.idNguoiNhan.toLowerCase() === currentUserId.toLowerCase()) {
+                            // Hiển thị và enable buttons cho người nhận khi status = pending
+                            actionButtons.style.display = 'block';
+                            approveBtn.disabled = false;
+                            rejectBtn.disabled = false;
+                            approveBtn.style.opacity = '1';
+                            rejectBtn.style.opacity = '1';
+                            approveBtn.style.cursor = 'pointer';
+                            rejectBtn.style.cursor = 'pointer';
+                            console.log('Buttons enabled');
+                        } else {
+                            // Hiển thị nhưng disable buttons trong các trường hợp khác
+                            actionButtons.style.display = 'block';
+                            approveBtn.disabled = true;
+                            rejectBtn.disabled = true;
+                            approveBtn.style.opacity = '0.5';
+                            rejectBtn.style.opacity = '0.5';
+                            approveBtn.style.cursor = 'not-allowed';
+                            rejectBtn.style.cursor = 'not-allowed';
+                            console.log('Buttons disabled');
+                        }
+                        
+                        // Hiển thị modal
+                        document.getElementById('viewDeXuatMuaSamModal').style.display = 'flex';
+                        
+                        // Load danh sách nguyên liệu
+                        loadViewNguyenLieuList(deXuat.id);
+                    } else {
+                        alert('Lỗi: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading data:', error);
+                    alert('Có lỗi khi tải thông tin đề xuất');
+                });
+        }
+
+        // Đóng modal xem chi tiết
+        function closeViewDeXuatMuaSamModal() {
+            document.getElementById('viewDeXuatMuaSamModal').style.display = 'none';
+        }
+
+        // Phê duyệt đề xuất
+        function approveDeXuat() {
+            console.log('approveDeXuat called');
+            const approveBtn = document.getElementById('approveBtn');
+            console.log('approveBtn.disabled:', approveBtn.disabled);
+            
+            if (approveBtn.disabled) {
+                alert('Bạn không có quyền thực hiện thao tác này!');
+                return;
+            }
+            
+            const deXuatId = document.getElementById('viewDeXuatId').value;
+            if (!deXuatId) return;
+            
+            updateDeXuatStatus(deXuatId, 'accepted', 'Đề xuất đã được phê duyệt thành công!');
+        }
+
+        // Từ chối đề xuất
+        function rejectDeXuat() {
+            console.log('rejectDeXuat called');
+            const rejectBtn = document.getElementById('rejectBtn');
+            console.log('rejectBtn.disabled:', rejectBtn.disabled);
+            
+            if (rejectBtn.disabled) {
+                alert('Bạn không có quyền thực hiện thao tác này!');
+                return;
+            }
+            
+            const deXuatId = document.getElementById('viewDeXuatId').value;
+            if (!deXuatId) return;
+            
+            updateDeXuatStatus(deXuatId, 'rejected', 'Đề xuất đã được từ chối!');
+        }
+
+        // Cập nhật trạng thái đề xuất
+        function updateDeXuatStatus(deXuatId, newStatus, successMessage) {
+            // Lấy anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            // Tạo FormData
+            const formData = new FormData();
+            formData.append('id', deXuatId);
+            formData.append('status', newStatus);
+            formData.append('__RequestVerificationToken', token);
+            
+            fetch('/DeXuatMuaSam/DeXuatMuaSamList?handler=UpdateStatus', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers.get('content-type'));
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                // Kiểm tra content-type trước khi parse JSON
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    // Nếu không phải JSON, đọc text để debug
+                    return response.text().then(text => {
+                        console.log('Response text:', text);
+                        throw new Error('Server không trả về JSON. Response: ' + text.substring(0, 200));
+                    });
+                }
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                
+                if (data.success) {
+                    console.log('Success! Message:', data.message);
+                    alert(successMessage);
+                    closeViewDeXuatMuaSamModal();
+                    window.location.reload();
+                } else {
+                    console.log('Error from server:', data.message);
                     alert('Lỗi: ' + data.message);
                 }
             })
@@ -918,6 +1613,13 @@
                         initSearchableDropdown('updateIDChiNhanhNhan');
                         // Setup event listener cho chi nhánh nhận
                         setupUpdateChiNhanhNhanListener();
+                        
+                        // Tải danh sách nguyên liệu hiện tại và thiết lập dropdown
+                        loadCurrentNguyenLieuList(deXuat.id);
+                        // Load dropdown options trước, sau đó khởi tạo dropdown
+                        loadUpdateNguyenLieuOptions().then(() => {
+                            initSearchableDropdown('updateNguyenLieuSearch');
+                        });
                     } else {
                         alert('Lỗi: ' + data.message);
                     }
@@ -1022,6 +1724,19 @@
         function closeUpdateDeXuatMuaSamModal() {
             document.getElementById('updateDeXuatMuaSamModal').style.display = 'none';
             document.getElementById('updateDeXuatMuaSamForm').reset();
+            // Reset danh sách nguyên liệu
+            updateSelectedNguyenLieuList = [];
+            updateUpdateNguyenLieuTable();
+            // Reset search inputs
+            const nguyenLieuSearch = document.getElementById('updateNguyenLieuSearch');
+            const soLuongInput = document.getElementById('updateNguyenLieuSoLuong');
+            if (nguyenLieuSearch) {
+                nguyenLieuSearch.value = '';
+                nguyenLieuSearch.setAttribute('data-selected-id', '');
+            }
+            if (soLuongInput) {
+                soLuongInput.value = '';
+            }
         }
 
         // Xử lý form cập nhật đề xuất mua sắm
@@ -1044,11 +1759,17 @@
                 alert('Vui lòng nhập đầy đủ thông tin!');
                 return;
             }
+
+            // Kiểm tra có ít nhất một nguyên liệu
+            if (updateSelectedNguyenLieuList.length === 0) {
+                alert('Vui lòng thêm ít nhất một nguyên liệu vào đề xuất!');
+                return;
+            }
             
             // Lấy anti-forgery token
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
             
-            // Tạo FormData
+            // Tạo FormData cho thông tin cơ bản
             const form = new FormData();
             form.append('id', formData.id);
             form.append('tieuDe', formData.tieuDe);
@@ -1057,6 +1778,7 @@
             form.append('idNguoiNhan', formData.idNguoiNhan);
             form.append('__RequestVerificationToken', token);
             
+            // Cập nhật thông tin cơ bản trước
             fetch('/DeXuatMuaSam/UpdateDeXuatMuaSam', {
                 method: 'POST',
                 body: form
@@ -1069,10 +1791,34 @@
             })
             .then(data => {
                 if (data.success) {
-                    alert('Cập nhật thành công!');
+                    // Sau khi cập nhật thông tin cơ bản thành công, cập nhật nguyên liệu
+                    const nguyenLieuData = updateSelectedNguyenLieuList.map(item => ({
+                        Id: item.id,
+                        Name: item.name,
+                        SoLuong: item.soLuong,
+                        DonViTinh: item.donViTinh
+                    }));
+
+                    const nguyenLieuForm = new FormData();
+                    nguyenLieuForm.append('idDeXuat', formData.id);
+                    nguyenLieuForm.append('NguyenLieuList', JSON.stringify(nguyenLieuData));
+                    nguyenLieuForm.append('__RequestVerificationToken', token);
+
+                    return fetch('/Pages/DeXuatMuaSam/UpdateDeXuatMuaSam?handler=UpdateNguyenLieu', {
+                        method: 'POST',
+                        body: nguyenLieuForm
+                    });
+                } else {
+                    throw new Error(data.message || 'Lỗi cập nhật thông tin cơ bản');
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Cập nhật đề xuất mua sắm thành công!');
                     window.location.reload();
                 } else {
-                    alert('Lỗi: ' + data.message);
+                    alert('Lỗi cập nhật nguyên liệu: ' + (data.message || 'Không xác định'));
                 }
             })
             .catch(error => {
@@ -1144,6 +1890,21 @@
                     nguoiNhanOptions.style.display = 'none';
                     nguoiNhanOptions.innerHTML = ''; // Clear options
                 }
+            }
+            
+            // Nguyên liệu search
+            const nguyenLieuInput = document.getElementById('addNguyenLieuSearch');
+            if (nguyenLieuInput) {
+                nguyenLieuInput.value = '';
+                nguyenLieuInput.setAttribute('data-selected-id', '');
+                const nguyenLieuOptions = document.getElementById('addNguyenLieuSearchOptions');
+                if (nguyenLieuOptions) nguyenLieuOptions.style.display = 'none';
+            }
+            
+            // Số lượng nguyên liệu
+            const soLuongInput = document.getElementById('addNguyenLieuSoLuong');
+            if (soLuongInput) {
+                soLuongInput.value = '';
             }
         }
 
@@ -1221,9 +1982,52 @@
                 });
         }
 
+        // Hàm nhận hàng
+        function receiveOrder(id) {
+            // Lấy anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            // Tạo FormData
+            const formData = new FormData();
+            formData.append('id', id);
+            formData.append('__RequestVerificationToken', token);
+            
+            fetch('/DeXuatMuaSam/DeXuatMuaSamList?handler=ReceiveOrder', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    return response.text().then(text => {
+                        console.log('Response text:', text);
+                        throw new Error('Server không trả về JSON. Response: ' + text.substring(0, 200));
+                    });
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            });
+        }
+
         // Close modals when clicking outside
         window.addEventListener('click', function(event) {
-            const modals = ['addDeXuatMuaSamModal', 'deleteDeXuatMuaSamModal', 'updateDeXuatMuaSamModal'];
+            const modals = ['addDeXuatMuaSamModal', 'deleteDeXuatMuaSamModal', 'updateDeXuatMuaSamModal', 'viewDeXuatMuaSamModal'];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
@@ -1231,6 +2035,244 @@
                 }
             });
         });
+
+        // Load danh sách nguyên liệu cho modal xem chi tiết
+        function loadViewNguyenLieuList(deXuatId) {
+            fetch(`/DeXuatMuaSam/DeXuatMuaSamList?handler=GetNguyenLieuDetail&deXuatId=${deXuatId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const tableBody = document.getElementById('viewNguyenLieuTableBody');
+                    const emptyRow = document.getElementById('viewNguyenLieuEmptyRow');
+                    
+                    if (data.success && data.data && data.data.length > 0) {
+                        emptyRow.style.display = 'none';
+                        
+                        // Xóa các dòng cũ
+                        const rows = tableBody.querySelectorAll('tr:not(#viewNguyenLieuEmptyRow)');
+                        rows.forEach(row => row.remove());
+                        
+                        // Thêm các dòng mới
+                        data.data.forEach(item => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td style="padding: 12px; border-bottom: 1px solid #f0f0f0;">
+                                    ${item.tenNguyenLieu}
+                                    <small style="color: #666; display: block; font-size: 12px;">Đơn vị: ${item.donViTinh}</small>
+                                </td>
+                                <td style="padding: 12px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                                    ${item.maNguyenLieu}
+                                </td>
+                                <td style="padding: 12px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                                    ${formatNumber(item.soLuong)}
+                                </td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    } else {
+                        emptyRow.style.display = '';
+                        emptyRow.innerHTML = `
+                            <td colspan="3" style="padding: 20px; text-align: center; color: #999; font-style: italic;">
+                                Không có nguyên liệu nào trong đề xuất này
+                            </td>
+                        `;
+                        
+                        // Xóa các dòng khác
+                        const rows = tableBody.querySelectorAll('tr:not(#viewNguyenLieuEmptyRow)');
+                        rows.forEach(row => row.remove());
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading nguyên liệu:', error);
+                    const tableBody = document.getElementById('viewNguyenLieuTableBody');
+                    const emptyRow = document.getElementById('viewNguyenLieuEmptyRow');
+                    
+                    emptyRow.style.display = '';
+                    emptyRow.innerHTML = `
+                        <td colspan="3" style="padding: 20px; text-align: center; color: #dc3545; font-style: italic;">
+                            Có lỗi khi tải danh sách nguyên liệu
+                        </td>
+                    `;
+                    
+                    // Xóa các dòng khác
+                    const rows = tableBody.querySelectorAll('tr:not(#viewNguyenLieuEmptyRow)');
+                    rows.forEach(row => row.remove());
+                });
+        }
+
+        // ===== CÁC HÀM CHO MODAL CẬP NHẬT =====
+        let updateSelectedNguyenLieuList = [];
+
+        // Thêm nguyên liệu vào danh sách cập nhật
+        function updateAddNguyenLieuToList() {
+            const nguyenLieuInput = document.getElementById('updateNguyenLieuSearch');
+            const soLuongInput = document.getElementById('updateNguyenLieuSoLuong');
+            
+            const nguyenLieuId = nguyenLieuInput.getAttribute('data-selected-id');
+            const soLuong = getNumberValue(soLuongInput);
+            
+            if (!nguyenLieuId) {
+                alert('Vui lòng chọn nguyên liệu!');
+                return;
+            }
+            
+            if (!soLuong || soLuong <= 0) {
+                alert('Vui lòng nhập số lượng hợp lệ!');
+                soLuongInput.focus();
+                return;
+            }
+            
+            // Lấy thông tin nguyên liệu từ dropdown option được chọn
+            const selectedOption = document.querySelector(`#updateNguyenLieuSearchOptions .searchable-option[data-value="${nguyenLieuId}"]`);
+            if (!selectedOption) {
+                alert('Không tìm thấy thông tin nguyên liệu!');
+                return;
+            }
+            
+            const nguyenLieuName = selectedOption.getAttribute('data-name');
+            const donViTinh = selectedOption.getAttribute('data-donvi');
+            
+            // Kiểm tra xem nguyên liệu đã có trong danh sách chưa
+            const existingIndex = updateSelectedNguyenLieuList.findIndex(item => item.id === nguyenLieuId);
+            if (existingIndex !== -1) {
+                // Cập nhật số lượng nếu đã có
+                updateSelectedNguyenLieuList[existingIndex].soLuong = soLuong;
+            } else {
+                // Thêm mới vào danh sách
+                updateSelectedNguyenLieuList.push({
+                    id: nguyenLieuId,
+                    name: nguyenLieuName,
+                    soLuong: soLuong,
+                    donViTinh: donViTinh
+                });
+            }
+            
+            // Cập nhật bảng hiển thị
+            updateUpdateNguyenLieuTable();
+            
+            // Reset form
+            nguyenLieuInput.value = '';
+            nguyenLieuInput.setAttribute('data-selected-id', '');
+            soLuongInput.value = '';
+        }
+
+        // Cập nhật bảng hiển thị nguyên liệu cho modal cập nhật
+        function updateUpdateNguyenLieuTable() {
+            const tableBody = document.getElementById('updateNguyenLieuTableBody');
+            const emptyRow = document.getElementById('updateNguyenLieuEmptyRow');
+            
+            if (updateSelectedNguyenLieuList.length === 0) {
+                emptyRow.style.display = '';
+                // Xóa các dòng khác
+                const rows = tableBody.querySelectorAll('tr:not(#updateNguyenLieuEmptyRow)');
+                rows.forEach(row => row.remove());
+            } else {
+                emptyRow.style.display = 'none';
+                
+                // Xóa các dòng cũ
+                const rows = tableBody.querySelectorAll('tr:not(#updateNguyenLieuEmptyRow)');
+                rows.forEach(row => row.remove());
+                
+                // Thêm các dòng mới
+                updateSelectedNguyenLieuList.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="padding: 10px; border-bottom: 1px solid #f0f0f0; width: 40%;">
+                            ${item.name}
+                            ${item.donViTinh ? `<small style="color: #666; display: block; font-size: 12px;">Đơn vị: ${item.donViTinh}</small>` : ''}
+                        </td>
+                        <td style="padding: 10px; border-bottom: 1px solid #f0f0f0; text-align: center; width: 40%;">${formatNumber(item.soLuong)}</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #f0f0f0; text-align: center; width: 20%;">
+                            <button type="button" onclick="updateRemoveNguyenLieuFromList('${item.id}')" 
+                                    class="userlist-delete-btn" style="padding: 4px 8px; font-size: 12px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        // Xóa nguyên liệu khỏi danh sách cập nhật
+        function updateRemoveNguyenLieuFromList(nguyenLieuId) {
+            updateSelectedNguyenLieuList = updateSelectedNguyenLieuList.filter(item => item.id !== nguyenLieuId);
+            updateUpdateNguyenLieuTable();
+        }
+
+        // Tải danh sách nguyên liệu hiện tại của đề xuất
+        function loadCurrentNguyenLieuList(deXuatId) {
+            const url = `/DeXuatMuaSam/DeXuatMuaSamList?handler=GetNguyenLieuDetail&deXuatId=${deXuatId}`;
+            
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    updateSelectedNguyenLieuList = [];
+                    
+                    if (data.success && data.data && data.data.length > 0) {
+                        data.data.forEach(item => {
+                            updateSelectedNguyenLieuList.push({
+                                id: item.idNguyenLieu,
+                                name: item.tenNguyenLieu,
+                                soLuong: parseInt(item.soLuong),
+                                donViTinh: item.donViTinh
+                            });
+                        });
+                    }
+                    
+                    // Cập nhật bảng hiển thị
+                    updateUpdateNguyenLieuTable();
+                })
+                .catch(error => {
+                    console.error('Error loading current nguyên liệu:', error);
+                    updateSelectedNguyenLieuList = [];
+                    updateUpdateNguyenLieuTable();
+                });
+        }
+
+        // Tải danh sách nguyên liệu cho modal cập nhật
+        function loadUpdateNguyenLieuOptions() {
+            return new Promise((resolve, reject) => {
+                const optionsContainer = document.getElementById('updateNguyenLieuSearchOptions');
+                
+                fetch('/NguyenLieu/NguyenLieuList?handler=ActiveNguyenLieu')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        optionsContainer.innerHTML = '';
+                        
+                        if (data && Array.isArray(data)) {
+                            data.forEach(nguyenLieu => {
+                                const optionDiv = document.createElement('div');
+                                optionDiv.className = 'searchable-option';
+                                optionDiv.setAttribute('data-value', nguyenLieu.id);
+                                optionDiv.setAttribute('data-name', nguyenLieu.tenNguyenLieu);
+                                optionDiv.setAttribute('data-donvi', nguyenLieu.donViTinh || '');
+                                optionDiv.textContent = `${nguyenLieu.tenNguyenLieu} (${nguyenLieu.maNguyenLieu})`;
+                                optionsContainer.appendChild(optionDiv);
+                            });
+                        }
+                        resolve();
+                    })
+                    .catch(error => {
+                        console.error('Error loading nguyên liệu options:', error);
+                        reject(error);
+                    });
+            });
+        }
     </script>
         </main>
     </div>

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Data;
+using QRB.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace QRB.Pages.DeXuatMuaSam
@@ -25,6 +26,7 @@ namespace QRB.Pages.DeXuatMuaSam
             public string TenChiNhanhNhan { get; set; } = string.Empty;
             public string Status { get; set; } = string.Empty;
             public DateTime CreateTime { get; set; }
+            public DateTime? ReceiveTime { get; set; }
             public Guid IDNguoiGui { get; set; }
             public Guid IDChiNhanhGui { get; set; }
             public Guid IDNguoiNhan { get; set; }
@@ -68,33 +70,42 @@ namespace QRB.Pages.DeXuatMuaSam
         public int DaTuChoiCount { get; set; } = 0;
         public int DaXoaCount { get; set; } = 0;
 
-        public async Task OnGetAsync(int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> OnGetAsync(int pageNumber = 1, int pageSize = 10)
         {
             try
             {
+                // Kiểm tra đăng nhập - bắt buộc phải đăng nhập mới được truy cập
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId) || !Guid.TryParse(userId, out Guid userGuid))
+                {
+                    // Chưa đăng nhập, redirect về trang login
+                    return RedirectToPage("/Login");
+                }
+
                 CurrentPage = pageNumber < 1 ? 1 : pageNumber;
                 PageSize = pageSize < 5 ? 10 : (pageSize > 100 ? 100 : pageSize);
 
                 // Lấy thông tin chi nhánh của user đang đăng nhập
-                var userId = HttpContext.Session.GetString("UserId");
-                if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out Guid userGuid))
+                CurrentUserId = userGuid;
+                    
+                var currentUser = await _context.NguoiDungs
+                    .Where(u => u.ID == userGuid && !u.IsDelete)
+                    .Join(_context.ChiNhanhs, u => u.IDChiNhanh, c => c.ID, (u, c) => new { u, c })
+                    .FirstOrDefaultAsync();
+                
+                if (currentUser != null)
                 {
-                    CurrentUserId = userGuid;
+                    CurrentUserBranchId = currentUser.c.ID;
                     
-                    var currentUser = await _context.NguoiDungs
-                        .Where(u => u.ID == userGuid && !u.IsDelete)
-                        .Join(_context.ChiNhanhs, u => u.IDChiNhanh, c => c.ID, (u, c) => new { u, c })
-                        .FirstOrDefaultAsync();
-                    
-                    if (currentUser != null)
-                    {
-                        CurrentUserBranchId = currentUser.c.ID;
-                        
-                        // Ưu tiên MaChiNhanh, nếu không có thì dùng 3 ký tự đầu của TenChiNhanh
-                        CurrentUserBranchCode = !string.IsNullOrWhiteSpace(currentUser.c.MaChiNhanh) 
-                            ? currentUser.c.MaChiNhanh 
-                            : (currentUser.c.TenChiNhanh.Length >= 3 ? currentUser.c.TenChiNhanh.Substring(0, 3).ToUpper() : currentUser.c.TenChiNhanh.ToUpper());
-                    }
+                    // Ưu tiên MaChiNhanh, nếu không có thì dùng 3 ký tự đầu của TenChiNhanh
+                    CurrentUserBranchCode = !string.IsNullOrWhiteSpace(currentUser.c.MaChiNhanh) 
+                        ? currentUser.c.MaChiNhanh 
+                        : (currentUser.c.TenChiNhanh.Length >= 3 ? currentUser.c.TenChiNhanh.Substring(0, 3).ToUpper() : currentUser.c.TenChiNhanh.ToUpper());
+                }
+                else
+                {
+                    // Nếu không tìm thấy thông tin user, redirect về login
+                    return RedirectToPage("/Login");
                 }
 
                 // Đếm số lượng cho từng tab theo logic mới
@@ -106,17 +117,17 @@ namespace QRB.Pages.DeXuatMuaSam
                 DaNhanCount = await _context.DeXuatMuaSams
                     .CountAsync(dx => dx.Status == "pending" && dx.IDNguoiNhan == CurrentUserId && !dx.IsDelete);
 
-                // Tab "Đã duyệt": status = accepted
+                // Tab "Đã duyệt": status = accepted và (người nhận = người đăng nhập HOẶC người gửi = người đăng nhập)
                 DaDuyetCount = await _context.DeXuatMuaSams
-                    .CountAsync(dx => dx.Status == "accepted" && !dx.IsDelete);
+                    .CountAsync(dx => dx.Status == "accepted" && (dx.IDNguoiNhan == CurrentUserId || dx.IDNguoiGui == CurrentUserId) && !dx.IsDelete);
 
-                // Tab "Đã từ chối": status = rejected
+                // Tab "Đã từ chối": status = rejected và (người nhận = người đăng nhập HOẶC người gửi = người đăng nhập)
                 DaTuChoiCount = await _context.DeXuatMuaSams
-                    .CountAsync(dx => dx.Status == "rejected" && !dx.IsDelete);
+                    .CountAsync(dx => dx.Status == "rejected" && (dx.IDNguoiNhan == CurrentUserId || dx.IDNguoiGui == CurrentUserId) && !dx.IsDelete);
 
-                // Tab "Đã xóa": IsDelete = true
+                // Tab "Đã xóa": IsDelete = true và người gửi = người đăng nhập
                 DaXoaCount = await _context.DeXuatMuaSams
-                    .CountAsync(dx => dx.IsDelete);
+                    .CountAsync(dx => dx.IsDelete && dx.IDNguoiGui == CurrentUserId);
 
                 // Đếm tổng số bản ghi (bao gồm cả đã xóa)
                 TotalRecords = await _context.DeXuatMuaSams.CountAsync();
@@ -144,6 +155,7 @@ namespace QRB.Pages.DeXuatMuaSam
                                              TenChiNhanhNhan = chiNhanhNhan != null ? chiNhanhNhan.TenChiNhanh : "N/A",
                                              Status = dx.Status,
                                              CreateTime = dx.CreateTime,
+                                             ReceiveTime = dx.ReceiveTime,
                                              IDNguoiGui = dx.IDNguoiGui,
                                              IDChiNhanhGui = dx.IDChiNhanhGui,
                                              IDNguoiNhan = dx.IDNguoiNhan,
@@ -206,6 +218,8 @@ namespace QRB.Pages.DeXuatMuaSam
                 AllChiNhanhList = new List<ChiNhanhViewModel>();
                 // Log error if needed
             }
+
+            return Page();
         }
 
         // Handler method để lấy danh sách người dùng theo chi nhánh
@@ -213,6 +227,13 @@ namespace QRB.Pages.DeXuatMuaSam
         {
             try
             {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
+                }
+
                 var users = await _context.NguoiDungs
                     .Where(u => u.IDChiNhanh == branchId && !u.IsDelete)
                     .Select(u => new
@@ -235,6 +256,12 @@ namespace QRB.Pages.DeXuatMuaSam
         {
             try
             {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
+                }
                 var deXuat = await (from dx in _context.DeXuatMuaSams
                                    join nguoiGui in _context.NguoiDungs on dx.IDNguoiGui equals nguoiGui.ID into nguoiGuiGroup
                                    from nguoiGui in nguoiGuiGroup.DefaultIfEmpty()
@@ -252,6 +279,7 @@ namespace QRB.Pages.DeXuatMuaSam
                                        tieuDe = dx.TieuDe,
                                        noiDungDeXuat = dx.NoiDungDeXuat,
                                        status = dx.Status,
+                                       createTime = dx.CreateTime,
                                        idNguoiGui = dx.IDNguoiGui.ToString(),
                                        tenNguoiGui = nguoiGui != null ? nguoiGui.TenHienThi : "N/A",
                                        idChiNhanhGui = dx.IDChiNhanhGui.ToString(),
@@ -268,17 +296,245 @@ namespace QRB.Pages.DeXuatMuaSam
                     return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
                 }
 
-                // Kiểm tra chỉ cho phép sửa khi ở trạng thái "Chờ duyệt"
-                if (deXuat.status != "pending")
-                {
-                    return new JsonResult(new { success = false, message = "Chỉ có thể sửa đề xuất ở trạng thái 'Chờ duyệt'" });
-                }
-
                 return new JsonResult(new { success = true, data = deXuat });
             }
             catch (Exception ex)
             {
                 return new JsonResult(new { success = false, message = "Có lỗi khi lấy chi tiết đề xuất: " + ex.Message });
+            }
+        }
+
+        // Handler để cập nhật trạng thái đề xuất
+        public async Task<IActionResult> OnPostUpdateStatusAsync()
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                var sessionUserId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(sessionUserId) || !Guid.TryParse(sessionUserId, out Guid userGuid))
+                {
+                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
+                }
+
+                // Đọc dữ liệu từ form thay vì JSON
+                var idString = Request.Form["id"].ToString();
+                var newStatus = Request.Form["status"].ToString();
+                
+                if (string.IsNullOrEmpty(idString) || !Guid.TryParse(idString, out Guid deXuatId))
+                {
+                    return new JsonResult(new { success = false, message = "ID đề xuất không hợp lệ" });
+                }
+
+                if (string.IsNullOrEmpty(newStatus) || (newStatus != "accepted" && newStatus != "rejected"))
+                {
+                    return new JsonResult(new { success = false, message = "Trạng thái không hợp lệ" });
+                }
+
+                // Lấy thông tin user hiện tại
+                var currentUserId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(currentUserId) || !Guid.TryParse(currentUserId, out Guid userId))
+                {
+                    return new JsonResult(new { success = false, message = "Vui lòng đăng nhập lại" });
+                }
+
+                // Tìm đề xuất mua sắm
+                var deXuat = await _context.DeXuatMuaSams.FirstOrDefaultAsync(dx => dx.ID == deXuatId && !dx.IsDelete);
+                if (deXuat == null)
+                {
+                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
+                }
+
+                // Kiểm tra quyền: chỉ người nhận mới được phê duyệt/từ chối
+                if (deXuat.IDNguoiNhan != userId)
+                {
+                    return new JsonResult(new { success = false, message = "Bạn không có quyền xử lý đề xuất này" });
+                }
+
+                // Kiểm tra trạng thái hiện tại phải là "pending"
+                if (deXuat.Status != "pending")
+                {
+                    return new JsonResult(new { success = false, message = "Chỉ có thể xử lý đề xuất ở trạng thái 'Chờ duyệt'" });
+                }
+
+                // Cập nhật trạng thái và thời gian tương ứng
+                deXuat.Status = newStatus;
+                deXuat.UpdateTime = DateTime.Now;
+                
+                if (newStatus == "accepted")
+                {
+                    deXuat.AcceptTime = DateTime.Now;
+                }
+                else if (newStatus == "rejected")
+                {
+                    deXuat.RejectTime = DateTime.Now;
+                }
+
+                await _context.SaveChangesAsync();
+
+                var statusText = newStatus == "accepted" ? "đã được phê duyệt" : "đã bị từ chối";
+                return new JsonResult(new { success = true, message = $"Đề xuất {statusText} thành công" });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = "Có lỗi khi cập nhật trạng thái: " + ex.Message });
+            }
+        }
+
+        // Handler để cập nhật thời gian nhận hàng
+        public async Task<IActionResult> OnPostReceiveOrderAsync()
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Kiểm tra đăng nhập
+                var sessionUserId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(sessionUserId) || !Guid.TryParse(sessionUserId, out Guid userGuid))
+                {
+                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
+                }
+
+                // Đọc dữ liệu từ form
+                var idString = Request.Form["id"].ToString();
+                
+                if (string.IsNullOrEmpty(idString) || !Guid.TryParse(idString, out Guid deXuatId))
+                {
+                    return new JsonResult(new { success = false, message = "ID đề xuất không hợp lệ" });
+                }
+
+                // Lấy thông tin user hiện tại
+                var currentUserId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(currentUserId) || !Guid.TryParse(currentUserId, out Guid userId))
+                {
+                    return new JsonResult(new { success = false, message = "Vui lòng đăng nhập lại" });
+                }
+
+                // Tìm đề xuất mua sắm
+                var deXuat = await _context.DeXuatMuaSams.FirstOrDefaultAsync(dx => dx.ID == deXuatId && !dx.IsDelete);
+                if (deXuat == null)
+                {
+                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
+                }
+
+                // Kiểm tra quyền: chỉ người tạo đơn mới được nhận hàng
+                if (deXuat.IDNguoiGui != userId)
+                {
+                    return new JsonResult(new { success = false, message = "Bạn không có quyền thực hiện thao tác này" });
+                }
+
+                // Kiểm tra trạng thái phải là "accepted"
+                if (deXuat.Status != "accepted")
+                {
+                    return new JsonResult(new { success = false, message = "Chỉ có thể nhận hàng khi đề xuất đã được phê duyệt" });
+                }
+
+                // Kiểm tra đã nhận hàng chưa
+                if (deXuat.ReceiveTime.HasValue)
+                {
+                    return new JsonResult(new { success = false, message = "Đề xuất này đã được nhận hàng" });
+                }
+
+                // Cập nhật thời gian nhận hàng
+                deXuat.ReceiveTime = DateTime.Now;
+                deXuat.UpdateTime = DateTime.Now;
+
+                // Lấy danh sách nguyên liệu trong đơn đề xuất
+                var chiTietNguyenLieu = await _context.ChiTietDonDeXuats
+                    .Where(ct => ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete)
+                    .ToListAsync();
+
+                if (chiTietNguyenLieu == null || !chiTietNguyenLieu.Any())
+                {
+                    return new JsonResult(new { success = false, message = "Không tìm thấy nguyên liệu nào trong đề xuất" });
+                }
+
+                // Cập nhật số lượng trong kho sản phẩm
+                int updatedCount = 0;
+                int createdCount = 0;
+                
+                foreach (var chiTiet in chiTietNguyenLieu)
+                {
+                    // Tìm bản ghi trong KhoSanPham theo IDNguyenLieu và IDChiNhanh (chi nhánh của người tạo đề xuất)
+                    var khoSanPham = await _context.KhoSanPhams
+                        .FirstOrDefaultAsync(ksp => ksp.IDNguyenLieu == chiTiet.IDNguyenLieu 
+                                          && ksp.IDChiNhanh == deXuat.IDChiNhanhGui 
+                                          && !ksp.IsDelete);
+
+                    if (khoSanPham != null)
+                    {
+                        // Cập nhật số lượng: số hiện tại + số trong phiếu
+                        var soLuongHienTai = int.TryParse(khoSanPham.SoLuongConLai, out int currentQty) ? currentQty : 0;
+                        var soLuongMoi = soLuongHienTai + chiTiet.SoLuong;
+                        
+                        khoSanPham.SoLuongConLai = soLuongMoi.ToString();
+                        khoSanPham.UpdateTime = DateTime.Now;
+                        
+                        // Update trong database
+                        _context.KhoSanPhams.Update(khoSanPham);
+                        updatedCount++;
+                    }
+                    else
+                    {
+                        // Nếu chưa có bản ghi, tạo mới cho chi nhánh của người tạo đề xuất
+                        var khoSanPhamMoi = new QRB.Models.KhoSanPham
+                        {
+                            ID = Guid.NewGuid(),
+                            IDNguyenLieu = chiTiet.IDNguyenLieu,
+                            IDChiNhanh = deXuat.IDChiNhanhGui,
+                            SoLuongConLai = chiTiet.SoLuong.ToString(),
+                            IsDelete = false,
+                            CreateTime = DateTime.Now
+                        };
+                        
+                        await _context.KhoSanPhams.AddAsync(khoSanPhamMoi);
+                        createdCount++;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return new JsonResult(new { 
+                    success = true, 
+                    message = $"Đã xác nhận nhận hàng và cập nhật kho thành công. Cập nhật: {updatedCount}, Tạo mới: {createdCount}" 
+                });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return new JsonResult(new { success = false, message = "Có lỗi khi cập nhật: " + ex.Message });
+            }
+        }
+
+        // Handler method để lấy chi tiết nguyên liệu của đề xuất mua sắm
+        public async Task<JsonResult> OnGetGetNguyenLieuDetailAsync(Guid deXuatId)
+        {
+            try
+            {
+                // Kiểm tra đăng nhập
+                var userId = HttpContext.Session.GetString("UserId");
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
+                }
+
+                var nguyenLieuDetails = await (from ct in _context.ChiTietDonDeXuats
+                                             join nl in _context.NguyenLieus on ct.IDNguyenLieu equals nl.ID
+                                             where ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete && !nl.IsDelete
+                                             select new
+                                             {
+                                                 id = nl.ID.ToString(),
+                                                 tenNguyenLieu = nl.TenNguyenLieu,
+                                                 maNguyenLieu = nl.MaNguyenLieu,
+                                                 donViTinh = nl.DonViTinh,
+                                                 soLuong = ct.SoLuong
+                                             })
+                                             .ToListAsync();
+
+                return new JsonResult(new { success = true, data = nguyenLieuDetails });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = "Có lỗi khi lấy chi tiết nguyên liệu: " + ex.Message });
             }
         }
     }

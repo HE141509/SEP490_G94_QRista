@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using QRB.Data;
+using QRB.Models;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace QRB.Pages.DeXuatMuaSam
@@ -35,6 +37,7 @@ namespace QRB.Pages.DeXuatMuaSam
         
         public async Task<IActionResult> OnPostAsync()
         {
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 // Lấy dữ liệu từ form
@@ -84,10 +87,89 @@ namespace QRB.Pages.DeXuatMuaSam
                 deXuat.UpdateTime = DateTime.Now;
 
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
                 return new JsonResult(new { success = true, message = "Cập nhật đề xuất mua sắm thành công!" });
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
+                return new JsonResult(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> OnPostUpdateNguyenLieuAsync()
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                string? idDeXuatStr = Request.Form["idDeXuat"];
+                string? nguyenLieuListJson = Request.Form["NguyenLieuList"];
+
+                if (string.IsNullOrEmpty(idDeXuatStr) || !Guid.TryParse(idDeXuatStr, out Guid idDeXuat))
+                {
+                    return new JsonResult(new { success = false, message = "ID đề xuất không hợp lệ" });
+                }
+
+                if (string.IsNullOrEmpty(nguyenLieuListJson))
+                {
+                    return new JsonResult(new { success = false, message = "Danh sách nguyên liệu không được để trống" });
+                }
+
+                var nguyenLieuList = JsonSerializer.Deserialize<List<UpdateNguyenLieuItem>>(nguyenLieuListJson);
+                if (nguyenLieuList == null || !nguyenLieuList.Any())
+                {
+                    return new JsonResult(new { success = false, message = "Danh sách nguyên liệu không hợp lệ" });
+                }
+
+                // Kiểm tra đề xuất có tồn tại và đang ở trạng thái pending
+                var deXuat = await _context.DeXuatMuaSams
+                    .Where(dx => dx.ID == idDeXuat && !dx.IsDelete)
+                    .FirstOrDefaultAsync();
+
+                if (deXuat == null)
+                {
+                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
+                }
+
+                if (deXuat.Status != "pending")
+                {
+                    return new JsonResult(new { success = false, message = "Chỉ có thể cập nhật nguyên liệu khi đề xuất ở trạng thái 'Chờ duyệt'" });
+                }
+
+                // Xóa các chi tiết cũ
+                var existingDetails = await _context.ChiTietDonDeXuats
+                    .Where(ct => ct.IDDeXuatMuaSam == idDeXuat)
+                    .ToListAsync();
+
+                _context.ChiTietDonDeXuats.RemoveRange(existingDetails);
+
+                // Thêm chi tiết mới
+                foreach (var nguyenLieu in nguyenLieuList)
+                {
+                    if (string.IsNullOrEmpty(nguyenLieu.Id) || !Guid.TryParse(nguyenLieu.Id, out Guid idNguyenLieu) || nguyenLieu.SoLuong <= 0)
+                        continue;
+
+                    var chiTiet = new ChiTietDonDeXuat
+                    {
+                        ID = Guid.NewGuid(),
+                        IDDeXuatMuaSam = idDeXuat,
+                        IDNguyenLieu = idNguyenLieu,
+                        SoLuong = nguyenLieu.SoLuong,
+                        CreateTime = DateTime.Now,
+                        UpdateTime = DateTime.Now,
+                        IsDelete = false
+                    };
+
+                    await _context.ChiTietDonDeXuats.AddAsync(chiTiet);
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return new JsonResult(new { success = true, message = "Cập nhật danh sách nguyên liệu thành công!" });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
                 return new JsonResult(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
             }
         }
@@ -139,6 +221,14 @@ namespace QRB.Pages.DeXuatMuaSam
                 return new JsonResult(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
             }
         }
+    }
+
+    public class UpdateNguyenLieuItem
+    {
+        public string Id { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public int SoLuong { get; set; }
+        public string? DonViTinh { get; set; }
     }
     
     public class UpdateDeXuatMuaSamRequest

@@ -103,5 +103,40 @@ namespace QRB.Pages.Menu
 
             return new JsonResult(new { products, productTypes });
         }
+
+        // API: Lưu chi tiết đơn hàng vào session trước khi thanh toán
+        public JsonResult OnPostSaveOrderDetails([FromBody] SaveOrderRequest request)
+        {
+            try
+            {
+                // Lưu thông tin vào session
+                HttpContext.Session.SetString("CartData", request.CartData ?? "");
+                HttpContext.Session.SetString("PhoneNumber", request.PhoneNumber ?? "");
+                HttpContext.Session.SetString("OrderTotalAmount", request.TotalAmount.ToString());
+                HttpContext.Session.SetString("OrderDiscountAmount", request.DiscountAmount.ToString());
+                
+                return new JsonResult(new { success = true, message = "Đã lưu thông tin đơn hàng" });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = $"Lỗi khi lưu thông tin: {ex.Message}" });
+            }
+        }
+
+        // API: Lấy số điện thoại từ session
+        public JsonResult OnGetGetPhoneNumberFromSession()
+        {
+            var phoneNumber = HttpContext.Session.GetString("PhoneNumber");
+            return new JsonResult(new { phoneNumber });
+        }
+    }
+
+    // Request model cho SaveOrderDetails
+    public class SaveOrderRequest
+    {
+        public string? CartData { get; set; }
+        public string? PhoneNumber { get; set; }
+        public int TotalAmount { get; set; }
+        public int DiscountAmount { get; set; }
     }
 }
