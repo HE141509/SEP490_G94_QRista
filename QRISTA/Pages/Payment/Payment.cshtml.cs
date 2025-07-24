@@ -142,8 +142,22 @@ namespace QRB.Pages.Payment
         {
             try
             {
+                // Debug session info
+                Console.WriteLine($"Payment Session ID: {HttpContext.Session.Id}");
+                Console.WriteLine($"Looking for cart data in session...");
+                
+                // Debug: list all session keys
+                Console.WriteLine("All session keys:");
+                foreach (var key in HttpContext.Session.Keys)
+                {
+                    var value = HttpContext.Session.GetString(key);
+                    Console.WriteLine($"  {key}: {value?.Substring(0, Math.Min(100, value.Length))}...");
+                }
+                
                 // Lấy dữ liệu giỏ hàng từ session
-                var cartDataJson = HttpContext.Session.GetString("CartData");
+                var cartDataJson = HttpContext.Session.GetString("qrb_cart_data");
+                Console.WriteLine($"Cart data from session: {cartDataJson ?? "NULL"}");
+                
                 if (string.IsNullOrEmpty(cartDataJson))
                 {
                     Console.WriteLine("No cart data found in session");

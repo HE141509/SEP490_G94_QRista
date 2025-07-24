@@ -475,14 +475,16 @@
                         },
                         body: JSON.stringify(data)
                     })
-                        .then(res => res.json())
-                        .then(resp => {
-                            if (resp.success) {
-                                location.reload();
-                            } else {
-                                alert(resp.message || 'Thêm hóa đơn thất bại!');
-                            }
-                        });
+                        .then(res => res.json())                    .then(resp => {
+                        if (resp.success) {
+                            closeAddOrderModal();
+                            // Lưu trạng thái filter trước khi reload
+                            saveFilterState();
+                            location.reload();
+                        } else {
+                            alert(resp.message || 'Thêm hóa đơn thất bại!');
+                        }
+                    });
                 };
             </script>
             <div class="userlist-card userlist-modern">
@@ -607,7 +609,16 @@
                 .then(res => res.json())
                 .then(resp => {
                     if (resp.success) {
-                        location.reload();
+                        // Xóa dòng khỏi bảng thay vì reload
+                        const rows = document.querySelectorAll('#orderListTable tbody tr');
+                        rows.forEach(row => {
+                            const link = row.querySelector('a[onclick*="' + deleteOrderId + '"]');
+                            if (link) {
+                                row.remove();
+                            }
+                        });
+                        closeDeleteOrderModal();
+                        updateOrderPagination(); // Cập nhật lại pagination
                     } else {
                         alert(resp.message || 'Xóa hóa đơn thất bại!');
                     }
@@ -852,32 +863,86 @@
                 function gotoOrderPage(page) {
                     orderCurrentPage = page;
                     updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi chuyển trang
                 }
                 function changeOrderPageSize() {
                     orderPageSize = parseInt(document.getElementById('orderPageSize').value);
                     orderCurrentPage = 1;
                     updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi thay đổi kích thước trang
                 }
                 function filterOrderList() {
                     orderCurrentSearch = document.querySelector('.userlist-search').value.toLowerCase();
                     orderCurrentPage = 1;
                     updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi tìm kiếm
                 }
                 function filterOrderByStatus() {
                     orderCurrentFilter = document.getElementById('filterOrderStatus').value;
                     orderCurrentPage = 1;
                     updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi lọc theo trạng thái
                 }
                 
                 function filterOrderByDeliveryStatus() {
                     orderCurrentDeliveryFilter = document.getElementById('filterDeliveryStatus').value;
                     orderCurrentPage = 1;
                     updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi lọc theo giao hàng
                 }
                 window.addEventListener('DOMContentLoaded', function () {
                     orderPageSize = parseInt(document.getElementById('orderPageSize').value) || 10;
+                    // Khôi phục trạng thái filter từ URL
+                    restoreFilterState();
                     setTimeout(updateOrderPagination, 0);
                 });
+
+                // Lưu trạng thái filter vào URL
+                function saveFilterState() {
+                    const params = new URLSearchParams();
+                    if (orderCurrentFilter !== 'all') params.set('status', orderCurrentFilter);
+                    if (orderCurrentDeliveryFilter !== 'all') params.set('delivery', orderCurrentDeliveryFilter);
+                    if (orderCurrentSearch) params.set('search', orderCurrentSearch);
+                    if (orderCurrentPage > 1) params.set('page', orderCurrentPage);
+                    if (orderPageSize !== 10) params.set('pageSize', orderPageSize);
+                    
+                    const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                    window.history.replaceState({}, '', newUrl);
+                }
+
+                // Khôi phục trạng thái filter từ URL
+                function restoreFilterState() {
+                    const params = new URLSearchParams(window.location.search);
+                    
+                    // Khôi phục filter trạng thái thanh toán
+                    if (params.get('status')) {
+                        orderCurrentFilter = params.get('status');
+                        document.getElementById('filterOrderStatus').value = orderCurrentFilter;
+                    }
+                    
+                    // Khôi phục filter trạng thái giao hàng
+                    if (params.get('delivery')) {
+                        orderCurrentDeliveryFilter = params.get('delivery');
+                        document.getElementById('filterDeliveryStatus').value = orderCurrentDeliveryFilter;
+                    }
+                    
+                    // Khôi phục từ khóa tìm kiếm
+                    if (params.get('search')) {
+                        orderCurrentSearch = params.get('search');
+                        document.querySelector('.userlist-search').value = orderCurrentSearch;
+                    }
+                    
+                    // Khôi phục trang hiện tại
+                    if (params.get('page')) {
+                        orderCurrentPage = parseInt(params.get('page')) || 1;
+                    }
+                    
+                    // Khôi phục kích thước trang
+                    if (params.get('pageSize')) {
+                        orderPageSize = parseInt(params.get('pageSize')) || 10;
+                        document.getElementById('orderPageSize').value = orderPageSize;
+                    }
+                }
 
                 // Cập nhật trạng thái giao hàng
                 function updateDeliveryStatus(orderId, delivered) {
@@ -895,12 +960,30 @@
                     .then(res => res.json())
                     .then(response => {
                         if (response.success) {
-                            location.reload();
+                            // Tìm và cập nhật trạng thái trong bảng
+                            const rows = document.querySelectorAll('#orderListTable tbody tr');
+                            rows.forEach(row => {
+                                const link = row.querySelector('a[onclick*="' + orderId + '"]');
+                                if (link) {
+                                    const deliveryCell = row.querySelector('.delivery-status');
+                                    if (deliveryCell) {
+                                        deliveryCell.innerHTML = '<span style="color: #28a745; font-weight: bold;">Đã trả hàng</span>';
+                                    }
+                                    // Cập nhật data-delivery attribute
+                                    row.setAttribute('data-delivery', 'delivered');
+                                }
+                            });
+                            
+                            // Cập nhật lại pagination nếu đang lọc theo trạng thái giao hàng
+                            if (orderCurrentDeliveryFilter !== 'all') {
+                                updateOrderPagination();
+                            }
                         } else {
                             alert(response.message || 'Cập nhật trạng thái thất bại!');
                         }
                     })
                     .catch(err => {
+                        console.error('Error:', err);
                         alert('Có lỗi khi cập nhật trạng thái giao hàng');
                     });
                 }
@@ -995,7 +1078,10 @@
                         if (response.success) {
                             alert('Cập nhật hóa đơn thành công');
                             closeOrderDetailModal();
-                            location.reload(); // Reload để cập nhật danh sách
+                            // Thay vì reload, chỉ cần lưu trạng thái và có thể cập nhật lại dữ liệu
+                            saveFilterState();
+                            // Có thể thêm logic cập nhật dòng trong bảng ở đây nếu cần
+                            location.reload(); // Giữ lại reload cho function này vì cần cập nhật nhiều thông tin
                         } else {
                             alert(response.message || 'Cập nhật hóa đơn thất bại');
                         }

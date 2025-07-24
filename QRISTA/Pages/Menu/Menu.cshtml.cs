@@ -22,7 +22,6 @@ namespace QRB.Pages.Menu
 
         public void OnGet()
         {
-            // Kiểm tra trạng thái đăng nhập
             IsLoggedIn = !string.IsNullOrEmpty(HttpContext.Session.GetString("UserId"));
             if (IsLoggedIn)
             {
@@ -30,24 +29,20 @@ namespace QRB.Pages.Menu
                 ChiNhanhName = HttpContext.Session.GetString("ChiNhanhName") ?? "Chi nhánh";
             }
 
-            // Lấy danh sách nhóm sản phẩm từ DB (chỉ lấy nhóm chưa xóa)
             ProductGroups = _context.NhomSanPhams
                 .Where(x => !x.IsDelete)
                 .OrderBy(x => x.TenNhom)
                 .ToList();
         }
 
-        // API: Lấy sản phẩm và loại sản phẩm theo nhóm (Razor Pages: ?handler=GetProductsByGroup&maNhom=...)
         public JsonResult OnGetGetProductsByGroup(string maNhom)
         {
-            // Nếu maNhom là "all" thì lấy tất cả sản phẩm chưa xóa
             var query = _context.SanPhams.Where(x => !x.IsDelete);
             if (!string.IsNullOrEmpty(maNhom) && maNhom != "all")
             {
                 query = query.Where(x => x.NhomSanPham.MaNhom == maNhom);
             }
 
-            // Lấy loại sản phẩm thuộc các sản phẩm này
             var productTypes = _context.LoaiSanPhams
                 .Where(x => !x.IsDelete && query.Select(p => p.ID).Contains(x.IDSanPham))
                 .Select(x => new
@@ -56,20 +51,19 @@ namespace QRB.Pages.Menu
                     x.MaLoai,
                     x.TenLoai,
                     x.IDSanPham,
-                    // DonGiaRaw = Microsoft.EntityFrameworkCore.EF.Property<object>(x, "DonGia")
+                    DonGiaRaw = Microsoft.EntityFrameworkCore.EF.Property<object>(x, "DonGia")
                 })
-                .AsEnumerable() // chuyển sang LINQ to Objects để xử lý logic C#
+                .AsEnumerable()
                 .Select(x => new
                 {
                     x.ID,
                     x.MaLoai,
                     x.TenLoai,
                     x.IDSanPham,
-                    // DonGia = TryParseDonGia(x.DonGiaRaw)
+                    DonGia = TryParseDonGia(x.DonGiaRaw)
                 })
                 .ToList();
 
-            // Lọc ra các sản phẩm có ít nhất 1 loại sản phẩm
             var productIdsWithTypes = productTypes.Select(x => x.IDSanPham).Distinct().ToHashSet();
             var products = query.Where(x => productIdsWithTypes.Contains(x.ID)).Select(x => new
             {
@@ -81,7 +75,6 @@ namespace QRB.Pages.Menu
                 x.IDChiNhanh
             }).ToList();
 
-            // Hàm parse DonGia an toàn
             static decimal? TryParseDonGia(object donGiaObj)
             {
                 if (donGiaObj == null) return null;
@@ -92,9 +85,7 @@ namespace QRB.Pages.Menu
                 if (donGiaObj is long l) return l;
                 var str = donGiaObj.ToString();
                 if (string.IsNullOrWhiteSpace(str)) return null;
-                // Loại bỏ dấu phẩy, dấu cách, .00, ký tự lạ
                 str = str.Replace(",", "").Replace(".00", "").Replace(" ", "").Trim();
-                // Giữ lại ký tự số
                 str = new string(str.Where(char.IsDigit).ToArray());
                 if (string.IsNullOrWhiteSpace(str)) return null;
                 if (decimal.TryParse(str, out var result)) return result;
@@ -104,13 +95,12 @@ namespace QRB.Pages.Menu
             return new JsonResult(new { products, productTypes });
         }
 
-        // API: Lưu chi tiết đơn hàng vào session trước khi thanh toán
         public JsonResult OnPostSaveOrderDetails([FromBody] SaveOrderRequest request)
         {
             try
             {
-                // Lưu thông tin vào session
                 HttpContext.Session.SetString("CartData", request.CartData ?? "");
+                HttpContext.Session.SetString("qrb_cart_data", request.CartData ?? ""); // Thêm key cho Payment
                 HttpContext.Session.SetString("PhoneNumber", request.PhoneNumber ?? "");
                 HttpContext.Session.SetString("OrderTotalAmount", request.TotalAmount.ToString());
                 HttpContext.Session.SetString("OrderDiscountAmount", request.DiscountAmount.ToString());
@@ -123,20 +113,47 @@ namespace QRB.Pages.Menu
             }
         }
 
-        // API: Lấy số điện thoại từ session
+        public JsonResult OnPostSaveCartData([FromBody] SaveCartRequest request)
+        {
+            try
+            {
+                Console.WriteLine($"SaveCartData called with: {request.CartData}");
+                HttpContext.Session.SetString("qrb_cart_data", request.CartData ?? "");
+                Console.WriteLine($"Saved to session. Session ID: {HttpContext.Session.Id}");
+                return new JsonResult(new { success = true, message = "Đã lưu cart data" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in SaveCartData: {ex.Message}");
+                return new JsonResult(new { success = false, message = $"Lỗi khi lưu cart: {ex.Message}" });
+            }
+        }
+
         public JsonResult OnGetGetPhoneNumberFromSession()
         {
             var phoneNumber = HttpContext.Session.GetString("PhoneNumber");
             return new JsonResult(new { phoneNumber });
         }
+
+        public JsonResult OnGetGetCartDataFromSession()
+        {
+            var cartData = HttpContext.Session.GetString("qrb_cart_data");
+            Console.WriteLine($"GetCartDataFromSession called. Session ID: {HttpContext.Session.Id}");
+            Console.WriteLine($"Cart data from session: {cartData ?? "NULL"}");
+            return new JsonResult(new { cartData });
+        }
     }
 
-    // Request model cho SaveOrderDetails
     public class SaveOrderRequest
     {
         public string? CartData { get; set; }
         public string? PhoneNumber { get; set; }
         public int TotalAmount { get; set; }
         public int DiscountAmount { get; set; }
+    }
+
+    public class SaveCartRequest
+    {
+        public string? CartData { get; set; }
     }
 }
