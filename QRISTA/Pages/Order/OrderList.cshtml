@@ -494,6 +494,13 @@
                             <option value="paid">Đã thanh toán</option>
                             <option value="unpaid">Chưa thanh toán</option>
                         </select>
+                        
+                        <label for="filterDeliveryStatus" style="margin-left: 15px;">Giao hàng:</label>
+                        <select id="filterDeliveryStatus" class="userlist-filter" onchange="filterOrderByDeliveryStatus()">
+                            <option value="all">Tất cả</option>
+                            <option value="delivered">Đã trả hàng</option>
+                            <option value="not-delivered">Chưa trả hàng</option>
+                        </select>
                     </div>
                     <div class="userlist-toolbar-right">
                         <label for="orderPageSize" style="font-size:15px;margin-right:8px;color:#555;">Hiển thị:</label>
@@ -504,7 +511,7 @@
                             <option value="50">50</option>
                             <option value="100">100</option>
                         </select>
-                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterOrderList()"
+                        <input type="text" class="userlist-search" placeholder="Tìm mã đơn, khách hàng, số bàn..." onkeyup="filterOrderList()"
                             style="margin-left:12px;" />
                     </div>
                 </div>
@@ -515,9 +522,11 @@
                                 <th>STT</th>
                                 <th>Mã đơn hàng</th>
                                 <th>Khách hàng</th>
+                                <th>Số bàn</th>
                                 <th>Chi nhánh</th>
                                 <th>Tổng tiền</th>
                                 <th>Trạng thái</th>
+                                <th>Giao hàng</th>
                                 <th>Ngày tạo</th>
                                 <th></th>
                             </tr>
@@ -529,16 +538,38 @@
                                 foreach (var order in Model.Orders)
                                 {
                                     var status = order.TrangThaiThanhToan ? "Đã thanh toán" : "Chưa thanh toán";
-                                    <tr data-index="@stt" data-status="@(order.TrangThaiThanhToan ? "paid" : "unpaid")">
+                                    <tr data-index="@stt" 
+                                        data-status="@(order.TrangThaiThanhToan ? "paid" : "unpaid")" 
+                                        data-delivery="@(order.TrangThaiThanhToan ? (order.DaTraDon == true ? "delivered" : "not-delivered") : "not-applicable")">
                                         <td>@stt</td>
                                         <td>
                                             <a href="javascript:void(0)" onclick="showOrderDetail('@order.ID')"
                                                 style="color:#007bff;text-decoration:underline;cursor:pointer;">@order.MaDonHang</a>
                                         </td>
                                         <td>@order.KhachHang?.TenKhachHang</td>
+                                        <td>@(order.SoBan?.ToString() ?? "")</td>
                                         <td>@order.ChiNhanh?.TenChiNhanh</td>
                                         <td>@order.TongTien đ</td>
                                         <td class="order-status">@status</td>
+                                        <td class="delivery-status">
+                                            @if (order.TrangThaiThanhToan)
+                                            {
+                                                @if (order.DaTraDon == true)
+                                                {
+                                                    <span style="color: #28a745; font-weight: bold;">Đã trả hàng</span>
+                                                }
+                                                else
+                                                {
+                                                    <span style="color: #dc3545; font-weight: bold; cursor: pointer; text-decoration: underline;" 
+                                                          onclick="updateDeliveryStatus('@order.ID', true)" 
+                                                          title="Click để cập nhật thành đã trả hàng">Chưa trả hàng</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span style="color: #6c757d;">-</span>
+                                            }
+                                        </td>
                                         <td>@order.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
                                         <td>
                                             @* <form method="get" action="/Order/EditOrder" style="display:inline;">
@@ -601,7 +632,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="8">Không có dữ liệu hóa đơn.</td>
+                                    <td colspan="10">Không có dữ liệu hóa đơn.</td>
                                 </tr>
                             }
                         </tbody>
@@ -733,6 +764,7 @@
                 let orderCurrentPage = 1;
                 let orderPageSize = 10;
                 let orderCurrentFilter = 'all';
+                let orderCurrentDeliveryFilter = 'all';
                 let orderCurrentSearch = '';
 
                 function getAllOrderRows() {
@@ -742,13 +774,24 @@
                 }
                 function getFilteredOrderRows() {
                     let rows = getAllOrderRows();
-                    // Lọc theo trạng thái
+                    // Lọc theo trạng thái thanh toán
                     if (orderCurrentFilter !== 'all') {
                         rows = rows.filter(function (row) {
-                            var statusCell = row.querySelector('.order-status');
-                            var isPaid = statusCell && statusCell.textContent.trim() === 'Đã thanh toán';
-                            if (orderCurrentFilter === 'paid') return isPaid;
-                            if (orderCurrentFilter === 'unpaid') return !isPaid;
+                            var status = row.getAttribute('data-status');
+                            return status === orderCurrentFilter;
+                        });
+                    }
+                    // Lọc theo trạng thái giao hàng (chỉ áp dụng cho đơn đã thanh toán)
+                    if (orderCurrentDeliveryFilter !== 'all') {
+                        rows = rows.filter(function (row) {
+                            var deliveryStatus = row.getAttribute('data-delivery');
+                            var paymentStatus = row.getAttribute('data-status');
+                            // Chỉ lọc nếu đơn hàng đã thanh toán
+                            if (paymentStatus === 'paid') {
+                                return deliveryStatus === orderCurrentDeliveryFilter;
+                            }
+                            // Đối với đơn chưa thanh toán, không hiển thị nếu đang lọc theo delivery
+                            return false;
                         });
                     }
                     // Lọc theo search
@@ -756,7 +799,8 @@
                         rows = rows.filter(function (row) {
                             var code = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
                             var customer = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
-                            return code.includes(orderCurrentSearch) || customer.includes(orderCurrentSearch);
+                            var tableNumber = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
+                            return code.includes(orderCurrentSearch) || customer.includes(orderCurrentSearch) || tableNumber.includes(orderCurrentSearch);
                         });
                     }
                     return rows;
@@ -824,10 +868,42 @@
                     orderCurrentPage = 1;
                     updateOrderPagination();
                 }
+                
+                function filterOrderByDeliveryStatus() {
+                    orderCurrentDeliveryFilter = document.getElementById('filterDeliveryStatus').value;
+                    orderCurrentPage = 1;
+                    updateOrderPagination();
+                }
                 window.addEventListener('DOMContentLoaded', function () {
                     orderPageSize = parseInt(document.getElementById('orderPageSize').value) || 10;
                     setTimeout(updateOrderPagination, 0);
                 });
+
+                // Cập nhật trạng thái giao hàng
+                function updateDeliveryStatus(orderId, delivered) {
+                    fetch('/Order/OrderList?handler=UpdateDeliveryStatus', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('#antiForgeryFormOrder input[name=__RequestVerificationToken]').value
+                        },
+                        body: JSON.stringify({ 
+                            OrderId: orderId, 
+                            Delivered: delivered 
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(response => {
+                        if (response.success) {
+                            location.reload();
+                        } else {
+                            alert(response.message || 'Cập nhật trạng thái thất bại!');
+                        }
+                    })
+                    .catch(err => {
+                        alert('Có lỗi khi cập nhật trạng thái giao hàng');
+                    });
+                }
 
                 // Hiển thị popup chi tiết hóa đơn
                 function showOrderDetail(orderId) {
