@@ -150,7 +150,7 @@ function renderMenuItems(items) {
             });
         } else {
             const donGiaMacDinh = 30000;
-            let gia = (item.Price && item.Price > 0) ? item.Price : donGiaMacDinh;
+            let gia = (item.donGia && item.donGia > 0) ? item.donGia : donGiaMacDinh;
             typesHtml = `
                 <div class="menu-item-price">Giá: <span>${gia.toLocaleString()}</span> đ</div>
                 <div class="menu-item-qty">

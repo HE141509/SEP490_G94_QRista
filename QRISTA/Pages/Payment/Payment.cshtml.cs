@@ -93,8 +93,7 @@ namespace QRB.Pages.Payment
                 // Lấy thông tin session (nếu có)
                 var phoneNumber = HttpContext.Session.GetString("PhoneNumber");
                 var tableNumber = HttpContext.Session.GetInt32("TableNumber");
-                var employeeId = HttpContext.Session.GetString("EmployeeId");
-                var branchId = HttpContext.Session.GetString("BranchId");
+                var branchId = HttpContext.Session.GetString("BranchCode");
 
                 // Tìm khách hàng theo số điện thoại (nếu có)
                 Guid? customerId = null;
@@ -103,17 +102,8 @@ namespace QRB.Pages.Payment
                     var customer = _context.KhachHangs.FirstOrDefault(kh => kh.SDT == phoneNumber);
                     customerId = customer?.ID;
                 }
-
-                // Lấy ID nhân viên và chi nhánh (có thể từ session hoặc default)
-                Guid nhanVienId = !string.IsNullOrEmpty(employeeId) ? Guid.Parse(employeeId) : Guid.Empty;
                 Guid chiNhanhId = !string.IsNullOrEmpty(branchId) ? Guid.Parse(branchId) : Guid.Empty;
 
-                // Nếu không có thông tin nhân viên/chi nhánh từ session, lấy mặc định
-                if (nhanVienId == Guid.Empty)
-                {
-                    var defaultEmployee = _context.NguoiDungs.FirstOrDefault();
-                    nhanVienId = defaultEmployee?.ID ?? Guid.Empty;
-                }
                 
                 if (chiNhanhId == Guid.Empty)
                 {
@@ -121,16 +111,11 @@ namespace QRB.Pages.Payment
                     chiNhanhId = defaultBranch?.ID ?? Guid.Empty;
                 }
 
-                if (nhanVienId == Guid.Empty || chiNhanhId == Guid.Empty)
-                {
-                    throw new Exception("Không tìm thấy thông tin nhân viên hoặc chi nhánh");
-                }
-
                 var order = new DonHang
                 {
                     ID = Guid.NewGuid(),
                     IDKhachHang = customerId,
-                    IDNhanVien = nhanVienId,
+                    IDNhanVien = Guid.Empty, // Nhân viên sẽ được cập nhật sau
                     IDChiNhanh = chiNhanhId,
                     MaDonHang = orderCode,
                     DonGia = "0", // Sẽ cập nhật sau khi có chi tiết đơn hàng

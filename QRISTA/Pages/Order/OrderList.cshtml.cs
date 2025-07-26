@@ -273,6 +273,44 @@ namespace QRB.Pages.Order
             }
         }
 
+        // Cập nhật trạng thái giao hàng
+        public async Task<IActionResult> OnPostUpdateDeliveryStatus()
+        {
+            try
+            {
+                var json = await new StreamReader(Request.Body).ReadToEndAsync();
+                var data = System.Text.Json.JsonSerializer.Deserialize<UpdateDeliveryStatusRequest>(json);
+                
+                if (data == null || string.IsNullOrEmpty(data.OrderId) || !Guid.TryParse(data.OrderId, out Guid orderId))
+                {
+                    return new JsonResult(new { success = false, message = "Dữ liệu không hợp lệ" });
+                }
+
+                var order = await _context.DonHangs.FindAsync(orderId);
+                if (order == null)
+                {
+                    return new JsonResult(new { success = false, message = "Không tìm thấy đơn hàng" });
+                }
+
+                // Chỉ cho phép cập nhật nếu đơn hàng đã thanh toán
+                if (!order.TrangThaiThanhToan)
+                {
+                    return new JsonResult(new { success = false, message = "Chỉ có thể cập nhật trạng thái giao hàng cho đơn hàng đã thanh toán" });
+                }
+
+                order.DaTraDon = data.Delivered;
+                order.UpdateTime = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+
+                return new JsonResult(new { success = true, message = "Cập nhật trạng thái giao hàng thành công" });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new { success = false, message = "Có lỗi khi cập nhật trạng thái giao hàng: " + ex.Message });
+            }
+        }
+
         public class OrderUpdateRequest
         {
             public string ID { get; set; } = string.Empty;
@@ -280,6 +318,12 @@ namespace QRB.Pages.Order
             public string TienUuDai { get; set; } = string.Empty;
             public string TongTien { get; set; } = string.Empty;
             public bool TrangThaiThanhToan { get; set; }
+        }
+
+        public class UpdateDeliveryStatusRequest
+        {
+            public string OrderId { get; set; } = string.Empty;
+            public bool Delivered { get; set; }
         }
     }
 }
