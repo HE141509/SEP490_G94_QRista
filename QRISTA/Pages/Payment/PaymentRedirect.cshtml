@@ -1,0 +1,45 @@
+@page
+@model QRB.Pages.Payment.PaymentRedirectModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Đang chuyển hướng thanh toán...</title>
+</head>
+<body>
+    <div style="text-align: center; padding: 50px;">
+        <h3>Đang chuẩn bị thanh toán...</h3>
+        <p>Vui lòng đợi trong giây lát...</p>
+    </div>
+
+    <script>
+        // Đọc dữ liệu từ localStorage và chuyển sang Payment page
+        function redirectToPayment() {
+            try {
+                const cartData = localStorage.getItem('qrb_cart_data');
+                const phoneNumber = localStorage.getItem('qrb_phone_number');
+                const totalAmount = localStorage.getItem('qrb_total_amount');
+                const discountAmount = localStorage.getItem('qrb_discount_amount');
+                if (!cartData || !phoneNumber || !totalAmount) {
+                    alert('Không tìm thấy thông tin đơn hàng. Vui lòng thử lại.');
+                    window.location.href = '/Menu/Menu';
+                    return;
+                }
+                const encodedCartData = encodeURIComponent(cartData);
+                const encodedPhoneNumber = encodeURIComponent(phoneNumber);
+                const paymentUrl = `/Payment/Payment?phone=${encodedPhoneNumber}&total=${totalAmount}&discount=${discountAmount}&cartData=${encodedCartData}`;
+                window.location.href = paymentUrl;
+            } catch (error) {
+                alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                window.location.href = '/Menu/Menu';
+            }
+        }
+
+        // Tự động chuyển hướng sau 1 giây
+        setTimeout(redirectToPayment, 1000);
+    </script>
+</body>
+</html>

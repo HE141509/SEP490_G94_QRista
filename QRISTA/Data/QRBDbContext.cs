@@ -149,9 +149,6 @@ namespace QRB.Data
                 entity.HasOne(d => d.NguyenLieu)
                     .WithMany(p => p.KhoSanPhams)
                     .HasForeignKey(d => d.IDNguyenLieu);
-                entity.HasOne(d => d.SanPham)
-                    .WithMany(p => p.KhoSanPhams)
-                    .HasForeignKey(d => d.IDSanPham);
                 entity.HasOne(d => d.ChiNhanh)
                     .WithMany(p => p.KhoSanPhams)
                     .HasForeignKey(d => d.IDChiNhanh);

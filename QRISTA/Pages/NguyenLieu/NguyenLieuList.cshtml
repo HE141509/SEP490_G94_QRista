@@ -64,7 +64,7 @@
                             {
                                 <tr>
                                     <td>
-                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditNguyenLieuModal('@item.ID', '@item.TenNguyenLieu', '@item.MaNguyenLieu')">
+                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditNguyenLieuModal('@item.ID', '@item.TenNguyenLieu', '@item.MaNguyenLieu', '@item.DonViTinh')">
                                             @item.TenNguyenLieu
                                         </span>
                                     </td>
@@ -115,7 +115,8 @@
     <div id="addNguyenLieuModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
         <div class="modal-content userlist-add-modal-content">
             <div class="userlist-add-modal-title"><i class="fas fa-leaf"></i> Thêm nguyên liệu mới</div>
-            <form id="addNguyenLieuForm" autocomplete="off">
+            <form id="addNguyenLieuForm" method="post" action="/NguyenLieu/AddNguyenLieu" autocomplete="off">
+                @Html.AntiForgeryToken()
                 <div class="userlist-add-form-group">
                     <label for="addTenNguyenLieu">Tên nguyên liệu</label>
                     <input type="text" id="addTenNguyenLieu" name="TenNguyenLieu" class="userlist-input" required maxlength="100" />
@@ -123,6 +124,10 @@
                 <div class="userlist-add-form-group">
                     <label for="addMaNguyenLieu">Mã nguyên liệu</label>
                     <input type="text" id="addMaNguyenLieu" name="MaNguyenLieu" class="userlist-input" required maxlength="50" />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="addDonViTinh">Đơn vị tính</label>
+                    <input type="text" id="addDonViTinh" name="DonViTinh" class="userlist-input" required maxlength="50" />
                 </div>
                 <div class="userlist-add-modal-actions">
                     <button type="button" onclick="closeAddNguyenLieuModal()" class="userlist-add-cancel-btn">Hủy</button>
@@ -134,7 +139,8 @@
     <div id="editNguyenLieuModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
         <div class="modal-content userlist-add-modal-content">
             <div class="userlist-add-modal-title"><i class="fas fa-leaf"></i> Sửa nguyên liệu</div>
-            <form id="editNguyenLieuForm" autocomplete="off">
+            <form id="editNguyenLieuForm" method="post" action="/NguyenLieu/UpdateNguyenLieu" autocomplete="off">
+                @Html.AntiForgeryToken()
                 <input type="hidden" id="editNguyenLieuId" name="ID" />
                 <div class="userlist-add-form-group">
                     <label for="editTenNguyenLieu">Tên nguyên liệu</label>
@@ -143,6 +149,10 @@
                 <div class="userlist-add-form-group">
                     <label for="editMaNguyenLieu">Mã nguyên liệu</label>
                     <input type="text" id="editMaNguyenLieu" name="MaNguyenLieu" class="userlist-input" required maxlength="50" />
+                </div>
+                <div class="userlist-add-form-group">
+                    <label for="editDonViTinh">Đơn vị tính</label>
+                    <input type="text" id="editDonViTinh" name="DonViTinh" class="userlist-input" required maxlength="50" />
                 </div>
                 <div class="userlist-add-modal-actions">
                     <button type="button" onclick="closeEditNguyenLieuModal()" class="userlist-add-cancel-btn">Hủy</button>
@@ -263,10 +273,11 @@
             document.getElementById('addNguyenLieuModal').style.display = 'none';
             document.getElementById('addNguyenLieuForm').reset();
         }
-        function showEditNguyenLieuModal(id, tenNguyenLieu, maNguyenLieu) {
+        function showEditNguyenLieuModal(id, tenNguyenLieu, maNguyenLieu, donViTinh) {
             document.getElementById('editNguyenLieuId').value = id;
             document.getElementById('editTenNguyenLieu').value = tenNguyenLieu;
             document.getElementById('editMaNguyenLieu').value = maNguyenLieu;
+            document.getElementById('editDonViTinh').value = donViTinh || '';
             document.getElementById('editNguyenLieuModal').style.display = 'flex';
         }
         function closeEditNguyenLieuModal() {
@@ -283,55 +294,8 @@
             deleteNguyenLieuId = null;
             document.getElementById('deleteNguyenLieuModal').style.display = 'none';
         }
-        document.getElementById('addNguyenLieuForm').onsubmit = function(e) {
-            e.preventDefault();
-            var form = e.target;
-            var data = {
-                TenNguyenLieu: form.TenNguyenLieu.value,
-                MaNguyenLieu: form.MaNguyenLieu.value
-            };
-            fetch('/NguyenLieu/AddNguyenLieu', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
-                },
-                body: JSON.stringify(data)
-            })
-            .then(res => res.json())
-            .then(resp => {
-                if (resp.success) {
-                    location.reload();
-                } else {
-                    alert(resp.message || 'Thêm nguyên liệu thất bại!');
-                }
-            });
-        };
-        document.getElementById('editNguyenLieuForm').onsubmit = function(e) {
-            e.preventDefault();
-            var form = e.target;
-            var data = {
-                ID: form.ID.value,
-                TenNguyenLieu: form.TenNguyenLieu.value,
-                MaNguyenLieu: form.MaNguyenLieu.value
-            };
-            fetch('/NguyenLieu/UpdateNguyenLieu', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]').value
-                },
-                body: JSON.stringify(data)
-            })
-            .then(res => res.json())
-            .then(resp => {
-                if (resp.success) {
-                    location.reload();
-                } else {
-                    alert(resp.message || 'Cập nhật nguyên liệu thất bại!');
-                }
-            });
-        };
+        // Form thêm mới nguyên liệu đã chuyển sang submit chuẩn Razor Page, không dùng fetch nữa
+        // Form sửa nguyên liệu đã chuyển sang submit chuẩn Razor Page, không dùng fetch nữa
         // Đã chuyển chức năng xóa sang trang DeleteNguyenLieu.cshtml
     </script>
 </body>

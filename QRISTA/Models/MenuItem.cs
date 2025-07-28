@@ -69,7 +69,6 @@ namespace QRB.Models
         public virtual ChiNhanh ChiNhanh { get; set; } = null!;
         public virtual ICollection<LoaiSanPham> LoaiSanPhams { get; set; } = new List<LoaiSanPham>();
         public virtual ICollection<ChiTietDonHang> ChiTietDonHangs { get; set; } = new List<ChiTietDonHang>();
-        public virtual ICollection<KhoSanPham> KhoSanPhams { get; set; } = new List<KhoSanPham>();
     }
 
     [Table("LoaiSanPham")]
@@ -218,7 +217,9 @@ namespace QRB.Models
 
         public DateTime? NgayThanhToan { get; set; }
 
-        public int? SoBan { get; set; } // Thêm trường số bàn
+        public int? SoBan { get; set; }
+
+        public bool? DaTraDon { get; set; }
 
         // Navigation properties
         [ForeignKey("IDKhachHang")]
@@ -344,10 +345,10 @@ namespace QRB.Models
         [Required]
         public Guid IDNguyenLieu { get; set; }
 
-        [Required]
-        public Guid IDSanPham { get; set; }
 
-        public int SoLuongConLai { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string SoLuongConLai { get; set; } = string.Empty;
 
         [Required]
         public Guid IDChiNhanh { get; set; }
@@ -362,8 +363,6 @@ namespace QRB.Models
         [ForeignKey("IDNguyenLieu")]
         public virtual NguyenLieu NguyenLieu { get; set; } = null!;
 
-        [ForeignKey("IDSanPham")]
-        public virtual SanPham SanPham { get; set; } = null!;
 
         [ForeignKey("IDChiNhanh")]
         public virtual ChiNhanh ChiNhanh { get; set; } = null!;
@@ -426,31 +425,25 @@ namespace QRB.Models
 
         [Required]
         [StringLength(50)]
-        public string Status { get; set; } = "PENDING";
-
-        public bool IsDelete { get; set; } = false;
+        public string Status { get; set; } = string.Empty;
 
         public DateTime CreateTime { get; set; } = DateTime.Now;
 
         public DateTime? AcceptTime { get; set; }
 
+        public DateTime? RejectTime { get; set; }
+
         public DateTime? ReceiveTime { get; set; }
 
         public DateTime? UpdateTime { get; set; }
 
-        // Navigation properties
-        [ForeignKey("IDNguoiGui")]
-        public virtual NguoiDung NguoiGui { get; set; } = null!;
+        public bool IsDelete { get; set; } = false;
 
-        [ForeignKey("IDChiNhanhGui")]
-        public virtual ChiNhanh ChiNhanhGui { get; set; } = null!;
-
-        [ForeignKey("IDNguoiNhan")]
-        public virtual NguoiDung NguoiNhan { get; set; } = null!;
-
-        [ForeignKey("IDChiNhanhNhan")]
-        public virtual ChiNhanh ChiNhanhNhan { get; set; } = null!;
-
+        // Navigation properties (nếu cần)
+        public virtual NguyenLieu? NguoiGui { get; set; }
+        public virtual ChiNhanh? ChiNhanhGui { get; set; }
+        public virtual NguyenLieu? NguoiNhan { get; set; }
+        public virtual ChiNhanh? ChiNhanhNhan { get; set; }
         public virtual ICollection<ChiTietDonDeXuat> ChiTietDonDeXuats { get; set; } = new List<ChiTietDonDeXuat>();
     }
 

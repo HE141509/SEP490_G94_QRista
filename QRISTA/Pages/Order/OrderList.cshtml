@@ -475,14 +475,16 @@
                         },
                         body: JSON.stringify(data)
                     })
-                        .then(res => res.json())
-                        .then(resp => {
-                            if (resp.success) {
-                                location.reload();
-                            } else {
-                                alert(resp.message || 'Thêm hóa đơn thất bại!');
-                            }
-                        });
+                        .then(res => res.json())                    .then(resp => {
+                        if (resp.success) {
+                            closeAddOrderModal();
+                            // Lưu trạng thái filter trước khi reload
+                            saveFilterState();
+                            location.reload();
+                        } else {
+                            alert(resp.message || 'Thêm hóa đơn thất bại!');
+                        }
+                    });
                 };
             </script>
             <div class="userlist-card userlist-modern">
@@ -494,6 +496,13 @@
                             <option value="paid">Đã thanh toán</option>
                             <option value="unpaid">Chưa thanh toán</option>
                         </select>
+                        
+                        <label for="filterDeliveryStatus" style="margin-left: 15px;">Giao hàng:</label>
+                        <select id="filterDeliveryStatus" class="userlist-filter" onchange="filterOrderByDeliveryStatus()">
+                            <option value="all">Tất cả</option>
+                            <option value="delivered">Đã trả hàng</option>
+                            <option value="not-delivered">Chưa trả hàng</option>
+                        </select>
                     </div>
                     <div class="userlist-toolbar-right">
                         <label for="orderPageSize" style="font-size:15px;margin-right:8px;color:#555;">Hiển thị:</label>
@@ -504,7 +513,7 @@
                             <option value="50">50</option>
                             <option value="100">100</option>
                         </select>
-                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterOrderList()"
+                        <input type="text" class="userlist-search" placeholder="Tìm mã đơn, khách hàng, số bàn..." onkeyup="filterOrderList()"
                             style="margin-left:12px;" />
                     </div>
                 </div>
@@ -515,9 +524,11 @@
                                 <th>STT</th>
                                 <th>Mã đơn hàng</th>
                                 <th>Khách hàng</th>
+                                <th>Số bàn</th>
                                 <th>Chi nhánh</th>
                                 <th>Tổng tiền</th>
                                 <th>Trạng thái</th>
+                                <th>Giao hàng</th>
                                 <th>Ngày tạo</th>
                                 <th></th>
                             </tr>
@@ -529,25 +540,47 @@
                                 foreach (var order in Model.Orders)
                                 {
                                     var status = order.TrangThaiThanhToan ? "Đã thanh toán" : "Chưa thanh toán";
-                                    <tr data-index="@stt" data-status="@(order.TrangThaiThanhToan ? "paid" : "unpaid")">
+                                    <tr data-index="@stt" 
+                                        data-status="@(order.TrangThaiThanhToan ? "paid" : "unpaid")" 
+                                        data-delivery="@(order.TrangThaiThanhToan ? (order.DaTraDon == true ? "delivered" : "not-delivered") : "not-applicable")">
                                         <td>@stt</td>
                                         <td>
-                                            <a href="/Order/OrderDetail?id=@order.ID"
+                                            <a href="javascript:void(0)" onclick="showOrderDetail('@order.ID')"
                                                 style="color:#007bff;text-decoration:underline;cursor:pointer;">@order.MaDonHang</a>
                                         </td>
                                         <td>@order.KhachHang?.TenKhachHang</td>
+                                        <td>@(order.SoBan?.ToString() ?? "")</td>
                                         <td>@order.ChiNhanh?.TenChiNhanh</td>
                                         <td>@order.TongTien đ</td>
                                         <td class="order-status">@status</td>
+                                        <td class="delivery-status">
+                                            @if (order.TrangThaiThanhToan)
+                                            {
+                                                @if (order.DaTraDon == true)
+                                                {
+                                                    <span style="color: #28a745; font-weight: bold;">Đã trả hàng</span>
+                                                }
+                                                else
+                                                {
+                                                    <span style="color: #dc3545; font-weight: bold; cursor: pointer; text-decoration: underline;" 
+                                                          onclick="updateDeliveryStatus('@order.ID', true)" 
+                                                          title="Click để cập nhật thành đã trả hàng">Chưa trả hàng</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span style="color: #6c757d;">-</span>
+                                            }
+                                        </td>
                                         <td>@order.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
                                         <td>
-                                            <form method="get" action="/Order/EditOrder" style="display:inline;">
+                                            @* <form method="get" action="/Order/EditOrder" style="display:inline;">
                                                 <input type="hidden" name="id" value="@order.ID" />
                                                 <button type="submit" class="userlist-edit-btn" title="Sửa"
                                                     style="margin-left:4px; background-color:#b6f5c6; color:#218838; border:none;">
                                                     <i class="fas fa-pen"></i>
                                                 </button>
-                                            </form>
+                                            </form> *@
                                             <button type="button" class="userlist-delete-btn" title="Xóa"
                                                 style="margin-left:4px;" onclick="showDeleteOrderConfirm('@order.ID')">
                                                 <i class="fas fa-trash"></i>
@@ -576,7 +609,16 @@
                 .then(res => res.json())
                 .then(resp => {
                     if (resp.success) {
-                        location.reload();
+                        // Xóa dòng khỏi bảng thay vì reload
+                        const rows = document.querySelectorAll('#orderListTable tbody tr');
+                        rows.forEach(row => {
+                            const link = row.querySelector('a[onclick*="' + deleteOrderId + '"]');
+                            if (link) {
+                                row.remove();
+                            }
+                        });
+                        closeDeleteOrderModal();
+                        updateOrderPagination(); // Cập nhật lại pagination
                     } else {
                         alert(resp.message || 'Xóa hóa đơn thất bại!');
                     }
@@ -601,7 +643,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="8">Không có dữ liệu hóa đơn.</td>
+                                    <td colspan="10">Không có dữ liệu hóa đơn.</td>
                                 </tr>
                             }
                         </tbody>
@@ -613,6 +655,104 @@
             <form id="antiForgeryFormOrder" style="display:none;">
                 @Html.AntiForgeryToken()
             </form>
+            
+            <!-- Popup chi tiết và chỉnh sửa hóa đơn -->
+            <div id="orderDetailModal" class="modal"
+                style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content userlist-add-modal-content" style="max-width:800px;max-height:90vh;overflow-y:auto;">
+                    <div class="userlist-add-modal-title"><i class="fas fa-file-invoice"></i> Chi tiết hóa đơn</div>
+                    <form id="orderDetailForm" autocomplete="off">
+                        <input type="hidden" id="detailOrderId" />
+                        
+                        <!-- Thông tin cơ bản -->
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Mã đơn hàng</label>
+                                <input type="text" id="detailMaDonHang" class="userlist-input" readonly />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Ngày tạo</label>
+                                <input type="text" id="detailCreateTime" class="userlist-input" readonly />
+                            </div>
+                        </div>
+
+                        <!-- Thông tin khách hàng -->
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Khách hàng</label>
+                                <input type="text" id="detailTenKhachHang" class="userlist-input" readonly />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Số điện thoại</label>
+                                <input type="text" id="detailSdtKhachHang" class="userlist-input" readonly />
+                            </div>
+                        </div>
+
+                        <!-- Thông tin nhân viên và chi nhánh -->
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Nhân viên</label>
+                                <input type="text" id="detailTenNhanVien" class="userlist-input" readonly />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label>Chi nhánh</label>
+                                <input type="text" id="detailTenChiNhanh" class="userlist-input" readonly />
+                            </div>
+                        </div>
+
+                        <!-- Chi tiết sản phẩm -->
+                        <div class="userlist-add-form-group">
+                            <label>Chi tiết sản phẩm</label>
+                            <table class="userlist-table userlist-table-modern" style="width:100%;margin-top:8px;">
+                                <thead>
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th>Loại</th>
+                                        <th>Đơn giá</th>
+                                        <th>Số lượng</th>
+                                        <th>Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="orderDetailProductGrid">
+                                    <!-- Dữ liệu sẽ được thêm động -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Thông tin ưu đãi và thanh toán -->
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label for="detailMaUuDai">Mã ưu đãi</label>
+                                <input type="text" id="detailMaUuDai" class="userlist-input" />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label for="detailTienUuDai">Tiền ưu đãi</label>
+                                <input type="text" id="detailTienUuDai" class="userlist-input" />
+                            </div>
+                        </div>
+
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label for="detailTongTien">Tổng tiền</label>
+                                <input type="text" id="detailTongTien" class="userlist-input" />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label for="detailTrangThaiThanhToan">Trạng thái thanh toán</label>
+                                <select id="detailTrangThaiThanhToan" class="userlist-input">
+                                    <option value="false">Chưa thanh toán</option>
+                                    <option value="true">Đã thanh toán</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="userlist-add-modal-actions">
+                            <button type="button" onclick="closeOrderDetailModal()" class="userlist-add-cancel-btn">Đóng</button>
+                            <button type="submit" class="userlist-add-submit-btn">Cập nhật</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
             <div id="deleteOrderModal" class="modal"
                 style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
                 <div class="modal-content"
@@ -635,6 +775,7 @@
                 let orderCurrentPage = 1;
                 let orderPageSize = 10;
                 let orderCurrentFilter = 'all';
+                let orderCurrentDeliveryFilter = 'all';
                 let orderCurrentSearch = '';
 
                 function getAllOrderRows() {
@@ -644,13 +785,24 @@
                 }
                 function getFilteredOrderRows() {
                     let rows = getAllOrderRows();
-                    // Lọc theo trạng thái
+                    // Lọc theo trạng thái thanh toán
                     if (orderCurrentFilter !== 'all') {
                         rows = rows.filter(function (row) {
-                            var statusCell = row.querySelector('.order-status');
-                            var isPaid = statusCell && statusCell.textContent.trim() === 'Đã thanh toán';
-                            if (orderCurrentFilter === 'paid') return isPaid;
-                            if (orderCurrentFilter === 'unpaid') return !isPaid;
+                            var status = row.getAttribute('data-status');
+                            return status === orderCurrentFilter;
+                        });
+                    }
+                    // Lọc theo trạng thái giao hàng (chỉ áp dụng cho đơn đã thanh toán)
+                    if (orderCurrentDeliveryFilter !== 'all') {
+                        rows = rows.filter(function (row) {
+                            var deliveryStatus = row.getAttribute('data-delivery');
+                            var paymentStatus = row.getAttribute('data-status');
+                            // Chỉ lọc nếu đơn hàng đã thanh toán
+                            if (paymentStatus === 'paid') {
+                                return deliveryStatus === orderCurrentDeliveryFilter;
+                            }
+                            // Đối với đơn chưa thanh toán, không hiển thị nếu đang lọc theo delivery
+                            return false;
                         });
                     }
                     // Lọc theo search
@@ -658,7 +810,8 @@
                         rows = rows.filter(function (row) {
                             var code = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
                             var customer = row.querySelector('td:nth-child(3)')?.textContent.toLowerCase() || '';
-                            return code.includes(orderCurrentSearch) || customer.includes(orderCurrentSearch);
+                            var tableNumber = row.querySelector('td:nth-child(4)')?.textContent.toLowerCase() || '';
+                            return code.includes(orderCurrentSearch) || customer.includes(orderCurrentSearch) || tableNumber.includes(orderCurrentSearch);
                         });
                     }
                     return rows;
@@ -710,25 +863,233 @@
                 function gotoOrderPage(page) {
                     orderCurrentPage = page;
                     updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi chuyển trang
                 }
                 function changeOrderPageSize() {
                     orderPageSize = parseInt(document.getElementById('orderPageSize').value);
                     orderCurrentPage = 1;
                     updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi thay đổi kích thước trang
                 }
                 function filterOrderList() {
                     orderCurrentSearch = document.querySelector('.userlist-search').value.toLowerCase();
                     orderCurrentPage = 1;
                     updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi tìm kiếm
                 }
                 function filterOrderByStatus() {
                     orderCurrentFilter = document.getElementById('filterOrderStatus').value;
                     orderCurrentPage = 1;
                     updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi lọc theo trạng thái
+                }
+                
+                function filterOrderByDeliveryStatus() {
+                    orderCurrentDeliveryFilter = document.getElementById('filterDeliveryStatus').value;
+                    orderCurrentPage = 1;
+                    updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi lọc theo giao hàng
                 }
                 window.addEventListener('DOMContentLoaded', function () {
                     orderPageSize = parseInt(document.getElementById('orderPageSize').value) || 10;
+                    // Khôi phục trạng thái filter từ URL
+                    restoreFilterState();
                     setTimeout(updateOrderPagination, 0);
+                });
+
+                // Lưu trạng thái filter vào URL
+                function saveFilterState() {
+                    const params = new URLSearchParams();
+                    if (orderCurrentFilter !== 'all') params.set('status', orderCurrentFilter);
+                    if (orderCurrentDeliveryFilter !== 'all') params.set('delivery', orderCurrentDeliveryFilter);
+                    if (orderCurrentSearch) params.set('search', orderCurrentSearch);
+                    if (orderCurrentPage > 1) params.set('page', orderCurrentPage);
+                    if (orderPageSize !== 10) params.set('pageSize', orderPageSize);
+                    
+                    const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+                    window.history.replaceState({}, '', newUrl);
+                }
+
+                // Khôi phục trạng thái filter từ URL
+                function restoreFilterState() {
+                    const params = new URLSearchParams(window.location.search);
+                    
+                    // Khôi phục filter trạng thái thanh toán
+                    if (params.get('status')) {
+                        orderCurrentFilter = params.get('status');
+                        document.getElementById('filterOrderStatus').value = orderCurrentFilter;
+                    }
+                    
+                    // Khôi phục filter trạng thái giao hàng
+                    if (params.get('delivery')) {
+                        orderCurrentDeliveryFilter = params.get('delivery');
+                        document.getElementById('filterDeliveryStatus').value = orderCurrentDeliveryFilter;
+                    }
+                    
+                    // Khôi phục từ khóa tìm kiếm
+                    if (params.get('search')) {
+                        orderCurrentSearch = params.get('search');
+                        document.querySelector('.userlist-search').value = orderCurrentSearch;
+                    }
+                    
+                    // Khôi phục trang hiện tại
+                    if (params.get('page')) {
+                        orderCurrentPage = parseInt(params.get('page')) || 1;
+                    }
+                    
+                    // Khôi phục kích thước trang
+                    if (params.get('pageSize')) {
+                        orderPageSize = parseInt(params.get('pageSize')) || 10;
+                        document.getElementById('orderPageSize').value = orderPageSize;
+                    }
+                }
+
+                // Cập nhật trạng thái giao hàng
+                function updateDeliveryStatus(orderId, delivered) {
+                    fetch('/Order/OrderList?handler=UpdateDeliveryStatus', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('#antiForgeryFormOrder input[name=__RequestVerificationToken]').value
+                        },
+                        body: JSON.stringify({ 
+                            OrderId: orderId, 
+                            Delivered: delivered 
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(response => {
+                        if (response.success) {
+                            // Tìm và cập nhật trạng thái trong bảng
+                            const rows = document.querySelectorAll('#orderListTable tbody tr');
+                            rows.forEach(row => {
+                                const link = row.querySelector('a[onclick*="' + orderId + '"]');
+                                if (link) {
+                                    const deliveryCell = row.querySelector('.delivery-status');
+                                    if (deliveryCell) {
+                                        deliveryCell.innerHTML = '<span style="color: #28a745; font-weight: bold;">Đã trả hàng</span>';
+                                    }
+                                    // Cập nhật data-delivery attribute
+                                    row.setAttribute('data-delivery', 'delivered');
+                                }
+                            });
+                            
+                            // Cập nhật lại pagination nếu đang lọc theo trạng thái giao hàng
+                            if (orderCurrentDeliveryFilter !== 'all') {
+                                updateOrderPagination();
+                            }
+                        } else {
+                            alert(response.message || 'Cập nhật trạng thái thất bại!');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        alert('Có lỗi khi cập nhật trạng thái giao hàng');
+                    });
+                }
+
+                // Hiển thị popup chi tiết hóa đơn
+                function showOrderDetail(orderId) {
+                    fetch(`/Order/OrderList?handler=GetOrderDetail&id=${orderId}`)
+                        .then(res => res.json())
+                        .then(response => {
+                            if (response.success && response.data) {
+                                const data = response.data;
+                                
+                                // Điền thông tin cơ bản
+                                document.getElementById('detailOrderId').value = data.id;
+                                document.getElementById('detailMaDonHang').value = data.maDonHang;
+                                document.getElementById('detailCreateTime').value = data.createTime;
+                                
+                                // Thông tin khách hàng
+                                document.getElementById('detailTenKhachHang').value = data.tenKhachHang;
+                                document.getElementById('detailSdtKhachHang').value = data.sdtKhachHang;
+                                
+                                // Thông tin nhân viên và chi nhánh
+                                document.getElementById('detailTenNhanVien').value = data.tenNhanVien;
+                                document.getElementById('detailTenChiNhanh').value = data.tenChiNhanh;
+                                
+                                // Thông tin ưu đãi và thanh toán
+                                document.getElementById('detailMaUuDai').value = data.maUuDai || '';
+                                document.getElementById('detailTienUuDai').value = data.tienUuDai || '0';
+                                document.getElementById('detailTongTien').value = data.tongTien || '0';
+                                document.getElementById('detailTrangThaiThanhToan').value = data.trangThaiThanhToan.toString();
+                                
+                                // Hiển thị chi tiết sản phẩm
+                                const productGrid = document.getElementById('orderDetailProductGrid');
+                                productGrid.innerHTML = '';
+                                if (data.chiTiet && Array.isArray(data.chiTiet)) {
+                                    data.chiTiet.forEach(item => {
+                                        const tr = document.createElement('tr');
+                                        tr.innerHTML = `
+                                            <td>${item.tenSanPham}</td>
+                                            <td>${item.tenLoaiSanPham}</td>
+                                            <td>${formatCurrency(item.donGia)}</td>
+                                            <td>${item.soLuong}</td>
+                                            <td>${formatCurrency(item.thanhTien)}</td>
+                                        `;
+                                        productGrid.appendChild(tr);
+                                    });
+                                }
+                                
+                                document.getElementById('orderDetailModal').style.display = 'flex';
+                            } else {
+                                alert(response.message || 'Không thể lấy chi tiết hóa đơn');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                            alert('Có lỗi khi tải chi tiết hóa đơn');
+                        });
+                }
+
+                function closeOrderDetailModal() {
+                    document.getElementById('orderDetailModal').style.display = 'none';
+                }
+
+                // Cập nhật hóa đơn
+                document.getElementById('orderDetailForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const orderId = document.getElementById('detailOrderId').value;
+                    if (!orderId) {
+                        alert('Không tìm thấy ID hóa đơn');
+                        return;
+                    }
+
+                    const updateData = {
+                        ID: orderId,
+                        MaUuDai: document.getElementById('detailMaUuDai').value,
+                        TienUuDai: document.getElementById('detailTienUuDai').value,
+                        TongTien: document.getElementById('detailTongTien').value,
+                        TrangThaiThanhToan: document.getElementById('detailTrangThaiThanhToan').value === 'true'
+                    };
+
+                    fetch('/Order/OrderList?handler=UpdateOrder', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('#antiForgeryFormOrder input[name=__RequestVerificationToken]').value
+                        },
+                        body: JSON.stringify(updateData)
+                    })
+                    .then(res => res.json())
+                    .then(response => {
+                        if (response.success) {
+                            alert('Cập nhật hóa đơn thành công');
+                            closeOrderDetailModal();
+                            // Thay vì reload, chỉ cần lưu trạng thái và có thể cập nhật lại dữ liệu
+                            saveFilterState();
+                            // Có thể thêm logic cập nhật dòng trong bảng ở đây nếu cần
+                            location.reload(); // Giữ lại reload cho function này vì cần cập nhật nhiều thông tin
+                        } else {
+                            alert(response.message || 'Cập nhật hóa đơn thất bại');
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        alert('Có lỗi khi cập nhật hóa đơn');
+                    });
                 });
             </script>
         </main>
