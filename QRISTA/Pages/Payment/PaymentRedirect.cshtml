@@ -23,31 +23,16 @@
                 const phoneNumber = localStorage.getItem('qrb_phone_number');
                 const totalAmount = localStorage.getItem('qrb_total_amount');
                 const discountAmount = localStorage.getItem('qrb_discount_amount');
-
                 if (!cartData || !phoneNumber || !totalAmount) {
                     alert('Không tìm thấy thông tin đơn hàng. Vui lòng thử lại.');
                     window.location.href = '/Menu/Menu';
                     return;
                 }
-
-                // Encode dữ liệu để chuyển qua URL
                 const encodedCartData = encodeURIComponent(cartData);
                 const encodedPhoneNumber = encodeURIComponent(phoneNumber);
-                
-                // Tạo URL với parameters
                 const paymentUrl = `/Payment/Payment?phone=${encodedPhoneNumber}&total=${totalAmount}&discount=${discountAmount}&cartData=${encodedCartData}`;
-                
-                console.log('Redirecting to payment with data:', {
-                    phone: phoneNumber,
-                    total: totalAmount,
-                    discount: discountAmount,
-                    cartDataLength: cartData.length
-                });
-
-                // Chuyển hướng
                 window.location.href = paymentUrl;
             } catch (error) {
-                console.error('Error during payment redirect:', error);
                 alert('Có lỗi xảy ra. Vui lòng thử lại.');
                 window.location.href = '/Menu/Menu';
             }
