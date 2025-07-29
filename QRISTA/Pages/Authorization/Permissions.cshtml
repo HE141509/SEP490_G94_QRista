@@ -1,0 +1,296 @@
+@page "/Authorization/Permissions"
+@model QRB.Pages.Authorization.PermissionsModel
+@{
+    ViewData["Title"] = "QRB - Ma trận phân quyền";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-key"></i>
+                    Ma trận phân quyền
+                </h1>
+                <p class="page-description">Cấu hình quyền hạn chi tiết cho từng vai trò trong hệ thống</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ma trận phân quyền -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-key"></i>
+                        Ma trận phân quyền
+                    </h5>
+                    <p class="card-text mb-0">Đánh dấu vào ô tương ứng để cấp quyền cho vai trò</p>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover permission-matrix">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width: 300px;">
+                                        <i class="fas fa-shield-alt"></i>
+                                        Quyền hạn
+                                    </th>
+                                    @foreach (var role in Model.Roles)
+                                    {
+                                        <th class="text-center" style="width: 120px;">
+                                            <div class="role-header">
+                                                <i class="fas fa-user-tag"></i>
+                                                <br>
+                                                <strong>@role.Name</strong>
+                                            </div>
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var group in Model.PermissionGroups)
+                                {
+                                    <tr class="table-secondary">
+                                        <td colspan="@(Model.Roles.Count + 1)">
+                                            <strong>
+                                                <i class="fas fa-folder-open"></i>
+                                                @group.Key
+                                            </strong>
+                                        </td>
+                                    </tr>
+                                    @foreach (var permission in group.Value)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="permission-info">
+                                                    <strong>@permission.Name</strong>
+                                                    <br>
+                                                    <small class="text-muted">@permission.Description</small>
+                                                </div>
+                                            </td>
+                                            @foreach (var role in Model.Roles)
+                                            {
+                                                <td class="text-center">
+                                                    <div class="form-check d-flex justify-content-center">
+                                                        <input type="checkbox" 
+                                                               class="form-check-input permission-checkbox" 
+                                                               data-role-id="@role.Id" 
+                                                               data-permission-id="@permission.Id"
+                                                               @(Model.RolePermissions.Any(rp => rp.RoleId == role.Id && rp.PermissionId == permission.Id) ? "checked" : "")
+                                                               onchange="togglePermission(this)">
+                                                    </div>
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-primary" onclick="saveAllPermissions()">
+                            <i class="fas fa-save"></i> Lưu tất cả thay đổi
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="location.reload()">
+                            <i class="fas fa-undo"></i> Hủy thay đổi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thống kê quyền -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-pie"></i>
+                        Thống kê theo vai trò
+                    </h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var role in Model.Roles)
+                    {
+                        var rolePermissionCount = Model.RolePermissions.Count(rp => rp.RoleId == role.Id);
+                        var percentage = Model.Permissions.Count > 0 ? (rolePermissionCount * 100 / Model.Permissions.Count) : 0;
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span><strong>@role.Name</strong></span>
+                                <span class="text-muted">@rolePermissionCount/@Model.Permissions.Count quyền</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: @percentage%"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i>
+                        Hướng dẫn sử dụng
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success"></i>
+                            Đánh dấu vào ô để cấp quyền cho vai trò
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-times text-danger"></i>
+                            Bỏ đánh dấu để thu hồi quyền
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-save text-primary"></i>
+                            Nhấn "Lưu tất cả thay đổi" để áp dụng
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                            Thay đổi sẽ ảnh hưởng ngay lập tức đến người dùng
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .permission-matrix th {
+            vertical-align: middle;
+        }
+        
+        .role-header {
+            font-size: 0.9em;
+            line-height: 1.2;
+        }
+        
+        .permission-info {
+            line-height: 1.3;
+        }
+        
+        .permission-checkbox {
+            transform: scale(1.2);
+        }
+        
+        .table-bordered td {
+            vertical-align: middle;
+        }
+    </style>
+
+    <script>
+        let pendingChanges = [];
+
+        // Hàm hiển thị thông báo
+        function showToast(message, type = 'success') {
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                document.body.appendChild(toastContainer);
+            }
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toastElement = toastContainer.lastElementChild;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+            
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+
+        // Toggle permission
+        function togglePermission(checkbox) {
+            const roleId = checkbox.dataset.roleId;
+            const permissionId = checkbox.dataset.permissionId;
+            const isGranted = checkbox.checked;
+
+            // Thêm vào danh sách thay đổi chờ xử lý
+            const existingIndex = pendingChanges.findIndex(
+                change => change.roleId === roleId && change.permissionId === permissionId
+            );
+
+            if (existingIndex >= 0) {
+                pendingChanges[existingIndex].isGranted = isGranted;
+            } else {
+                pendingChanges.push({
+                    roleId: roleId,
+                    permissionId: permissionId,
+                    isGranted: isGranted
+                });
+            }
+
+            // Hiển thị số thay đổi chờ xử lý
+            updatePendingChangesCount();
+        }
+
+        // Cập nhật số thay đổi chờ xử lý
+        function updatePendingChangesCount() {
+            if (pendingChanges.length > 0) {
+                showToast(`Có ${pendingChanges.length} thay đổi chờ lưu`, 'info');
+            }
+        }
+
+        // Lưu tất cả thay đổi
+        async function saveAllPermissions() {
+            if (pendingChanges.length === 0) {
+                showToast('Không có thay đổi nào để lưu', 'info');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/authorization/permissions/batch-update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ changes: pendingChanges })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showToast(`Đã lưu ${pendingChanges.length} thay đổi thành công`);
+                    pendingChanges = [];
+                } else {
+                    showToast(result.message || 'Có lỗi xảy ra khi lưu', 'danger');
+                }
+            } catch (error) {
+                showToast('Có lỗi xảy ra khi lưu thay đổi', 'danger');
+                console.error('Error:', error);
+            }
+        }
+
+        // Kiểm tra thay đổi chưa lưu khi rời trang
+        window.addEventListener('beforeunload', function (e) {
+            if (pendingChanges.length > 0) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    </script>
+}

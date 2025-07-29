@@ -161,6 +161,15 @@ namespace QRB.Models
         [Required]
         public Guid IDChiNhanh { get; set; }
 
+        // Thêm các trường cho hệ thống phân quyền
+        [StringLength(50)]
+        public string VaiTro { get; set; } = "Staff";
+
+        public bool TrangThaiHoatDong { get; set; } = true;
+
+        [StringLength(100)]
+        public string? Email { get; set; }
+
         public bool IsDelete { get; set; } = false;
 
         public DateTime CreateTime { get; set; } = DateTime.Now;

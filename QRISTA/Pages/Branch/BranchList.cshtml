@@ -116,7 +116,6 @@
                 </div>
             </div>
             <script>
-            // PHÂN TRANG + SEARCH + FILTER CHI NHÁNH
             let branchCurrentPage = 1;
             let branchPageSize = 10;
             let branchCurrentFilter = 'active';
@@ -129,7 +128,6 @@
             }
             function getFilteredBranchRows() {
                 let rows = getAllBranchRows();
-                // Lọc theo trạng thái
                 rows = rows.filter(function(row) {
                     var statusCell = row.querySelector('.branch-status');
                     var isActive = true;
@@ -139,7 +137,6 @@
                     if (branchCurrentFilter === 'active') return isActive;
                     if (branchCurrentFilter === 'inactive') return !isActive;
                 });
-                // Lọc theo search
                 if (branchCurrentSearch) {
                     rows = rows.filter(function(row) {
                         var name = row.querySelector('td:nth-child(2) span')?.textContent.toLowerCase() || '';

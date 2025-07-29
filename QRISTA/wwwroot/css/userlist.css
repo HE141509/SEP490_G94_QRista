@@ -299,6 +299,78 @@ footer {
     text-align: right;
 }
 
+/* CSS cho pagination container */
+.userlist-pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    padding: 16px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e6ed;
+}
+
+.userlist-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.userlist-pagination-btn {
+    min-width: 36px;
+    height: 36px;
+    border: 1px solid #e0e6ed;
+    background: #fff;
+    color: #4285f4;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.userlist-pagination-btn:hover {
+    background: #e3f2fd;
+    border-color: #4285f4;
+    color: #1976d2;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(66,133,244,0.15);
+}
+
+.userlist-pagination-btn-active {
+    background: #4285f4 !important;
+    color: #fff !important;
+    border-color: #4285f4 !important;
+    box-shadow: 0 2px 8px rgba(66,133,244,0.25) !important;
+    font-weight: 600;
+}
+
+.userlist-pagination-btn-active:hover {
+    background: #1976d2 !important;
+    border-color: #1976d2 !important;
+    transform: none;
+}
+
+.userlist-pagination-ellipsis {
+    padding: 0 8px;
+    color: #888;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.userlist-pagination-info {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
 /* Popup thêm mới user đẹp, hiện đại */
 .userlist-add-modal-content {
     background: #fff;

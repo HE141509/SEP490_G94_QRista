@@ -1,0 +1,304 @@
+@page "/Authorization/Roles"
+@model QRB.Pages.Authorization.RolesModel
+@{
+    ViewData["Title"] = "QRB - Quản lý vai trò";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-user-tag"></i>
+                    Quản lý vai trò
+                </h1>
+                <p class="page-description">Thiết lập và quản lý các vai trò trong hệ thống</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách vai trò -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-tag"></i>
+                        Danh sách vai trò
+                    </h5>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                        <i class="fas fa-plus"></i> Thêm vai trò
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="rolesTable">
+                            <thead>
+                                <tr>
+                                    <th>Tên vai trò</th>
+                                    <th>Mô tả</th>
+                                    <th>Số người dùng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var role in Model.Roles)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@role.Name</strong>
+                                        </td>
+                                        <td>@(role.Description ?? "Không có mô tả")</td>
+                                        <td>
+                                            <span class="badge bg-info">@role.UserCount người dùng</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-@(role.IsActive ? "success" : "danger")">
+                                                @(role.IsActive ? "Hoạt động" : "Tạm khóa")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-outline-primary" 
+                                                        onclick="editRole('@role.Id', '@role.Name', '@role.Description', @role.IsActive.ToString().ToLower())">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-@(role.IsActive ? "warning" : "success")"
+                                                        onclick="toggleRoleStatus('@role.Id')">
+                                                    <i class="fas fa-@(role.IsActive ? "eye-slash" : "eye")"></i>
+                                                </button>
+                                                @if (role.UserCount == 0)
+                                                {
+                                                    <button type="button" class="btn btn-outline-danger"
+                                                            onclick="deleteRole('@role.Id', '@role.Name')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm vai trò -->
+<div class="modal fade" id="addRoleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm vai trò mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addRoleForm">
+                    <div class="mb-3">
+                        <label class="form-label">Tên vai trò</label>
+                        <input type="text" class="form-control" id="addRoleName" required>
+                        <div class="form-text">Ví dụ: Manager, Supervisor, etc.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="addRoleDescription" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" onclick="addRole()">Thêm vai trò</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal chỉnh sửa vai trò -->
+<div class="modal fade" id="editRoleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chỉnh sửa vai trò</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editRoleForm">
+                    <input type="hidden" id="editRoleId">
+                    <div class="mb-3">
+                        <label class="form-label">Tên vai trò</label>
+                        <input type="text" class="form-control" id="editRoleName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="editRoleDescription" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="editRoleIsActive">
+                            <label class="form-check-label" for="editRoleIsActive">Vai trò hoạt động</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" onclick="updateRole()">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Hàm hiển thị thông báo
+        function showToast(message, type = 'success') {
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type} border-0" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>
+            `;
+            
+            let toastContainer = document.getElementById('toastContainer');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toastContainer';
+                toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+                document.body.appendChild(toastContainer);
+            }
+            
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+            const toastElement = toastContainer.lastElementChild;
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+            
+            toastElement.addEventListener('hidden.bs.toast', () => {
+                toastElement.remove();
+            });
+        }
+
+        // Thêm vai trò mới
+        async function addRole() {
+            const roleData = {
+                name: document.getElementById('addRoleName').value,
+                description: document.getElementById('addRoleDescription').value
+            };
+
+            try {
+                const response = await fetch('/api/authorization/roles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(roleData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showToast(result.message);
+                    document.getElementById('addRoleForm').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('addRoleModal')).hide();
+                    location.reload();
+                } else {
+                    showToast(result.message, 'danger');
+                }
+            } catch (error) {
+                showToast('Có lỗi xảy ra khi thêm vai trò', 'danger');
+            }
+        }
+
+        // Chỉnh sửa vai trò
+        function editRole(id, name, description, isActive) {
+            document.getElementById('editRoleId').value = id;
+            document.getElementById('editRoleName').value = name;
+            document.getElementById('editRoleDescription').value = description || '';
+            document.getElementById('editRoleIsActive').checked = isActive;
+            
+            new bootstrap.Modal(document.getElementById('editRoleModal')).show();
+        }
+
+        // Cập nhật vai trò
+        async function updateRole() {
+            const roleId = document.getElementById('editRoleId').value;
+            const roleData = {
+                name: document.getElementById('editRoleName').value,
+                description: document.getElementById('editRoleDescription').value,
+                isActive: document.getElementById('editRoleIsActive').checked
+            };
+
+            try {
+                const response = await fetch(`/api/authorization/roles/${roleId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(roleData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showToast(result.message);
+                    bootstrap.Modal.getInstance(document.getElementById('editRoleModal')).hide();
+                    location.reload();
+                } else {
+                    showToast(result.message, 'danger');
+                }
+            } catch (error) {
+                showToast('Có lỗi xảy ra khi cập nhật vai trò', 'danger');
+            }
+        }
+
+        // Bật/tắt trạng thái vai trò
+        async function toggleRoleStatus(roleId) {
+            try {
+                const response = await fetch(`/api/authorization/roles/${roleId}/toggle-status`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showToast(result.message);
+                    location.reload();
+                } else {
+                    showToast('Có lỗi xảy ra', 'danger');
+                }
+            } catch (error) {
+                showToast('Có lỗi xảy ra khi thay đổi trạng thái', 'danger');
+            }
+        }
+
+        // Xóa vai trò
+        async function deleteRole(roleId, roleName) {
+            if (!confirm(`Bạn có chắc chắn muốn xóa vai trò "${roleName}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/authorization/roles/${roleId}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showToast(result.message);
+                    location.reload();
+                } else {
+                    showToast(result.message, 'danger');
+                }
+            } catch (error) {
+                showToast('Có lỗi xảy ra khi xóa vai trò', 'danger');
+            }
+        }
+    </script>
+}

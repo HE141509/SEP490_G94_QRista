@@ -38,18 +38,15 @@ namespace QRB.Pages.Payment
         {
             try
             {
-                // Đảm bảo số tiền > 0 và là số nguyên
                 if (Amount < 1000) 
                 {
                     ErrorMessage = "Số tiền thanh toán phải lớn hơn 1,000 VND";
                     return;
                 }
 
-                // Tạo mã đơn hàng duy nhất
                 string txnRef = DateTime.Now.ToString("yyyyMMddHHmmssfff");
                 OrderId = txnRef;
 
-                // Tạo đơn hàng trong database trước khi thanh toán
                 var order = CreateOrder(txnRef, Amount);
                 if (order == null)
                 {
@@ -57,10 +54,8 @@ namespace QRB.Pages.Payment
                     return;
                 }
 
-                // Tạo chi tiết đơn hàng từ dữ liệu giỏ hàng
                 CreateOrderDetails(order.ID, txnRef);
 
-                // Thông tin cấu hình VNPAY demo
                 string tmnCode = "PT8AZLP3";
                 string hashSecret = "PWSHBSJCVDL54CGNA6C1F55ZZIPV6XP2";
                 string orderInfo = $"Thanh toan don hang QRista Cafe - {txnRef}";
@@ -90,12 +85,10 @@ namespace QRB.Pages.Payment
         {
             try
             {
-                // Lấy thông tin session (nếu có)
                 var phoneNumber = HttpContext.Session.GetString("PhoneNumber");
                 var tableNumber = HttpContext.Session.GetInt32("TableNumber");
                 var branchId = HttpContext.Session.GetString("BranchCode");
 
-                // Tìm khách hàng theo số điện thoại (nếu có)
                 Guid? customerId = null;
                 if (!string.IsNullOrEmpty(phoneNumber))
                 {
@@ -115,12 +108,9 @@ namespace QRB.Pages.Payment
                 {
                     ID = Guid.NewGuid(),
                     IDKhachHang = customerId,
-                    IDNhanVien = Guid.Empty, // Nhân viên sẽ được cập nhật sau
                     IDChiNhanh = chiNhanhId,
                     MaDonHang = orderCode,
-                    DonGia = "0", // Sẽ cập nhật sau khi có chi tiết đơn hàng
                     TongTien = totalAmount.ToString(),
-                    SoBan = tableNumber, // Lưu số bàn
                     TrangThaiThanhToan = false,
                     CreateTime = DateTime.Now,
                     IsDelete = false
@@ -142,33 +132,15 @@ namespace QRB.Pages.Payment
         {
             try
             {
-                // Debug session info
-                Console.WriteLine($"Payment Session ID: {HttpContext.Session.Id}");
-                Console.WriteLine($"Looking for cart data in session...");
-                
-                // Debug: list all session keys
-                Console.WriteLine("All session keys:");
-                foreach (var key in HttpContext.Session.Keys)
-                {
-                    var value = HttpContext.Session.GetString(key);
-                    Console.WriteLine($"  {key}: {value?.Substring(0, Math.Min(100, value.Length))}...");
-                }
-                
-                // Lấy dữ liệu giỏ hàng từ session
                 var cartDataJson = HttpContext.Session.GetString("qrb_cart_data");
-                Console.WriteLine($"Cart data from session: {cartDataJson ?? "NULL"}");
-                
                 if (string.IsNullOrEmpty(cartDataJson))
                 {
-                    Console.WriteLine("No cart data found in session");
                     return;
                 }
-
                 // Parse cart data (giả sử format: { "key": { "name": "...", "qty": 1, "price": 30000, "maLoai": "..." } })
                 var cartData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, CartItem>>(cartDataJson);
                 if (cartData == null || !cartData.Any())
                 {
-                    Console.WriteLine("Cart data is empty or invalid");
                     return;
                 }
 
