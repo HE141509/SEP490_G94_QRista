@@ -1,0 +1,419 @@
+@page
+@model QRB.Pages.AuthorizationModel
+@{
+    ViewData["Title"] = "QRB - Phân quyền";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="fas fa-shield-alt"></i>
+                    Quản lý phân quyền
+                </h1>
+                <p class="page-description">Quản lý quyền hạn và vai trò của người dùng trong hệ thống</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- User Management Card -->
+        <div class="col-lg-6 col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-users"></i>
+                        Danh sách người dùng
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tên đăng nhập</th>
+                                    <th>Vai trò</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Users != null && Model.Users.Any())
+                                {
+                                    @foreach (var user in Model.Users)
+                                    {
+                                        <tr>
+                                            <td>@user.ID</td>
+                                            <td>@user.TenNguoiDung</td>
+                                            <td>
+                                                <span class="badge bg-@(user.VaiTro == "Admin" ? "danger" : "info")">
+                                                    @user.VaiTro
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-@(user.TrangThaiHoatDong ? "success" : "secondary")">
+                                                    @(user.TrangThaiHoatDong ? "Hoạt động" : "Tạm khóa")
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary" 
+                                                        onclick="editUser('@user.ID')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-@(user.TrangThaiHoatDong ? "warning" : "success")" 
+                                                        onclick="toggleUserStatus('@user.ID')">
+                                                    <i class="fas fa-@(user.TrangThaiHoatDong ? "ban" : "check")"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted">Không có người dùng nào</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Role Management Card -->
+        <div class="col-lg-6 col-md-12 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-key"></i>
+                        Quản lý vai trò
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="CreateRole" class="mb-3">
+                        <div class="input-group">
+                            <input type="text" name="RoleName" class="form-control" 
+                                   placeholder="Tên vai trò mới..." required>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-plus"></i>
+                                Thêm vai trò
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="role-list">
+                        @if (Model.Roles != null && Model.Roles.Any())
+                        {
+                            @foreach (var role in Model.Roles)
+                            {
+                                <div class="role-item d-flex justify-content-between align-items-center p-3 mb-2 bg-light rounded">
+                                    <div>
+                                        <h6 class="mb-1">@role.Name</h6>
+                                        <small class="text-muted">@role.Description</small>
+                                    </div>
+                                    <div class="role-actions">
+                                        <button class="btn btn-sm btn-outline-primary" 
+                                                onclick="editRole('@role.Id')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        @if (role.Name != "Admin")
+                                        {
+                                            <button class="btn btn-sm btn-outline-danger" 
+                                                    onclick="deleteRole('@role.Id')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted text-center">Chưa có vai trò nào</p>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Permissions Matrix -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-matrix"></i>
+                        Ma trận phân quyền
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Chức năng</th>
+                                    @if (Model.Roles != null)
+                                    {
+                                        @foreach (var role in Model.Roles)
+                                        {
+                                            <th class="text-center">@role.Name</th>
+                                        }
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Permissions != null)
+                                {
+                                    @foreach (var permission in Model.Permissions)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@permission.Name</strong>
+                                                <br>
+                                                <small class="text-muted">@permission.Description</small>
+                                            </td>
+                                            @if (Model.Roles != null)
+                                            {
+                                                @foreach (var role in Model.Roles)
+                                                {
+                                                    <td class="text-center">
+                                                        <div class="form-check form-switch d-flex justify-content-center">
+                                                            <input class="form-check-input permission-toggle" 
+                                                                   type="checkbox" 
+                                                                   data-role="@role.Id" 
+                                                                   data-permission="@permission.Id"
+                                                                   @(Model.HasPermission(role.Id, permission.Id) ? "checked" : "")>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            }
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chỉnh sửa người dùng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" asp-page-handler="UpdateUser">
+                <div class="modal-body">
+                    <input type="hidden" name="UserId" id="editUserId">
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Tên đăng nhập</label>
+                        <input type="text" name="Username" id="editUsername" class="form-control" readonly>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Vai trò</label>
+                        <select name="Role" id="editUserRole" class="form-select">
+                            @if (Model.Roles != null)
+                            {
+                                @foreach (var role in Model.Roles)
+                                {
+                                    <option value="@role.Name">@role.Name</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" name="IsActive" id="editUserActive" class="form-check-input">
+                            <label class="form-check-label" for="editUserActive">
+                                Tài khoản hoạt động
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.page-description {
+    margin-bottom: 0;
+    opacity: 0.9;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.card-header {
+    border-radius: 10px 10px 0 0 !important;
+    border: none;
+}
+
+.role-item {
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.role-item:hover {
+    background-color: #f8f9fa !important;
+    border-color: #007bff;
+}
+
+.permission-toggle {
+    cursor: pointer;
+}
+
+.table-responsive {
+    border-radius: 8px;
+}
+
+.btn {
+    border-radius: 6px;
+}
+
+.badge {
+    font-size: 0.8em;
+}
+</style>
+
+<script>
+function editUser(userId) {
+    // Tìm thông tin user từ model hoặc gọi API
+    fetch(`/api/users/${userId}`)
+        .then(response => response.json())
+        .then(user => {
+            document.getElementById('editUserId').value = user.id;
+            document.getElementById('editUsername').value = user.username;
+            document.getElementById('editUserRole').value = user.role;
+            document.getElementById('editUserActive').checked = user.isActive;
+            
+            new bootstrap.Modal(document.getElementById('editUserModal')).show();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra khi tải thông tin người dùng');
+        });
+}
+
+function toggleUserStatus(userId) {
+    if (confirm('Bạn có chắc chắn muốn thay đổi trạng thái người dùng này?')) {
+        fetch(`/api/users/${userId}/toggle-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi thay đổi trạng thái');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra');
+        });
+    }
+}
+
+function editRole(roleId) {
+    // Implement edit role functionality
+    console.log('Edit role:', roleId);
+}
+
+function deleteRole(roleId) {
+    if (confirm('Bạn có chắc chắn muốn xóa vai trò này?')) {
+        fetch(`/api/roles/${roleId}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi xóa vai trò');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra');
+        });
+    }
+}
+
+// Handle permission toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const permissionToggles = document.querySelectorAll('.permission-toggle');
+    
+    permissionToggles.forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const roleId = this.dataset.role;
+            const permissionId = this.dataset.permission;
+            const isChecked = this.checked;
+            
+            fetch('/api/permissions/toggle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    roleId: roleId,
+                    permissionId: permissionId,
+                    hasPermission: isChecked
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Revert toggle if request failed
+                    this.checked = !isChecked;
+                    alert('Có lỗi xảy ra khi cập nhật quyền');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Revert toggle if request failed
+                this.checked = !isChecked;
+                alert('Có lỗi xảy ra');
+            });
+        });
+    });
+});
+</script>

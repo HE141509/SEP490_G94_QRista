@@ -7,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+// Add Controllers for API
+builder.Services.AddControllers();
+
 // Configure session
 builder.Services.AddSession(options =>
 {
@@ -22,8 +25,16 @@ builder.Services.AddDbContext<QRBDbContext>(options =>
 
 // Add custom services
 builder.Services.AddScoped<IMenuService, MenuService>();
+builder.Services.AddScoped<AuthorizationSeeder>();
 
 var app = builder.Build();
+
+// Seed authorization data
+using (var scope = app.Services.CreateScope())
+{
+    var seeder = scope.ServiceProvider.GetRequiredService<AuthorizationSeeder>();
+    await seeder.SeedAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -41,5 +52,6 @@ app.UseAuthorization();
 
 app.UseStaticFiles();
 app.MapRazorPages();
+app.MapControllers(); // Add API controllers
 
 app.Run();
