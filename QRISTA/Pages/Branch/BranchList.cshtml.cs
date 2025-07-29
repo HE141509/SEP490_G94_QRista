@@ -26,7 +26,6 @@ namespace QRB.Pages.Branch
 
         public IActionResult OnGet()
         {
-            // Kiểm tra session đăng nhập
             var userId = HttpContext.Session.GetString("UserId");
             if (string.IsNullOrEmpty(userId))
             {

@@ -56,12 +56,44 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/DeXuatMuaSam/AddDeXuatMuaSam.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXEFkZERlWHVhdE11YVNhbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/DeXuatMuaSam/DeleteDeXuatMuaSam.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXERlbGV0ZURlWHVhdE11YVNhbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/DeXuatMuaSam/DeXuatMuaSamList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXERlWHVhdE11YVNhbUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/DeXuatMuaSam/UpdateDeXuatMuaSam.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXFVwZGF0ZURlWHVhdE11YVNhbS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/Github/SEP490_G94_QRista/QRISTA/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/Github/SEP490_G94_QRista/QRISTA/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/KhoSanPham/AddKhoSanPham.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxBZGRLaG9TYW5QaGFtLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/KhoSanPham/DeleteKhoSanPham.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxEZWxldGVLaG9TYW5QaGFtLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/KhoSanPham/KhoSanPhamList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxLaG9TYW5QaGFtTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/KhoSanPham/UpdateKhoSanPham.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxVcGRhdGVLaG9TYW5QaGFtLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/Github/SEP490_G94_QRista/QRISTA/Pages/Login.cshtml]
@@ -84,12 +116,44 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVudVxNZW51LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/NguyenLieu/AddNguyenLieu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmd1eWVuTGlldVxBZGROZ3V5ZW5MaWV1LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/NguyenLieu/DeleteNguyenLieu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmd1eWVuTGlldVxEZWxldGVOZ3V5ZW5MaWV1LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/NguyenLieu/NguyenLieuList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmd1eWVuTGlldVxOZ3V5ZW5MaWV1TGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/NguyenLieu/UpdateNguyenLieu.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmd1eWVuTGlldVxVcGRhdGVOZ3V5ZW5MaWV1LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/Order/AddOrder.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JkZXJcQWRkT3JkZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/Order/DeleteOrder.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JkZXJcRGVsZXRlT3JkZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/Order/OrderList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JkZXJcT3JkZXJMaXN0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/Github/SEP490_G94_QRista/QRISTA/Pages/Payment.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/Github/SEP490_G94_QRista/QRISTA/Pages/Payment/Payment.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxQYXltZW50LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/Payment/PaymentRedirect.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxQYXltZW50UmVkaXJlY3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/Github/SEP490_G94_QRista/QRISTA/Pages/Privacy.cshtml]
@@ -202,6 +266,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [E:/Github/SEP490_G94_QRista/QRISTA/Pages/UuDai/MaUuDaiList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcTWFVdURhaUxpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/Vnpay/VnpayReturn.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVm5wYXlcVm5wYXlSZXR1cm4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/Github/SEP490_G94_QRista/QRISTA/Pages/_ViewImports.cshtml]

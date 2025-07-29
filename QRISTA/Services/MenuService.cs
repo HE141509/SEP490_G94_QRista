@@ -37,18 +37,26 @@ namespace QRB.Services
             var items = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(l => new MenuItemDto
+                .Select(l => new
                 {
-                    Id = l.ID.ToString(),
-                    Name = l.TenLoai,
-                    Category = GetCategoryFromProductName(l.SanPham.TenSanPham),
-                    Description = $"{l.SanPham.TenSanPham} - {l.TenLoai}",
-                    Price = l.DonGia,
-                    ImageUrl = "/images/cafe.png" // Default image
+                    l.ID,
+                    l.TenLoai,
+                    TenSanPham = l.SanPham.TenSanPham,
+                    l.DonGia
                 })
                 .ToListAsync();
 
-            return (items, totalCount);
+            var menuItems = items.Select(l => new MenuItemDto
+            {
+                Id = l.ID.ToString(),
+                Name = l.TenLoai,
+                Category = GetCategoryFromProductName(l.TenSanPham),
+                Description = $"{l.TenSanPham} - {l.TenLoai}",
+                Price = decimal.TryParse(l.DonGia, out var price) ? price : 0,
+                ImageUrl = "/images/cafe.png"
+            }).ToList();
+
+            return (menuItems, totalCount);
         }
 
         public async Task<List<string>> GetCategoriesAsync()

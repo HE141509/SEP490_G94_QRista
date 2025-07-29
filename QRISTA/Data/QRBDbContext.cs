@@ -100,6 +100,10 @@ namespace QRB.Data
                 entity.HasOne(d => d.ChiNhanh)
                     .WithMany(p => p.DonHangs)
                     .HasForeignKey(d => d.IDChiNhanh);
+
+                // Configure new properties for DonHang
+                entity.Property(e => e.TrangThaiThanhToan).HasDefaultValue(false);
+                entity.Property(e => e.NgayThanhToan).IsRequired(false);
             });
 
             // ChiTietDonHang
@@ -145,9 +149,6 @@ namespace QRB.Data
                 entity.HasOne(d => d.NguyenLieu)
                     .WithMany(p => p.KhoSanPhams)
                     .HasForeignKey(d => d.IDNguyenLieu);
-                entity.HasOne(d => d.SanPham)
-                    .WithMany(p => p.KhoSanPhams)
-                    .HasForeignKey(d => d.IDSanPham);
                 entity.HasOne(d => d.ChiNhanh)
                     .WithMany(p => p.KhoSanPhams)
                     .HasForeignKey(d => d.IDChiNhanh);
@@ -261,7 +262,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Cà phê đen",
                     MaLoai = "CFD001",
-                    DonGia = 25000,
+                    DonGia = "25000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 },
@@ -272,7 +273,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Cà phê sữa",
                     MaLoai = "CFS001",
-                    DonGia = 30000,
+                    DonGia = "30000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 },
@@ -283,7 +284,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Trà sữa",
                     MaLoai = "TS001",
-                    DonGia = 35000,
+                    DonGia = "35000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 },
@@ -294,7 +295,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Bánh croissant",
                     MaLoai = "BC001",
-                    DonGia = 40000,
+                    DonGia = "40000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 }

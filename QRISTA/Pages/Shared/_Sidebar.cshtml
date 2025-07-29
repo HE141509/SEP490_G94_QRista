@@ -24,6 +24,12 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="/Order/OrderList" class="nav-link@(currentPath.StartsWith("/order/orderlist") ? " active" : "")">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Hóa đơn</span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="/Customer/CustomerList" class="nav-link@(currentPath.StartsWith("/customer") ? " active" : "")">
                     <i class="fas fa-user-friends"></i>
                     <span>Khách hàng</span>
@@ -41,10 +47,27 @@
                     <li><a href="/ProductType/ProductTypeList" class="nav-link@(currentPath.StartsWith("/producttype") ? " active" : "")">Loại sản phẩm</a></li>
                 </ul>
             </li>
+            <li class="nav-item sidebar-kho-parent">
+                <a href="#" class="nav-link sidebar-kho-toggle@(currentPath.StartsWith("/nguyenlieu") || currentPath.StartsWith("/khosanpham") ? " active" : "")" onclick="toggleSidebarKhoMenu(event)">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Quản lý kho</span>
+                    <i class="fas fa-chevron-down sidebar-chevron" style="float:right;margin-top:4px;"></i>
+                </a>
+                <ul class="sidebar-submenu" id="sidebar-kho-submenu" style="display:none;">
+                    <li><a href="/NguyenLieu/NguyenLieuList" class="nav-link@(currentPath.StartsWith("/nguyenlieu") ? " active" : "")">Nguyên liệu</a></li>
+                    <li><a href="/KhoSanPham/KhoSanPhamList" class="nav-link@(currentPath.StartsWith("/khosanpham") ? " active" : "")">Kho sản phẩm</a></li>
+                </ul>
+            </li>
             <li class="nav-item">
                 <a href="/UuDai/MaUuDaiList" class="nav-link@(currentPath.StartsWith("/uudai") ? " active" : "")">
                     <i class="fas fa-gift"></i>
                     <span>Ưu đãi</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/DeXuatMuaSam/DeXuatMuaSamList" class="nav-link@(currentPath.StartsWith("/dexuatmuasam") ? " active" : "")">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Đề xuất mua sắm</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -86,11 +109,24 @@
     .sidebar-product-toggle {
         font-weight: 600;
     }
+    .sidebar-kho-toggle {
+        font-weight: 600;
+    }
 </style>
 <script>
 function toggleSidebarProductMenu(e) {
     e.preventDefault();
     var submenu = document.getElementById('sidebar-product-submenu');
+    if (submenu.style.display === 'none' || submenu.style.display === '') {
+        submenu.style.display = 'block';
+    } else {
+        submenu.style.display = 'none';
+    }
+}
+
+function toggleSidebarKhoMenu(e) {
+    e.preventDefault();
+    var submenu = document.getElementById('sidebar-kho-submenu');
     if (submenu.style.display === 'none' || submenu.style.display === '') {
         submenu.style.display = 'block';
     } else {
