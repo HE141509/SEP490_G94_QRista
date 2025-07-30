@@ -30,8 +30,14 @@ namespace QRB.Pages.Authorization
         [BindProperty(SupportsGet = true)]
         public string StatusFilter { get; set; } = "";
 
-        public async Task OnGetAsync(int pageNumber = 1, int pageSize = 10)
+        public async Task<IActionResult> OnGetAsync(int pageNumber = 1, int pageSize = 10)
         {
+            // Kiểm tra đăng nhập
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("Username")))
+            {
+                return RedirectToPage("/Login");
+            }
+
             CurrentPage = pageNumber;
             PageSize = pageSize;
 
@@ -72,6 +78,8 @@ namespace QRB.Pages.Authorization
                     .ToListAsync();
                 TotalRecords = await query.CountAsync();
             }
+
+            return Page();
         }
 
         private async Task CreateSampleUsersIfNeeded()

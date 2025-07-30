@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using QRB.Data;
@@ -16,8 +17,14 @@ namespace QRB.Pages.Authorization
 
         public List<RoleWithUserCount> Roles { get; set; } = new List<RoleWithUserCount>();
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
+            // Kiểm tra đăng nhập
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("Username")))
+            {
+                return RedirectToPage("/Login");
+            }
+
             try
             {
                 // Lấy tất cả roles để JavaScript phân trang client-side
@@ -63,6 +70,8 @@ namespace QRB.Pages.Authorization
                     UserCount = _context.NguoiDungs.Count(u => u.VaiTro == r.Name && !u.IsDelete)
                 }).ToList();
             }
+
+            return Page();
         }
 
         private async Task CreateSampleRolesIfNeeded()

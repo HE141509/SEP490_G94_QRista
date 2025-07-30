@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Models.Authorization;
 
@@ -10,8 +11,14 @@ namespace QRB.Pages.Authorization
         public List<AppRolePermission> RolePermissions { get; set; } = new List<AppRolePermission>();
         public Dictionary<string, List<AppPermission>> PermissionGroups { get; set; } = new Dictionary<string, List<AppPermission>>();
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
+            // Kiểm tra đăng nhập
+            if (string.IsNullOrEmpty(HttpContext.Session.GetString("Username")))
+            {
+                return RedirectToPage("/Login");
+            }
+
             // Tạo dữ liệu mẫu cho roles
             Roles = new List<AppRole>
             {
@@ -121,6 +128,7 @@ namespace QRB.Pages.Authorization
                 .ToDictionary(g => g.Key, g => g.ToList());
             
             await Task.CompletedTask;
+            return Page();
         }
     }
 }
