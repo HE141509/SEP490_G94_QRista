@@ -16,7 +16,7 @@ namespace QRB.Models.Authorization
         [StringLength(200)]
         public string Description { get; set; } = string.Empty;
         
-        public bool IsActive { get; set; } = true;
+        public bool? IsActive { get; set; } = true;
         
         public DateTime CreatedAt { get; set; } = DateTime.Now;
         

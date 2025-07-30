@@ -1,200 +1,350 @@
 @page "/Authorization/Permissions"
 @model QRB.Pages.Authorization.PermissionsModel
 @{
-    ViewData["Title"] = "QRB - Ma trận phân quyền";
-    Layout = "_Layout";
+    ViewData["Title"] = "Ma trận phân quyền";
+    Layout = null;
 }
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="page-header">
-                <h1 class="page-title">
-                    <i class="fas fa-key"></i>
-                    Ma trận phân quyền
-                </h1>
-                <p class="page-description">Cấu hình quyền hạn chi tiết cho từng vai trò trong hệ thống</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Ma trận phân quyền -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-key"></i>
-                        Ma trận phân quyền
-                    </h5>
-                    <p class="card-text mb-0">Đánh dấu vào ô tương ứng để cấp quyền cho vai trò</p>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover permission-matrix">
-                            <thead class="table-dark">
-                                <tr>
-                                    <th style="width: 300px;">
-                                        <i class="fas fa-shield-alt"></i>
-                                        Quyền hạn
-                                    </th>
-                                    @foreach (var role in Model.Roles)
-                                    {
-                                        <th class="text-center" style="width: 120px;">
-                                            <div class="role-header">
-                                                <i class="fas fa-user-tag"></i>
-                                                <br>
-                                                <strong>@role.Name</strong>
-                                            </div>
-                                        </th>
-                                    }
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var group in Model.PermissionGroups)
-                                {
-                                    <tr class="table-secondary">
-                                        <td colspan="@(Model.Roles.Count + 1)">
-                                            <strong>
-                                                <i class="fas fa-folder-open"></i>
-                                                @group.Key
-                                            </strong>
-                                        </td>
-                                    </tr>
-                                    @foreach (var permission in group.Value)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div class="permission-info">
-                                                    <strong>@permission.Name</strong>
-                                                    <br>
-                                                    <small class="text-muted">@permission.Description</small>
-                                                </div>
-                                            </td>
-                                            @foreach (var role in Model.Roles)
-                                            {
-                                                <td class="text-center">
-                                                    <div class="form-check d-flex justify-content-center">
-                                                        <input type="checkbox" 
-                                                               class="form-check-input permission-checkbox" 
-                                                               data-role-id="@role.Id" 
-                                                               data-permission-id="@permission.Id"
-                                                               @(Model.RolePermissions.Any(rp => rp.RoleId == role.Id && rp.PermissionId == permission.Id) ? "checked" : "")
-                                                               onchange="togglePermission(this)">
-                                                    </div>
-                                                </td>
-                                            }
-                                        </tr>
-                                    }
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="mt-3">
-                        <button type="button" class="btn btn-primary" onclick="saveAllPermissions()">
-                            <i class="fas fa-save"></i> Lưu tất cả thay đổi
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="location.reload()">
-                            <i class="fas fa-undo"></i> Hủy thay đổi
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Thống kê quyền -->
-    <div class="row mt-4">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="card-title mb-0">
-                        <i class="fas fa-chart-pie"></i>
-                        Thống kê theo vai trò
-                    </h6>
-                </div>
-                <div class="card-body">
-                    @foreach (var role in Model.Roles)
-                    {
-                        var rolePermissionCount = Model.RolePermissions.Count(rp => rp.RoleId == role.Id);
-                        var percentage = Model.Permissions.Count > 0 ? (rolePermissionCount * 100 / Model.Permissions.Count) : 0;
-                        
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span><strong>@role.Name</strong></span>
-                                <span class="text-muted">@rolePermissionCount/@Model.Permissions.Count quyền</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: @percentage%"></div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="card-title mb-0">
-                        <i class="fas fa-info-circle"></i>
-                        Hướng dẫn sử dụng
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        <li class="mb-2">
-                            <i class="fas fa-check text-success"></i>
-                            Đánh dấu vào ô để cấp quyền cho vai trò
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-times text-danger"></i>
-                            Bỏ đánh dấu để thu hồi quyền
-                        </li>
-                        <li class="mb-2">
-                            <i class="fas fa-save text-primary"></i>
-                            Nhấn "Lưu tất cả thay đổi" để áp dụng
-                        </li>
-                        <li class="mb-0">
-                            <i class="fas fa-exclamation-triangle text-warning"></i>
-                            Thay đổi sẽ ảnh hưởng ngay lập tức đến người dùng
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/userlist.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .permission-matrix th {
-            vertical-align: middle;
+        .permission-matrix {
+            overflow-x: auto;
+            margin-top: 20px;
         }
-        
-        .role-header {
-            font-size: 0.9em;
-            line-height: 1.2;
+        .permission-table {
+            width: 100%;
+            min-width: 800px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        .permission-info {
-            line-height: 1.3;
+        .permission-table th,
+        .permission-table td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #dee2e6;
         }
-        
+        .permission-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .permission-table .module-header {
+            background: #f8f9fa;
+            font-weight: bold;
+            text-align: left;
+            color: #495057;
+        }
+        .permission-table .permission-name {
+            text-align: left;
+            font-weight: 500;
+            background: #fafafa;
+        }
         .permission-checkbox {
-            transform: scale(1.2);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
         }
-        
-        .table-bordered td {
-            vertical-align: middle;
+        .role-header {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            min-width: 80px;
+            max-width: 80px;
+        }
+        .permission-description {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+        .module-group {
+            border-top: 3px solid #007bff;
+        }
+        .save-permissions-btn {
+            position: sticky;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,123,255,0.3);
         }
     </style>
+</head>
+<body>
+    
+    @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
 
+    <div class="main-container">
+        
+        @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml")
+
+        <main class="main-content">
+            <div class="dashboard-header userlist-header-flex">
+                <h1 class="page-title">Ma trận phân quyền</h1>
+                <button class="userlist-add-btn save-permissions-btn" type="button" onclick="savePermissions()">
+                    <i class="fas fa-save"></i> Lưu phân quyền
+                </button>
+            </div>
+
+            <div class="userlist-container">
+                <div class="userlist-toolbar">
+                    <div class="userlist-toolbar-left">
+                        <label for="moduleFilter" style="font-size:15px;margin-right:8px;color:#555;">Module:</label>
+                        <select id="moduleFilter" class="userlist-filter" onchange="filterByModule()">
+                            <option value="">Tất cả module</option>
+                            @foreach (var module in Model.PermissionGroups.Keys)
+                            {
+                                <option value="@module">@module</option>
+                            }
+                        </select>
+                        <label for="roleFilter" style="font-size:15px;margin-left:16px;margin-right:8px;color:#555;">Vai trò:</label>
+                        <select id="roleFilter" class="userlist-filter" onchange="filterByRole()">
+                            <option value="">Tất cả vai trò</option>
+                            @foreach (var role in Model.Roles.Where(r => r.IsActive == true))
+                            {
+                                <option value="@role.Id">@role.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="userlist-toolbar-right">
+                        <button class="userlist-filter-btn" onclick="selectAllPermissions()" title="Chọn tất cả">
+                            <i class="fas fa-check-square"></i>
+                        </button>
+                        <button class="userlist-filter-btn" onclick="clearAllPermissions()" title="Bỏ chọn tất cả" style="margin-left:8px;">
+                            <i class="fas fa-square"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="permission-matrix" id="permissionMatrix">
+                    <table class="permission-table" id="permissionTable">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 300px;">Quyền / Vai trò</th>
+                                @foreach (var role in Model.Roles.Where(r => r.IsActive == true))
+                                {
+                                    <th class="role-header" data-role-id="@role.Id">
+                                        <div style="writing-mode: horizontal-tb;">
+                                            <strong>@role.Name</strong>
+                                            <div style="font-size: 0.8em; opacity: 0.8;">@role.Description</div>
+                                        </div>
+                                    </th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var moduleGroup in Model.PermissionGroups)
+                            {
+                                <tr class="module-group" data-module="@moduleGroup.Key">
+                                    <td class="module-header" colspan="@(Model.Roles.Count(r => r.IsActive == true) + 1)">
+                                        <i class="fas fa-folder"></i> @moduleGroup.Key
+                                    </td>
+                                </tr>
+                                @foreach (var permission in moduleGroup.Value)
+                                {
+                                    <tr data-module="@moduleGroup.Key" data-permission-id="@permission.Id">
+                                        <td class="permission-name">
+                                            <strong>@permission.Name</strong>
+                                            <div class="permission-description">@permission.Description</div>
+                                        </td>
+                                        @foreach (var role in Model.Roles.Where(r => r.IsActive == true))
+                                        {
+                                            var hasPermission = Model.RolePermissions.Any(rp => rp.RoleId == role.Id && rp.PermissionId == permission.Id);
+                                            <td data-role-id="@role.Id">
+                                                <input type="checkbox" 
+                                                       class="permission-checkbox form-check-input" 
+                                                       data-role-id="@role.Id" 
+                                                       data-permission-id="@permission.Id"
+                                                       @(hasPermission ? "checked" : "")
+                                                       onchange="togglePermission('@role.Id', '@permission.Id', this.checked)" />
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Hướng dẫn:</strong> Tích chọn vào ô để cấp quyền cho vai trò tương ứng. Nhấn "Lưu phân quyền" để áp dụng thay đổi.
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal xác nhận lưu -->
+    <div class="modal fade" id="saveConfirmModal" tabindex="-1" aria-labelledby="saveConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="saveConfirmModalLabel">Xác nhận lưu phân quyền</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có chắc chắn muốn lưu các thay đổi phân quyền?</p>
+                    <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> Thao tác này sẽ thay đổi quyền hạn của người dùng trong hệ thống.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmSavePermissions()">Xác nhận lưu</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let pendingChanges = [];
+        let changedPermissions = new Map();
 
-        // Hàm hiển thị thông báo
+        // Lọc theo module
+        function filterByModule() {
+            const selectedModule = document.getElementById('moduleFilter').value;
+            const table = document.getElementById('permissionTable');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            
+            Array.from(rows).forEach(row => {
+                const module = row.getAttribute('data-module');
+                if (!selectedModule || module === selectedModule) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // Lọc theo vai trò
+        function filterByRole() {
+            const selectedRole = document.getElementById('roleFilter').value;
+            const table = document.getElementById('permissionTable');
+            const headers = table.getElementsByTagName('thead')[0].getElementsByTagName('th');
+            const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            
+            // Ẩn/hiện cột header
+            Array.from(headers).forEach((header, index) => {
+                if (index === 0) return; // Cột đầu tiên luôn hiển thị
+                const roleId = header.getAttribute('data-role-id');
+                if (!selectedRole || roleId === selectedRole) {
+                    header.style.display = '';
+                } else {
+                    header.style.display = 'none';
+                }
+            });
+            
+            // Ẩn/hiện cột dữ liệu
+            Array.from(rows).forEach(row => {
+                const cells = row.getElementsByTagName('td');
+                Array.from(cells).forEach((cell, index) => {
+                    if (index === 0) return; // Cột đầu tiên luôn hiển thị
+                    const roleId = cell.getAttribute('data-role-id');
+                    if (!selectedRole || roleId === selectedRole) {
+                        cell.style.display = '';
+                    } else {
+                        cell.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        // Chọn tất cả quyền
+        function selectAllPermissions() {
+            const checkboxes = document.querySelectorAll('.permission-checkbox');
+            checkboxes.forEach(checkbox => {
+                if (!checkbox.checked) {
+                    checkbox.checked = true;
+                    const roleId = checkbox.getAttribute('data-role-id');
+                    const permissionId = checkbox.getAttribute('data-permission-id');
+                    togglePermission(roleId, permissionId, true);
+                }
+            });
+        }
+
+        // Bỏ chọn tất cả quyền
+        function clearAllPermissions() {
+            const checkboxes = document.querySelectorAll('.permission-checkbox');
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    checkbox.checked = false;
+                    const roleId = checkbox.getAttribute('data-role-id');
+                    const permissionId = checkbox.getAttribute('data-permission-id');
+                    togglePermission(roleId, permissionId, false);
+                }
+            });
+        }
+
+        // Toggle permission
+        function togglePermission(roleId, permissionId, isGranted) {
+            const key = `${roleId}-${permissionId}`;
+            changedPermissions.set(key, {
+                roleId: roleId,
+                permissionId: permissionId,
+                isGranted: isGranted
+            });
+            
+            // Highlight changed rows
+            const checkbox = document.querySelector(`input[data-role-id="${roleId}"][data-permission-id="${permissionId}"]`);
+            if (checkbox) {
+                const row = checkbox.closest('tr');
+                if (row) {
+                    row.style.backgroundColor = isGranted ? '#d4edda' : '#f8d7da';
+                    setTimeout(() => {
+                        row.style.backgroundColor = '';
+                    }, 1000);
+                }
+            }
+        }
+
+        // Lưu phân quyền
+        function savePermissions() {
+            if (changedPermissions.size === 0) {
+                alert('Không có thay đổi nào để lưu.');
+                return;
+            }
+            
+            new bootstrap.Modal(document.getElementById('saveConfirmModal')).show();
+        }
+
+        // Xác nhận lưu phân quyền
+        function confirmSavePermissions() {
+            const permissionsArray = Array.from(changedPermissions.values());
+            
+            fetch('/api/authorization/permissions/update-matrix', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(permissionsArray)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('saveConfirmModal')).hide();
+                    changedPermissions.clear();
+                    showToast('Cập nhật phân quyền thành công!', 'success');
+                } else {
+                    showToast('Lỗi: ' + (data.message || 'Có lỗi xảy ra'), 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Có lỗi xảy ra khi lưu phân quyền', 'danger');
+            });
+        }
+
+        // Hiển thị toast notification
         function showToast(message, type = 'success') {
             const toastHtml = `
                 <div class="toast align-items-center text-white bg-${type} border-0" role="alert">
@@ -223,74 +373,11 @@
             });
         }
 
-        // Toggle permission
-        function togglePermission(checkbox) {
-            const roleId = checkbox.dataset.roleId;
-            const permissionId = checkbox.dataset.permissionId;
-            const isGranted = checkbox.checked;
-
-            // Thêm vào danh sách thay đổi chờ xử lý
-            const existingIndex = pendingChanges.findIndex(
-                change => change.roleId === roleId && change.permissionId === permissionId
-            );
-
-            if (existingIndex >= 0) {
-                pendingChanges[existingIndex].isGranted = isGranted;
-            } else {
-                pendingChanges.push({
-                    roleId: roleId,
-                    permissionId: permissionId,
-                    isGranted: isGranted
-                });
-            }
-
-            // Hiển thị số thay đổi chờ xử lý
-            updatePendingChangesCount();
-        }
-
-        // Cập nhật số thay đổi chờ xử lý
-        function updatePendingChangesCount() {
-            if (pendingChanges.length > 0) {
-                showToast(`Có ${pendingChanges.length} thay đổi chờ lưu`, 'info');
-            }
-        }
-
-        // Lưu tất cả thay đổi
-        async function saveAllPermissions() {
-            if (pendingChanges.length === 0) {
-                showToast('Không có thay đổi nào để lưu', 'info');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/authorization/permissions/batch-update', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ changes: pendingChanges })
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    showToast(`Đã lưu ${pendingChanges.length} thay đổi thành công`);
-                    pendingChanges = [];
-                } else {
-                    showToast(result.message || 'Có lỗi xảy ra khi lưu', 'danger');
-                }
-            } catch (error) {
-                showToast('Có lỗi xảy ra khi lưu thay đổi', 'danger');
-                console.error('Error:', error);
-            }
-        }
-
-        // Kiểm tra thay đổi chưa lưu khi rời trang
-        window.addEventListener('beforeunload', function (e) {
-            if (pendingChanges.length > 0) {
-                e.preventDefault();
-                e.returnValue = '';
-            }
+        // Khởi tạo khi trang load xong
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Permission matrix loaded successfully');
         });
     </script>
-}
+
+</body>
+</html>
