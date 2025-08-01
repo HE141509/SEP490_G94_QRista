@@ -13,6 +13,7 @@ public class IndexModel : PageModel
     public string? PhoneNumber { get; set; }
     public bool Skipped { get; set; }
     public int? TableNumber { get; set; }
+    public string? BranchCode { get; set; }
 
     public IndexModel(ILogger<IndexModel> logger, IConfiguration configuration)
     {
@@ -20,12 +21,19 @@ public class IndexModel : PageModel
         _configuration = configuration;
     }
 
-    public void OnGet(int? table)
+    public void OnGet(int? table, string? branch)
     {
         TableNumber = table;
+        BranchCode = branch;
+        
         if (table.HasValue)
         {
             HttpContext.Session.SetInt32("TableNumber", table.Value);
+        }
+        
+        if (!string.IsNullOrEmpty(branch))
+        {
+            HttpContext.Session.SetString("BranchCode", branch);
         }
     }
 
