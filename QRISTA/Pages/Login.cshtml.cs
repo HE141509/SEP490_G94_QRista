@@ -53,12 +53,20 @@ namespace QRB.Pages
 
                 if (user != null && VerifyPassword(Password, user.MatKhau))
                 {
+                    // Kiểm tra tài khoản có bị khóa không
+                    if (!user.TrangThaiHoatDong)
+                    {
+                        ErrorMessage = "Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên!";
+                        return Page();
+                    }
+
                     // Đăng nhập thành công
                     HttpContext.Session.SetString("UserId", user.ID.ToString());
                     HttpContext.Session.SetString("Username", user.TenNguoiDung);
                     HttpContext.Session.SetString("DisplayName", user.TenHienThi);
                     HttpContext.Session.SetString("ChiNhanhId", user.IDChiNhanh.ToString());
                     HttpContext.Session.SetString("ChiNhanhName", user.ChiNhanh.TenChiNhanh);
+                    HttpContext.Session.SetString("VaiTro", user.VaiTro); // Thêm vai trò vào session
 
                     if (RememberMe)
                     {
@@ -124,7 +132,7 @@ namespace QRB.Pages
 
         private bool VerifyPassword(string inputPassword, string hashedPassword)
         {
-            var key = _config["PasswordKey"];
+            var key = _config["PasswordKey"] ?? string.Empty;
             var hash = HashPassword(inputPassword, key);
             return hash == hashedPassword;
         }

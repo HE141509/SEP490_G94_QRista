@@ -41,7 +41,7 @@ namespace QRB.Controllers.Authorization
             var existingRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == request.Name);
             if (existingRole != null)
             {
-                return BadRequest(new { message = "Vai trò này đã tồn tại" });
+                return BadRequest(new { success = false, message = "Vai trò này đã tồn tại" });
             }
 
             var role = new AppRole
@@ -55,7 +55,7 @@ namespace QRB.Controllers.Authorization
             _context.Roles.Add(role);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Tạo vai trò thành công", roleId = role.Id });
+            return Ok(new { success = true, message = "Tạo vai trò thành công", roleId = role.Id });
         }
 
         [HttpPut("{id}")]
@@ -64,7 +64,7 @@ namespace QRB.Controllers.Authorization
             var role = await _context.Roles.FindAsync(id);
             if (role == null)
             {
-                return NotFound();
+                return NotFound(new { success = false, message = "Không tìm thấy vai trò" });
             }
 
             role.Name = request.Name;
@@ -72,7 +72,7 @@ namespace QRB.Controllers.Authorization
 
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Cập nhật vai trò thành công" });
+            return Ok(new { success = true, message = "Cập nhật vai trò thành công" });
         }
 
         [HttpDelete("{id}")]
@@ -81,13 +81,13 @@ namespace QRB.Controllers.Authorization
             var role = await _context.Roles.FindAsync(id);
             if (role == null)
             {
-                return NotFound();
+                return NotFound(new { success = false, message = "Không tìm thấy vai trò" });
             }
 
             // Không cho phép xóa vai trò Admin
             if (role.Name == "Admin")
             {
-                return BadRequest(new { message = "Không thể xóa vai trò Admin" });
+                return BadRequest(new { success = false, message = "Không thể xóa vai trò Admin" });
             }
 
             // Xóa các permissions liên quan
@@ -97,7 +97,30 @@ namespace QRB.Controllers.Authorization
             _context.Roles.Remove(role);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Xóa vai trò thành công" });
+            return Ok(new { success = true, message = "Xóa vai trò thành công" });
+        }
+
+        [HttpPost("{id}/toggle-status")]
+        public async Task<IActionResult> ToggleRoleStatus(string id)
+        {
+            var role = await _context.Roles.FindAsync(id);
+            if (role == null)
+            {
+                return NotFound(new { success = false, message = "Không tìm thấy vai trò" });
+            }
+
+            // Không cho phép vô hiệu hóa vai trò Admin
+            if (role.Name == "Admin" && role.IsActive == true)
+            {
+                return BadRequest(new { success = false, message = "Không thể vô hiệu hóa vai trò Admin" });
+            }
+
+            // Chuyển đổi trạng thái
+            role.IsActive = !role.IsActive;
+            await _context.SaveChangesAsync();
+
+            string statusMessage = role.IsActive == true ? "kích hoạt" : "vô hiệu hóa";
+            return Ok(new { success = true, message = $"Đã {statusMessage} vai trò thành công" });
         }
     }
 }

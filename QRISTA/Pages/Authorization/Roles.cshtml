@@ -204,7 +204,7 @@
         function changePageSize() {
             currentPageSize = parseInt(document.getElementById('pageSize').value);
             currentPageNumber = 1;
-            updatePagination();
+            applyFilters();
         }
 
         function goToPage(page) {
@@ -215,28 +215,26 @@
         function updatePagination() {
             const table = document.getElementById('roleListTable');
             const tbody = table.getElementsByTagName('tbody')[0];
-            const allRows = Array.from(tbody.getElementsByTagName('tr')).filter(row => {
-                const firstCell = row.getElementsByTagName('td')[0];
-                return firstCell && firstCell.colSpan !== 6;
+            // Chỉ lấy những hàng có data-visible-index (đã qua bộ lọc)
+            const visibleRows = Array.from(tbody.getElementsByTagName('tr')).filter(row => {
+                return row.hasAttribute('data-visible-index');
             });
             
-            const totalRecords = allRows.length;
+            const totalRecords = visibleRows.length;
             totalPages = Math.ceil(totalRecords / currentPageSize);
             
-            console.log('Total records:', totalRecords, 'Current page size:', currentPageSize, 'Total pages:', totalPages);
-            
-            // Ẩn tất cả các hàng
-            allRows.forEach(row => row.style.display = 'none');
+            // Ẩn tất cả các hàng có data-visible-index
+            visibleRows.forEach(row => row.style.display = 'none');
             
             // Hiển thị các hàng của trang hiện tại
             const startIndex = (currentPageNumber - 1) * currentPageSize;
             const endIndex = Math.min(startIndex + currentPageSize, totalRecords);
             
             for (let i = startIndex; i < endIndex; i++) {
-                if (allRows[i]) {
-                    allRows[i].style.display = '';
-                    // Cập nhật số thứ tự
-                    const sttCell = allRows[i].getElementsByTagName('td')[0];
+                if (visibleRows[i]) {
+                    visibleRows[i].style.display = '';
+                    // Cập nhật số thứ tự theo thứ tự hiển thị
+                    const sttCell = visibleRows[i].getElementsByTagName('td')[0];
                     sttCell.textContent = i + 1;
                 }
             }
@@ -306,15 +304,22 @@
 
         // Lọc và tìm kiếm
         function filterRoles() {
+            currentPageNumber = 1;
+            applyFilters();
+        }
+
+        function applyFilters() {
             const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
             const searchTerm = document.querySelector('.userlist-search').value.toLowerCase();
             
             const table = document.getElementById('roleListTable');
             const tbody = table.getElementsByTagName('tbody')[0];
-            const rows = Array.from(tbody.getElementsByTagName('tr')).filter(row => 
-                row.getElementsByTagName('td')[0].colSpan !== 6
-            );
+            const rows = Array.from(tbody.getElementsByTagName('tr')).filter(row => {
+                const firstCell = row.getElementsByTagName('td')[0];
+                return firstCell && firstCell.colSpan !== 6;
+            });
             
+            let visibleRowIndex = 1;
             rows.forEach(row => {
                 const status = row.getAttribute('data-status').toLowerCase();
                 const searchData = row.getAttribute('data-search').toLowerCase();
@@ -324,13 +329,14 @@
                 
                 if (statusMatch && searchMatch) {
                     row.style.display = '';
+                    row.setAttribute('data-visible-index', visibleRowIndex);
+                    visibleRowIndex++;
                 } else {
                     row.style.display = 'none';
+                    row.removeAttribute('data-visible-index');
                 }
             });
             
-            // Reset về trang đầu và cập nhật phân trang
-            currentPageNumber = 1;
             updatePagination();
         }
 
@@ -404,26 +410,24 @@
         }
 
         function toggleRoleStatus(id) {
-            if (confirm('Bạn có chắc chắn muốn thay đổi trạng thái vai trò này?')) {
-                fetch(`/api/authorization/roles/${id}/toggle-status`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Lỗi: ' + (data.message || 'Có lỗi xảy ra'));
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra khi thay đổi trạng thái');
-                });
-            }
+            fetch(`/api/authorization/roles/${id}/toggle-status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Lỗi: ' + (data.message || 'Có lỗi xảy ra'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi thay đổi trạng thái');
+            });
         }
 
         function deleteRole(id, name) {
@@ -451,7 +455,7 @@
 
         // Khởi tạo phân trang khi trang load xong
         document.addEventListener('DOMContentLoaded', function() {
-            updatePagination();
+            applyFilters();
         });
     </script>
 
