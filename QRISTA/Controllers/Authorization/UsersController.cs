@@ -19,42 +19,6 @@ namespace QRB.Controllers.Authorization
             _context = context;
         }
 
-        [HttpGet("roles")]
-        public async Task<IActionResult> GetAvailableRoles()
-        {
-            try
-            {
-                // Lấy danh sách vai trò từ bảng Roles
-                var roles = await _context.Roles
-                    .Where(r => r.IsActive == true)
-                    .OrderBy(r => r.Name)
-                    .Select(r => new
-                    {
-                        value = r.Name,
-                        display = !string.IsNullOrEmpty(r.Description) ? r.Description : r.Name
-                    })
-                    .ToListAsync();
-
-                return Ok(new { success = true, data = roles });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { success = false, message = "Có lỗi xảy ra khi lấy danh sách vai trò" });
-            }
-        }
-
-        private string GetRoleDisplayName(string role)
-        {
-            return role switch
-            {
-                "Admin" => "Quản trị viên",
-                "Manager" => "Quản lý",
-                "Staff" => "Nhân viên",
-                "Cashier" => "Thu ngân",
-                _ => role
-            };
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(string id)
         {

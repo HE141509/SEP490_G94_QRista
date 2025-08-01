@@ -15,11 +15,6 @@
     <link rel="stylesheet" href="/css/userlist.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .filtered-out {
-            display: none !important;
-        }
-    </style>
 </head>
 <body>
     
@@ -43,7 +38,10 @@
                         <label for="roleFilter" style="font-size:15px;margin-right:8px;color:#555;">Vai trò:</label>
                         <select id="roleFilter" class="userlist-filter" onchange="filterUsers()">
                             <option value="">Tất cả</option>
-                            <!-- Vai trò sẽ được load từ API -->
+                            <option value="Admin">Quản trị viên</option>
+                            <option value="Manager">Quản lý</option>
+                            <option value="Staff">Nhân viên</option>
+                            <option value="Cashier">Thu ngân</option>
                         </select>
                         <label for="statusFilter" style="font-size:15px;margin-left:16px;margin-right:8px;color:#555;">Trạng thái:</label>
                         <select id="statusFilter" class="userlist-filter" onchange="filterUsers()">
@@ -171,7 +169,10 @@
                             <label for="addRole" class="form-label">Vai trò</label>
                             <select class="form-select" id="addRole" required>
                                 <option value="">Chọn vai trò</option>
-                                <!-- Vai trò sẽ được load từ API -->
+                                <option value="Admin">Quản trị viên</option>
+                                <option value="Manager">Quản lý</option>
+                                <option value="Staff">Nhân viên</option>
+                                <option value="Cashier">Thu ngân</option>
                             </select>
                         </div>
                         <div class="mb-3 form-check">
@@ -215,7 +216,10 @@
                             <label for="editRole" class="form-label">Vai trò</label>
                             <select class="form-select" id="editRole" required>
                                 <option value="">Chọn vai trò</option>
-                                <!-- Vai trò sẽ được load từ API -->
+                                <option value="Admin">Quản trị viên</option>
+                                <option value="Manager">Quản lý</option>
+                                <option value="Staff">Nhân viên</option>
+                                <option value="Cashier">Thu ngân</option>
                             </select>
                         </div>
                         <div class="mb-3 form-check">
@@ -258,22 +262,23 @@
                 return firstCell && firstCell.colSpan !== 8;
             });
             
-            // Lấy các row không bị lọc (visible rows)
-            const visibleRows = allRows.filter(row => !row.classList.contains('filtered-out'));
-            const totalRecords = visibleRows.length;
-            totalPages = Math.ceil(totalRecords / currentPageSize) || 1;
+            const totalRecords = allRows.length;
+            totalPages = Math.ceil(totalRecords / currentPageSize);
             
-            // Ẩn tất cả các row visible
-            visibleRows.forEach(row => row.style.display = 'none');
+            console.log('Total records:', totalRecords, 'Current page size:', currentPageSize, 'Total pages:', totalPages);
             
-            // Hiển thị các row theo trang hiện tại
+            // Ẩn tất cả các hàng
+            allRows.forEach(row => row.style.display = 'none');
+            
+            // Hiển thị các hàng của trang hiện tại
             const startIndex = (currentPageNumber - 1) * currentPageSize;
             const endIndex = Math.min(startIndex + currentPageSize, totalRecords);
             
             for (let i = startIndex; i < endIndex; i++) {
-                if (visibleRows[i]) {
-                    visibleRows[i].style.display = '';
-                    const sttCell = visibleRows[i].getElementsByTagName('td')[0];
+                if (allRows[i]) {
+                    allRows[i].style.display = '';
+                    // Cập nhật số thứ tự
+                    const sttCell = allRows[i].getElementsByTagName('td')[0];
                     sttCell.textContent = i + 1;
                 }
             }
@@ -284,6 +289,7 @@
         function renderPagination(totalRecords) {
             const paginationContainer = document.getElementById('userlist-pagination');
             
+            // Luôn hiển thị phân trang nếu có nhiều hơn 1 trang
             if (totalPages <= 1) {
                 paginationContainer.innerHTML = `<div class="userlist-pagination-container">
                     <div class="userlist-pagination-info">Hiển thị ${totalRecords} bản ghi</div>
@@ -295,16 +301,19 @@
             paginationHTML += `<div class="userlist-pagination-info">Hiển thị ${((currentPageNumber - 1) * currentPageSize) + 1}-${Math.min(currentPageNumber * currentPageSize, totalRecords)} trong tổng số ${totalRecords} bản ghi</div>`;
             paginationHTML += '<div class="userlist-pagination-controls">';
             
+            // Nút Previous
             if (currentPageNumber > 1) {
                 paginationHTML += `<button class="userlist-pagination-btn" onclick="goToPage(${currentPageNumber - 1})">‹ Trước</button>`;
             }
             
+            // Hiển thị tất cả các trang nếu ít hơn 8 trang
             if (totalPages <= 7) {
                 for (let i = 1; i <= totalPages; i++) {
                     const isActive = i === currentPageNumber ? 'userlist-pagination-btn-active' : '';
                     paginationHTML += `<button class="userlist-pagination-btn ${isActive}" onclick="goToPage(${i})">${i}</button>`;
                 }
             } else {
+                // Logic phức tạp hơn cho nhiều trang
                 const startPage = Math.max(1, currentPageNumber - 2);
                 const endPage = Math.min(totalPages, startPage + 4);
                 
@@ -328,6 +337,7 @@
                 }
             }
             
+            // Nút Next
             if (currentPageNumber < totalPages) {
                 paginationHTML += `<button class="userlist-pagination-btn" onclick="goToPage(${currentPageNumber + 1})">Sau ›</button>`;
             }
@@ -358,16 +368,18 @@
                 const searchMatch = !searchTerm || searchData.includes(searchTerm);
                 
                 if (roleMatch && statusMatch && searchMatch) {
-                    row.classList.remove('filtered-out');
+                    row.style.display = '';
                 } else {
-                    row.classList.add('filtered-out');
+                    row.style.display = 'none';
                 }
             });
             
+            // Reset về trang đầu và cập nhật phân trang
             currentPageNumber = 1;
             updatePagination();
         }
 
+        // API Functions
         function saveUser() {
             const userData = {
                 Username: document.getElementById('addUserName').value,
@@ -483,55 +495,10 @@
             });
         }
 
+        // Khởi tạo phân trang khi trang load xong
         document.addEventListener('DOMContentLoaded', function() {
             updatePagination();
-            loadRoles();
         });
-
-        function loadRoles() {
-            fetch('/api/Authorization/Users/roles')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        populateRoleDropdowns(data.data);
-                    } else {
-                        console.error('Error loading roles:', data.message);
-                        populateRoleDropdowns([]);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading roles:', error);
-                    populateRoleDropdowns([]);
-                });
-        }
-
-        function populateRoleDropdowns(roles) {
-            const addRoleSelect = document.getElementById('addRole');
-            const editRoleSelect = document.getElementById('editRole');
-            const roleFilterSelect = document.getElementById('roleFilter');
-
-            addRoleSelect.innerHTML = '<option value="">Chọn vai trò</option>';
-            editRoleSelect.innerHTML = '<option value="">Chọn vai trò</option>';
-            
-            roleFilterSelect.innerHTML = '<option value="">Tất cả</option>';
-
-            if (roles && roles.length > 0) {
-                roles.forEach(role => {
-                    const addOption = new Option(role.display, role.value);
-                    const editOption = new Option(role.display, role.value);
-                    const filterOption = new Option(role.display, role.value);
-
-                    addRoleSelect.appendChild(addOption);
-                    editRoleSelect.appendChild(editOption);
-                    roleFilterSelect.appendChild(filterOption);
-                });
-            } else {
-                const noRoleOption = new Option('Không có vai trò nào', '');
-                noRoleOption.disabled = true;
-                addRoleSelect.appendChild(noRoleOption);
-                editRoleSelect.appendChild(noRoleOption.cloneNode(true));
-            }
-        }
     </script>
 
 </body>
