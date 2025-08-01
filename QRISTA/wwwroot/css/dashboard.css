@@ -376,27 +376,45 @@ body {
 }
 
 .stat-card {
-    background: white;
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-left: 4px solid;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 28px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-.stat-card.blue {
-    border-left-color: #4285f4;
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: 16px 16px 0 0;
 }
 
-.stat-card.green {
-    border-left-color: #34a853;
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
-.stat-card.orange {
-    border-left-color: #ff9500;
+.stat-card.blue::before {
+    background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
 }
 
-.stat-card.purple {
-    border-left-color: #9c27b0;
+.stat-card.green::before {
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+.stat-card.orange::before {
+    background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+}
+
+.stat-card.purple::before {
+    background: linear-gradient(90deg, #8b5cf6 0%, #7c3aed 100%);
 }
 
 .stat-content {
@@ -406,49 +424,61 @@ body {
 }
 
 .stat-info h3 {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 8px;
-    font-weight: 500;
+    font-size: 15px;
+    color: #6b7280;
+    margin-bottom: 12px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
 }
 
 .stat-number {
-    font-size: 36px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 4px;
+    font-size: 40px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    line-height: 1;
 }
 
 .stat-change {
-    font-size: 12px;
-    color: #666;
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
 }
 
 .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 20px;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-icon {
+    transform: scale(1.1);
 }
 
 .stat-card.blue .stat-icon {
-    background: #4285f4;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
 }
 
 .stat-card.green .stat-icon {
-    background: #34a853;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
 .stat-card.orange .stat-icon {
-    background: #ff9500;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
 }
 
 .stat-card.purple .stat-icon {
-    background: #9c27b0;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
 }
 
 /* Chart Tabs */
@@ -568,5 +598,424 @@ body {
     
     .date-filter {
         flex-wrap: wrap;
+    }
+}
+
+/* Chart Section */
+.chart-section {
+    margin-top: 32px;
+}
+
+.chart-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+    margin-bottom: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.chart-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1 0%, #10b981 100%);
+    border-radius: 16px 16px 0 0;
+}
+
+.chart-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.chart-card h3 {
+    font-size: 22px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #374151 0%, #6b7280 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    letter-spacing: -0.025em;
+}
+
+.chart-subtitle {
+    color: #6b7280;
+    font-size: 15px;
+    margin-bottom: 32px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 400px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    padding: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.chart-wrapper canvas {
+    max-height: 400px !important;
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .chart-card {
+        padding: 24px 20px;
+        border-radius: 12px;
+    }
+    
+    .chart-card h3 {
+        font-size: 20px;
+    }
+    
+    .chart-subtitle {
+        font-size: 14px;
+        margin-bottom: 24px;
+    }
+    
+    .chart-wrapper {
+        height: 300px;
+        padding: 12px;
+    }
+    
+    .chart-wrapper canvas {
+        max-height: 300px !important;
+    }
+}
+
+/* Pie Charts Row */
+.pie-charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 32px;
+    width: 100%;
+    align-items: stretch; /* Đảm bảo cả 2 card có cùng chiều cao */
+}
+
+.pie-chart-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    min-width: 0; /* Đảm bảo grid item không vượt quá container */
+}
+
+.pie-chart-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 50%, #10b981 100%);
+    border-radius: 16px 16px 0 0;
+}
+
+.pie-chart-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.pie-chart-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #374151 0%, #6b7280 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 6px;
+    letter-spacing: -0.025em;
+}
+
+.pie-chart-card .chart-subtitle {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 24px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.pie-chart-wrapper {
+    position: relative;
+    height: 280px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pie-chart-wrapper canvas {
+    max-height: 280px !important;
+    max-width: 280px !important;
+}
+
+@media (max-width: 768px) {
+    .pie-charts-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-top: 24px;
+    }
+    
+    .pie-chart-card {
+        padding: 20px;
+        width: 100%;
+    }
+    
+    .pie-chart-card h3 {
+        font-size: 16px;
+    }
+    
+    .pie-chart-wrapper {
+        height: 240px;
+    }
+    
+    .pie-chart-wrapper canvas {
+        max-height: 240px !important;
+        max-width: 240px !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .pie-charts-row {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 32px;
+    }
+    
+    .pie-chart-card {
+        flex: none !important;
+        width: 100% !important;
+    }
+}
+
+/* Top Products Section */
+.top-products-section {
+    margin-bottom: 32px;
+}
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 20px;
+}
+
+.section-title i {
+    font-size: 28px;
+    color: #f59e0b;
+}
+
+.top-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.product-rank-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.product-rank-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.product-rank-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f59e0b, #eab308);
+    border-radius: 16px 16px 0 0;
+}
+
+.rank-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    width: fit-content;
+}
+
+.rank-badge i {
+    font-size: 20px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.rank-number {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.product-info {
+    text-align: left;
+}
+
+.product-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.product-code {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+.product-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Rank specific styles */
+.rank-1 {
+    background: linear-gradient(135deg, #fef3c7 0%, #ffffff 100%);
+}
+
+.rank-1::before {
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+}
+
+.rank-1 .rank-badge {
+    background: rgba(251, 191, 36, 0.15);
+    border-color: rgba(251, 191, 36, 0.3);
+}
+
+.rank-2 {
+    background: linear-gradient(135deg, #f3f4f6 0%, #ffffff 100%);
+}
+
+.rank-2::before {
+    background: linear-gradient(90deg, #9ca3af, #6b7280);
+}
+
+.rank-2 .rank-badge {
+    background: rgba(156, 163, 175, 0.15);
+    border-color: rgba(156, 163, 175, 0.3);
+}
+
+.rank-3 {
+    background: linear-gradient(135deg, #fef2e6 0%, #ffffff 100%);
+}
+
+.rank-3::before {
+    background: linear-gradient(90deg, #cd7f32, #b8671f);
+}
+
+.rank-3 .rank-badge {
+    background: rgba(205, 127, 50, 0.15);
+    border-color: rgba(205, 127, 50, 0.3);
+}
+
+.rank-4 {
+    background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+}
+
+.rank-4::before {
+    background: linear-gradient(90deg, #60a5fa, #3b82f6);
+}
+
+.rank-4 .rank-badge {
+    background: rgba(96, 165, 250, 0.15);
+    border-color: rgba(96, 165, 250, 0.3);
+}
+
+.rank-5 {
+    background: linear-gradient(135deg, #f3e8ff 0%, #ffffff 100%);
+}
+
+.rank-5::before {
+    background: linear-gradient(90deg, #a855f7, #9333ea);
+}
+
+.rank-5 .rank-badge {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.3);
+}
+
+/* Responsive design for top products */
+@media (max-width: 768px) {
+    .top-products-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .product-rank-card {
+        padding: 20px;
+    }
+    
+    .section-title {
+        font-size: 20px;
+    }
+    
+    .section-title i {
+        font-size: 24px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .top-products-grid {
+        grid-template-columns: repeat(5, 1fr);
     }
 }

@@ -72,20 +72,20 @@
         <main class="main-content">
             <div class="dashboard-header">
                 <h1 class="page-title">Thống kê hệ thống</h1>
-                <div class="date-filter">
+                <form method="get" class="date-filter">
                     <div class="date-input-group">
                         <label>Từ:</label>
-                        <input type="date" value="2025-01-06" />
+                        <input type="date" name="FromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" />
                     </div>
                     <div class="date-input-group">
                         <label>Đến:</label>
-                        <input type="date" value="2025-01-07" />
+                        <input type="date" name="ToDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
                     </div>
-                    <button class="update-btn">
+                    <button type="submit" class="update-btn">
                         <i class="fas fa-sync-alt"></i>
                         Cập nhật
                     </button>
-                </div>
+                </form>
             </div>
 
             <!-- Stats Cards -->
@@ -93,12 +93,12 @@
                 <div class="stat-card blue">
                     <div class="stat-content">
                         <div class="stat-info">
-                            <h3>Tổng người dùng</h3>
-                            <div class="stat-number">59</div>
-                            <div class="stat-change">+0 trong tháng này</div>
+                            <h3>Số lượt người mua</h3>
+                            <div class="stat-number">@Model.SoLuotNguoiMuaTrongNgay</div>
+                            <div class="stat-change">@(Model.ThayDoiNguoiMua >= 0 ? "+" : "")@Model.ThayDoiNguoiMua so với kỳ trước</div>
                         </div>
                         <div class="stat-icon">
-                            <i class="fas fa-users"></i>
+                            <i class="fas fa-shopping-cart"></i>
                         </div>
                     </div>
                 </div>
@@ -106,12 +106,12 @@
                 <div class="stat-card green">
                     <div class="stat-content">
                         <div class="stat-info">
-                            <h3>Người dùng trực tuyến</h3>
-                            <div class="stat-number">0</div>
-                            <div class="stat-change">0% tổng số</div>
+                            <h3>Tổng giá trị mua</h3>
+                            <div class="stat-number">@Model.TongGiaTriMua.ToString("N0")₫</div>
+                            <div class="stat-change">@(Model.ThayDoiGiaTri >= 0 ? "+" : "")@Model.ThayDoiGiaTri.ToString("N0")₫ so với kỳ trước</div>
                         </div>
                         <div class="stat-icon">
-                            <i class="fas fa-user-check"></i>
+                            <i class="fas fa-dollar-sign"></i>
                         </div>
                     </div>
                 </div>
@@ -119,12 +119,12 @@
                 <div class="stat-card orange">
                     <div class="stat-content">
                         <div class="stat-info">
-                            <h3>Tổng khóa học</h3>
-                            <div class="stat-number">1</div>
-                            <div class="stat-change">46% hoàn thành trung bình</div>
+                            <h3>Số lượng sản phẩm mua</h3>
+                            <div class="stat-number">@Model.SoLuongSanPhamMua</div>
+                            <div class="stat-change">@(Model.ThayDoiSanPham >= 0 ? "+" : "")@Model.ThayDoiSanPham sản phẩm so với kỳ trước</div>
                         </div>
                         <div class="stat-icon">
-                            <i class="fas fa-book"></i>
+                            <i class="fas fa-box"></i>
                         </div>
                     </div>
                 </div>
@@ -132,81 +132,399 @@
                 <div class="stat-card purple">
                     <div class="stat-content">
                         <div class="stat-info">
-                            <h3>Tăng giờ học</h3>
-                            <div class="stat-number">2 giờ</div>
-                            <div class="stat-change">41 phiên học tập (0.3 giờ/người dùng)</div>
+                            <h3>Số lượng hóa đơn</h3>
+                            <div class="stat-number">@Model.SoLuongHoaDonTrongNgay</div>
+                            <div class="stat-change">@(Model.ThayDoiHoaDon >= 0 ? "+" : "")@Model.ThayDoiHoaDon hóa đơn so với kỳ trước</div>
                         </div>
                         <div class="stat-icon">
-                            <i class="fas fa-clock"></i>
+                            <i class="fas fa-receipt"></i>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Chart Tabs -->
-            <div class="chart-tabs">
-                <button class="tab-btn active" data-tab="overview">
-                    <i class="fas fa-clock"></i>
-                    Tổng quan
-                </button>
-                <button class="tab-btn" data-tab="users">
-                    <i class="fas fa-users"></i>
-                    Người dùng
-                </button>
-                <button class="tab-btn" data-tab="courses">
-                    <i class="fas fa-book"></i>
-                    Khóa học
-                </button>
-                <button class="tab-btn" data-tab="activities">
-                    <i class="fas fa-chart-line"></i>
-                    Hoạt động
-                </button>
+            <!-- Top Products Section -->
+            <div class="top-products-section">
+                <h2 class="section-title">
+                    <i class="fas fa-trophy"></i>
+                    Top 5 sản phẩm bán chạy nhất
+                </h2>
+                <div class="top-products-grid">
+                    @foreach (var product in Model.TopProducts)
+                    {
+                        <div class="product-rank-card rank-@product.Rank">
+                            <div class="rank-badge">
+                                <i class="@product.RankIcon" style="color: @product.RankColor;"></i>
+                                <span class="rank-number">#@product.Rank</span>
+                            </div>
+                            <div class="product-info">
+                                <h4 class="product-name">@product.TenSanPham</h4>
+                                <p class="product-code">@product.MaSanPham</p>
+                                <div class="product-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">Số lượng:</span>
+                                        <span class="stat-value">@product.TongSoLuong</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">Doanh thu:</span>
+                                        <span class="stat-value">@product.TongDoanhThu.ToString("N0")₫</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
             </div>
 
-            <!-- Charts Container -->
-            <div class="charts-container">
-                <div class="chart-section">
-                    <div class="chart-card">
-                        <h3>Người dùng theo vai trò</h3>
-                        <p class="chart-subtitle">Phân bố người dùng theo vai trò trong hệ thống</p>
-                        <div class="chart-wrapper">
-                            <canvas id="userRoleChart"></canvas>
-                        </div>
-                        <div class="chart-legend">
-                            <div class="legend-item">
-                                <span class="legend-color" style="background-color: #4285f4;"></span>
-                                <span>Quản trị viên</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background-color: #34a853;"></span>
-                                <span>Người dùng</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background-color: #fbbc05;"></span>
-                                <span>Điều hành viên</span>
-                            </div>
-                        </div>
+            <!-- Chart Section -->
+            <div class="chart-section">
+                <!-- Biểu đồ đường -->
+                <div class="chart-card">
+                    <h3>Biến động đơn hàng và số lượng sản phẩm</h3>
+                    <p class="chart-subtitle">Theo dõi xu hướng đơn hàng và số lượng sản phẩm bán ra theo ngày</p>
+                    <div class="chart-wrapper">
+                        <canvas id="orderTrendChart" style="height: 400px;"></canvas>
                     </div>
                 </div>
 
-                <div class="chart-section">
-                    <div class="chart-card">
-                        <h3>Khóa học phổ biến</h3>
-                        <p class="chart-subtitle">Khóa học được nhiều người học nhất</p>
-                        <div class="chart-wrapper">
-                            <canvas id="popularCoursesChart"></canvas>
+                <!-- Biểu đồ tròn - hàng ngang -->
+                <div class="pie-charts-row">
+                    <div class="pie-chart-card">
+                        <h3>Phân tích đơn hàng theo thứ</h3>
+                        <p class="chart-subtitle">Xem thứ nào có lượng khách đột biến</p>
+                        <div class="pie-chart-wrapper">
+                            <canvas id="weekdayChart"></canvas>
                         </div>
-                        <div class="chart-legend">
-                            <div class="legend-item">
-                                <span class="legend-color" style="background-color: #4285f4;"></span>
-                                <span>Số người học</span>
-                            </div>
+                    </div>
+
+                    <div class="pie-chart-card">
+                        <h3>Bàn được sử dụng nhiều nhất</h3>
+                        <p class="chart-subtitle">Thống kê tần suất sử dụng các bàn</p>
+                        <div class="pie-chart-wrapper">
+                            <canvas id="tableUsageChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
+
+    <script>
+        // Dữ liệu từ server
+        const chartLabels = @Html.Raw(Json.Serialize(Model.ChartLabels));
+        const orderData = @Html.Raw(Json.Serialize(Model.ChartOrderData));
+        const quantityData = @Html.Raw(Json.Serialize(Model.ChartQuantityData));
+        const weekdayLabels = @Html.Raw(Json.Serialize(Model.WeekdayLabels));
+        const weekdayOrderData = @Html.Raw(Json.Serialize(Model.WeekdayOrderData));
+        const tableLabels = @Html.Raw(Json.Serialize(Model.TableLabels));
+        const tableUsageData = @Html.Raw(Json.Serialize(Model.TableUsageData));
+
+        // 1. Biểu đồ xu hướng đơn hàng (line chart)
+        const ctx = document.getElementById('orderTrendChart').getContext('2d');
+        
+        // Tạo gradient cho đường đơn hàng
+        const orderGradient = ctx.createLinearGradient(0, 0, 0, 400);
+        orderGradient.addColorStop(0, 'rgba(99, 102, 241, 0.8)');
+        orderGradient.addColorStop(0.5, 'rgba(99, 102, 241, 0.4)');
+        orderGradient.addColorStop(1, 'rgba(99, 102, 241, 0.1)');
+        
+        // Tạo gradient cho đường số lượng sản phẩm
+        const quantityGradient = ctx.createLinearGradient(0, 0, 0, 400);
+        quantityGradient.addColorStop(0, 'rgba(16, 185, 129, 0.8)');
+        quantityGradient.addColorStop(0.5, 'rgba(16, 185, 129, 0.4)');
+        quantityGradient.addColorStop(1, 'rgba(16, 185, 129, 0.1)');
+        
+        const orderTrendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Số đơn hàng',
+                    data: orderData,
+                    borderColor: '#6366f1',
+                    backgroundColor: orderGradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#4f46e5',
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 3,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Số lượng sản phẩm',
+                    data: quantityData,
+                    borderColor: '#10b981',
+                    backgroundColor: quantityGradient,
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#059669',
+                    pointHoverBorderColor: '#ffffff',
+                    pointHoverBorderWidth: 3,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            padding: 20,
+                            font: {
+                                size: 14
+                            },
+                            color: '#374151'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#374151',
+                        bodyColor: '#6b7280',
+                        borderColor: '#e5e7eb',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12,
+                        displayColors: true,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: {
+                            display: true,
+                            color: 'rgba(156, 163, 175, 0.2)',
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Ngày',
+                            color: '#374151',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        grid: {
+                            color: 'rgba(156, 163, 175, 0.2)',
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            color: '#6366f1',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Số đơn hàng',
+                            color: '#6366f1',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                        ticks: {
+                            color: '#10b981',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Số lượng sản phẩm',
+                            color: '#10b981',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    line: {
+                        tension: 0.4
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // 2. Biểu đồ tròn phân tích thứ trong tuần
+        const weekdayCtx = document.getElementById('weekdayChart').getContext('2d');
+        const weekdayColors = [
+            '#ef4444', // Chủ nhật - đỏ
+            '#3b82f6', // Thứ hai - xanh dương
+            '#10b981', // Thứ ba - xanh lá
+            '#f59e0b', // Thứ tư - vàng
+            '#8b5cf6', // Thứ năm - tím
+            '#ec4899', // Thứ sáu - hồng
+            '#06b6d4'  // Thứ bảy - xanh cyan
+        ];
+
+        const weekdayChart = new Chart(weekdayCtx, {
+            type: 'doughnut',
+            data: {
+                labels: weekdayLabels,
+                datasets: [{
+                    data: weekdayOrderData,
+                    backgroundColor: weekdayColors,
+                    borderColor: '#ffffff',
+                    borderWidth: 3,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 12
+                            },
+                            color: '#374151',
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#374151',
+                        bodyColor: '#6b7280',
+                        borderColor: '#e5e7eb',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((context.parsed * 100) / total).toFixed(1) : 0;
+                                return context.label + ': ' + context.parsed + ' đơn (' + percentage + '%)';
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // 3. Biểu đồ tròn phân tích bàn
+        const tableCtx = document.getElementById('tableUsageChart').getContext('2d');
+        const tableColors = [
+            '#6366f1', '#8b5cf6', '#ec4899', '#ef4444', '#f59e0b',
+            '#10b981', '#06b6d4', '#84cc16', '#f97316', '#64748b'
+        ];
+
+        const tableUsageChart = new Chart(tableCtx, {
+            type: 'doughnut',
+            data: {
+                labels: tableLabels,
+                datasets: [{
+                    data: tableUsageData,
+                    backgroundColor: tableColors.slice(0, tableLabels.length),
+                    borderColor: '#ffffff',
+                    borderWidth: 3,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                size: 12
+                            },
+                            color: '#374151',
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#374151',
+                        bodyColor: '#6b7280',
+                        borderColor: '#e5e7eb',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((context.parsed * 100) / total).toFixed(1) : 0;
+                                return context.label + ': ' + context.parsed + ' lần (' + percentage + '%)';
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+    </script>
 
     <script src="~/js/dashboard.js"></script>
 </body>

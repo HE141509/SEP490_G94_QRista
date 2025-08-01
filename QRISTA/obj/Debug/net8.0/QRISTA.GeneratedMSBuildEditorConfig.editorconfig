@@ -24,6 +24,22 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aG9yaXphdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/Authorization/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aG9yaXphdGlvblxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/Authorization/Permissions.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aG9yaXphdGlvblxQZXJtaXNzaW9ucy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/Authorization/Roles.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aG9yaXphdGlvblxSb2xlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Github/SEP490_G94_QRista/QRISTA/Pages/Authorization/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aG9yaXphdGlvblxVc2Vycy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [E:/Github/SEP490_G94_QRista/QRISTA/Pages/Branch/AddBranch.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQnJhbmNoXEFkZEJyYW5jaC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
