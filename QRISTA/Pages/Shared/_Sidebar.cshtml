@@ -11,16 +11,22 @@
                     <span>Thống kê hệ thống</span>
                 </a>
             </li>
-            <li class="nav-item">
+            @* <li class="nav-item">
                 <a href="/User/UserList" class="nav-link@(currentPath.StartsWith("/user") ? " active" : "")">
                     <i class="fas fa-users"></i>
                     <span>Quản lý người dùng</span>
                 </a>
-            </li>
+            </li> *@
             <li class="nav-item">
                 <a href="/Branch/BranchList" class="nav-link@(currentPath.StartsWith("/branch") ? " active" : "")">
                     <i class="fas fa-store"></i>
                     <span>Chi nhánh</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/Order/OrderList" class="nav-link@(currentPath.StartsWith("/order/orderlist") ? " active" : "")">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Hóa đơn</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -41,6 +47,17 @@
                     <li><a href="/ProductType/ProductTypeList" class="nav-link@(currentPath.StartsWith("/producttype") ? " active" : "")">Loại sản phẩm</a></li>
                 </ul>
             </li>
+            <li class="nav-item sidebar-kho-parent">
+                <a href="#" class="nav-link sidebar-kho-toggle@(currentPath.StartsWith("/nguyenlieu") || currentPath.StartsWith("/khosanpham") ? " active" : "")" onclick="toggleSidebarKhoMenu(event)">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Quản lý kho</span>
+                    <i class="fas fa-chevron-down sidebar-chevron" style="float:right;margin-top:4px;"></i>
+                </a>
+                <ul class="sidebar-submenu" id="sidebar-kho-submenu" style="display:none;">
+                    <li><a href="/NguyenLieu/NguyenLieuList" class="nav-link@(currentPath.StartsWith("/nguyenlieu") ? " active" : "")">Nguyên liệu</a></li>
+                    <li><a href="/KhoSanPham/KhoSanPhamList" class="nav-link@(currentPath.StartsWith("/khosanpham") ? " active" : "")">Kho sản phẩm</a></li>
+                </ul>
+            </li>
             <li class="nav-item">
                 <a href="/UuDai/MaUuDaiList" class="nav-link@(currentPath.StartsWith("/uudai") ? " active" : "")">
                     <i class="fas fa-gift"></i>
@@ -48,10 +65,28 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="/DeXuatMuaSam/DeXuatMuaSamList" class="nav-link@(currentPath.StartsWith("/dexuatmuasam") ? " active" : "")">
+                    <i class="fas fa-file-invoice"></i>
+                    <span>Đề xuất mua sắm</span>
+                </a>
+            </li>
+            @* <li class="nav-item">
                 <a href="/Authorization" class="nav-link@(currentPath.StartsWith("/authorization") ? " active" : "")">
                     <i class="fas fa-shield-alt"></i>
                     <span>Phân quyền</span>
                 </a>
+            </li> *@
+            <li class="nav-item sidebar-authorization-parent">
+                <a href="#" class="nav-link sidebar-authorization-toggle@(currentPath.StartsWith("/authorization") ? " active" : "")" onclick="toggleSidebarAuthorizationMenu(event)">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Phân quyền</span>
+                    <i class="fas fa-chevron-down sidebar-chevron" style="float:right;margin-top:4px;"></i>
+                </a>
+                <ul class="sidebar-submenu" id="sidebar-authorization-submenu" style="display:none;">
+                    <li><a href="/Authorization/Users" class="nav-link@(currentPath.StartsWith("/authorization/users") ? " active" : "")">Quản lý người dùng</a></li>
+                    <li><a href="/Authorization/Roles" class="nav-link@(currentPath.StartsWith("/authorization/roles") ? " active" : "")">Quản lý vai trò</a></li>
+                    <li><a href="/Authorization/Permissions" class="nav-link@(currentPath.StartsWith("/authorization/permissions") ? " active" : "")">Ma trận phân quyền</a></li>
+                </ul>
             </li>
         </ul>
     </div>
@@ -86,11 +121,33 @@
     .sidebar-product-toggle {
         font-weight: 600;
     }
+    .sidebar-authorization-toggle {
+        font-weight: 600;
+    }
 </style>
 <script>
 function toggleSidebarProductMenu(e) {
     e.preventDefault();
     var submenu = document.getElementById('sidebar-product-submenu');
+    if (submenu.style.display === 'none' || submenu.style.display === '') {
+        submenu.style.display = 'block';
+    } else {
+        submenu.style.display = 'none';
+    }
+}
+function toggleSidebarAuthorizationMenu(e) {
+    e.preventDefault();
+    var submenu = document.getElementById('sidebar-authorization-submenu');
+    if (submenu.style.display === 'none' || submenu.style.display === '') {
+        submenu.style.display = 'block';
+    } else {
+        submenu.style.display = 'none';
+    }
+}
+
+function toggleSidebarKhoMenu(e) {
+    e.preventDefault();
+    var submenu = document.getElementById('sidebar-kho-submenu');
     if (submenu.style.display === 'none' || submenu.style.display === '') {
         submenu.style.display = 'block';
     } else {

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using QRB.Models;
+using QRB.Models.Authorization;
 
 namespace QRB.Data
 {
@@ -24,6 +25,11 @@ namespace QRB.Data
         public DbSet<DeXuatMuaSam> DeXuatMuaSams { get; set; }
         public DbSet<ChiTietDonDeXuat> ChiTietDonDeXuats { get; set; }
         public DbSet<NhomSanPham> NhomSanPhams { get; set; }
+        
+        // Authorization DbSets
+        public DbSet<AppRole> Roles { get; set; }
+        public DbSet<AppPermission> Permissions { get; set; }
+        public DbSet<AppRolePermission> RolePermissions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -83,6 +89,11 @@ namespace QRB.Data
                 entity.HasOne(d => d.ChiNhanh)
                     .WithMany(p => p.NguoiDungs)
                     .HasForeignKey(d => d.IDChiNhanh);
+                
+                // Cấu hình các trường mới
+                entity.Property(e => e.VaiTro).HasDefaultValue("Staff");
+                entity.Property(e => e.TrangThaiHoatDong).HasDefaultValue(true);
+                entity.Property(e => e.Email).IsRequired(false);
             });
 
             // DonHang
@@ -100,6 +111,10 @@ namespace QRB.Data
                 entity.HasOne(d => d.ChiNhanh)
                     .WithMany(p => p.DonHangs)
                     .HasForeignKey(d => d.IDChiNhanh);
+
+                // Configure new properties for DonHang
+                entity.Property(e => e.TrangThaiThanhToan).HasDefaultValue(false);
+                entity.Property(e => e.NgayThanhToan).IsRequired(false);
             });
 
             // ChiTietDonHang
@@ -145,9 +160,6 @@ namespace QRB.Data
                 entity.HasOne(d => d.NguyenLieu)
                     .WithMany(p => p.KhoSanPhams)
                     .HasForeignKey(d => d.IDNguyenLieu);
-                entity.HasOne(d => d.SanPham)
-                    .WithMany(p => p.KhoSanPhams)
-                    .HasForeignKey(d => d.IDSanPham);
                 entity.HasOne(d => d.ChiNhanh)
                     .WithMany(p => p.KhoSanPhams)
                     .HasForeignKey(d => d.IDChiNhanh);
@@ -196,6 +208,40 @@ namespace QRB.Data
                 entity.HasOne(d => d.NguyenLieu)
                     .WithMany(p => p.ChiTietDonDeXuats)
                     .HasForeignKey(d => d.IDNguyenLieu);
+            });
+
+            // Authorization Tables Configuration
+            modelBuilder.Entity<AppRole>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.Name).IsUnique();
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Description).HasMaxLength(200);
+                entity.Property(e => e.CreatedAt).IsRequired(false);
+            });
+
+            modelBuilder.Entity<AppPermission>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Description).HasMaxLength(200);
+                entity.Property(e => e.Module).HasMaxLength(50).IsRequired(false);
+                entity.Property(e => e.CreatedAt).IsRequired(false);
+            });
+
+            modelBuilder.Entity<AppRolePermission>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.RolePermissions)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(d => d.Permission)
+                    .WithMany(p => p.RolePermissions)
+                    .HasForeignKey(d => d.PermissionId)
+                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasIndex(e => new { e.RoleId, e.PermissionId }).IsUnique();
+                entity.Property(e => e.GrantedAt).IsRequired(false);
             });
 
             // Seed data mẫu
@@ -261,7 +307,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Cà phê đen",
                     MaLoai = "CFD001",
-                    DonGia = 25000,
+                    DonGia = "25000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 },
@@ -272,7 +318,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Cà phê sữa",
                     MaLoai = "CFS001",
-                    DonGia = 30000,
+                    DonGia = "30000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 },
@@ -283,7 +329,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Trà sữa",
                     MaLoai = "TS001",
-                    DonGia = 35000,
+                    DonGia = "35000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 },
@@ -294,7 +340,7 @@ namespace QRB.Data
                     IDChiNhanh = chiNhanhId,
                     TenLoai = "Bánh croissant",
                     MaLoai = "BC001",
-                    DonGia = 40000,
+                    DonGia = "40000",
                     IsDelete = false,
                     CreateTime = DateTime.Now
                 }
