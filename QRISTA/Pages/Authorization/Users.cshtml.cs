@@ -16,6 +16,7 @@ namespace QRB.Pages.Authorization
         }
 
         public List<NguoiDung> Users { get; set; } = new List<NguoiDung>();
+        public string CurrentUserRole { get; private set; } = string.Empty;
         public int CurrentPage { get; set; } = 1;
         public int PageSize { get; set; } = 10;
         public int TotalRecords { get; set; }
@@ -37,6 +38,9 @@ namespace QRB.Pages.Authorization
             {
                 return RedirectToPage("/Login");
             }
+
+            // Lấy vai trò người dùng từ session
+            CurrentUserRole = HttpContext.Session.GetString("VaiTro") ?? "Người dùng";
 
             CurrentPage = pageNumber;
             PageSize = pageSize;

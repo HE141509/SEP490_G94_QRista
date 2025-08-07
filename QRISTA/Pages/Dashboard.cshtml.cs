@@ -15,6 +15,7 @@ namespace QRB.Pages
         }
 
         public string UserName { get; private set; } = string.Empty;
+        public string CurrentUserRole { get; private set; } = string.Empty;
         public bool IsLoggedIn { get; private set; }
         
         // Bộ lọc ngày
@@ -66,6 +67,7 @@ namespace QRB.Pages
 
             IsLoggedIn = true;
             UserName = HttpContext.Session.GetString("DisplayName") ?? username;
+            CurrentUserRole = HttpContext.Session.GetString("VaiTro") ?? "Người dùng";
 
             // Thiết lập ngày mặc định nếu chưa có
             if (!FromDate.HasValue)

@@ -19,6 +19,7 @@ namespace QRB.Pages.Authorization
         public List<AppPermission> Permissions { get; set; } = new List<AppPermission>();
         public List<AppRolePermission> RolePermissions { get; set; } = new List<AppRolePermission>();
         public Dictionary<string, List<AppPermission>> PermissionGroups { get; set; } = new Dictionary<string, List<AppPermission>>();
+        public string CurrentUserRole { get; private set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -27,6 +28,9 @@ namespace QRB.Pages.Authorization
             {
                 return RedirectToPage("/Login");
             }
+
+            // Lấy vai trò người dùng từ session
+            CurrentUserRole = HttpContext.Session.GetString("VaiTro") ?? "Người dùng";
 
             try
             {

@@ -93,6 +93,7 @@ namespace QRB.Pages
                         HttpContext.Session.SetString("DisplayName", "Quản trị viên");
                         HttpContext.Session.SetString("ChiNhanhId", Guid.NewGuid().ToString());
                         HttpContext.Session.SetString("ChiNhanhName", "QRB Coffee - Chi nhánh chính");
+                        HttpContext.Session.SetString("VaiTro", "Quản trị viên");
                         return RedirectToPage("/Dashboard");
                     }
                     else if (Username == "staff" && Password == "123456")
@@ -102,6 +103,7 @@ namespace QRB.Pages
                         HttpContext.Session.SetString("DisplayName", "Nhân viên");
                         HttpContext.Session.SetString("ChiNhanhId", Guid.NewGuid().ToString());
                         HttpContext.Session.SetString("ChiNhanhName", "QRB Coffee - Chi nhánh chính");
+                        HttpContext.Session.SetString("VaiTro", "Nhân viên");
                         return RedirectToPage("/Dashboard");
                     }
                     else

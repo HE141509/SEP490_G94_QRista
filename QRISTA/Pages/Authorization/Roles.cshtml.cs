@@ -16,6 +16,7 @@ namespace QRB.Pages.Authorization
         }
 
         public List<RoleWithUserCount> Roles { get; set; } = new List<RoleWithUserCount>();
+        public string CurrentUserRole { get; private set; } = string.Empty;
 
         public async Task<IActionResult> OnGetAsync()
         {
@@ -24,6 +25,9 @@ namespace QRB.Pages.Authorization
             {
                 return RedirectToPage("/Login");
             }
+
+            // Lấy vai trò người dùng từ session
+            CurrentUserRole = HttpContext.Session.GetString("VaiTro") ?? "Người dùng";
 
             try
             {

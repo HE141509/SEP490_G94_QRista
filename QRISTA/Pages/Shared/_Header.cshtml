@@ -1,6 +1,8 @@
 @* Shared header for QRB app *@
 @{
     string? displayName = null;
+    string? userRole = null;
+    
     if (Model != null)
     {
         // Ưu tiên lấy thuộc tính CurrentUserDisplayName nếu có
@@ -17,10 +19,32 @@
             if (prop != null)
                 displayName = prop.GetValue(Model) as string;
         }
+        
+        // Lấy vai trò người dùng
+        prop = modelType.GetProperty("CurrentUserRole");
+        if (prop != null)
+        {
+            userRole = prop.GetValue(Model) as string;
+        }
     }
+    
     if (string.IsNullOrEmpty(displayName))
         displayName = Context?.Session?.GetString("DisplayName") ?? Context?.Session?.GetString("Username") ?? "Người dùng";
+    
+    if (string.IsNullOrEmpty(userRole))
+        userRole = Context?.Session?.GetString("VaiTro") ?? "Người dùng";
+        
     var avatarChar = !string.IsNullOrEmpty(displayName) ? displayName.Trim().Substring(0,1).ToUpper() : "U";
+    
+    // Xác định class CSS cho vai trò
+    string roleClass = userRole.ToLower() switch
+    {
+        "quản trị viên" or "admin" => "role-admin",
+        "quản lý" or "manager" => "role-manager", 
+        "nhân viên" or "staff" => "role-staff",
+        "kế toán" or "accountant" => "role-accountant",
+        _ => "role-user"
+    };
 }
 <header class="header">
     <div class="header-left">
@@ -39,9 +63,8 @@
             <button class="notification-btn">
                 <i class="fas fa-bell"></i>
             </button>
-            <button class="help-btn">
-                <i class="fas fa-question-circle"></i>
-                <span>Quản trị viên</span>
+            <button class="help-btn @roleClass">
+                <span>@userRole</span>
             </button>
             <div class="user-profile">
                 <span class="user-name">@displayName</span>
