@@ -18,7 +18,7 @@ namespace QRB.Models.Authorization
         
         public bool? IsActive { get; set; } = true;
         
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
         
         // Navigation properties
         public virtual ICollection<AppRolePermission> RolePermissions { get; set; } = new List<AppRolePermission>();
@@ -38,9 +38,9 @@ namespace QRB.Models.Authorization
         public string Description { get; set; } = string.Empty;
         
         [StringLength(50)]
-        public string Module { get; set; } = string.Empty;
+        public string? Module { get; set; }
         
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
         
         // Navigation properties
         public virtual ICollection<AppRolePermission> RolePermissions { get; set; } = new List<AppRolePermission>();
@@ -58,7 +58,7 @@ namespace QRB.Models.Authorization
         [Required]
         public string PermissionId { get; set; } = string.Empty;
         
-        public DateTime GrantedAt { get; set; } = DateTime.Now;
+        public DateTime? GrantedAt { get; set; } = DateTime.Now;
         
         // Navigation properties
         [ForeignKey("RoleId")]
@@ -99,6 +99,20 @@ namespace QRB.Models.Authorization
         public bool IsActive { get; set; } = true;
     }
 
+    public class CreatePermissionRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string? Module { get; set; }
+    }
+
+    public class UpdatePermissionRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string? Module { get; set; }
+    }
+
     public class TogglePermissionRequest
     {
         public string RoleId { get; set; } = string.Empty;
@@ -116,7 +130,7 @@ namespace QRB.Models.Authorization
         public bool IsActive { get; set; }
         public string? Email { get; set; }
         public string BranchName { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 
     public class RoleViewModel
@@ -126,7 +140,7 @@ namespace QRB.Models.Authorization
         public string Description { get; set; } = string.Empty;
         public int UserCount { get; set; }
         public int PermissionCount { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
     }
 
     public class PermissionViewModel
@@ -134,7 +148,7 @@ namespace QRB.Models.Authorization
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string Module { get; set; } = string.Empty;
+        public string? Module { get; set; }
         public bool IsAssigned { get; set; }
     }
 

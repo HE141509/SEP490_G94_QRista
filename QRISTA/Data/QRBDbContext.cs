@@ -217,6 +217,7 @@ namespace QRB.Data
                 entity.HasIndex(e => e.Name).IsUnique();
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.Description).HasMaxLength(200);
+                entity.Property(e => e.CreatedAt).IsRequired(false);
             });
 
             modelBuilder.Entity<AppPermission>(entity =>
@@ -224,7 +225,8 @@ namespace QRB.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Description).HasMaxLength(200);
-                entity.Property(e => e.Module).HasMaxLength(50);
+                entity.Property(e => e.Module).HasMaxLength(50).IsRequired(false);
+                entity.Property(e => e.CreatedAt).IsRequired(false);
             });
 
             modelBuilder.Entity<AppRolePermission>(entity =>
@@ -239,6 +241,7 @@ namespace QRB.Data
                     .HasForeignKey(d => d.PermissionId)
                     .OnDelete(DeleteBehavior.Cascade);
                 entity.HasIndex(e => new { e.RoleId, e.PermissionId }).IsUnique();
+                entity.Property(e => e.GrantedAt).IsRequired(false);
             });
 
             // Seed data mẫu

@@ -6,6 +6,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using QRB.Models;
+using System.Text.Json;
 
 namespace QRB.Pages.Customer
 {
@@ -21,13 +22,36 @@ namespace QRB.Pages.Customer
             _configuration = configuration;
         }
 
-        public void OnGet()
+        private bool HasPermission(string permissionName)
+        {
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public IActionResult OnGet()
         {
             if (HttpContext.Session.GetString("Username") == null)
             {
-                Response.Redirect("/Login");
-                return;
+                return Redirect("/Index");
             }
+
+            // Kiểm tra quyền truy cập
+            if (!HasPermission("Full Customers"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Customers&module=Customers");
+            }
+
             UserName = HttpContext.Session.GetString("Username") ?? string.Empty;
             UserAvatar = HttpContext.Session.GetString("UserAvatar") ?? string.Empty;
             string connectionString = _configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
@@ -56,6 +80,7 @@ namespace QRB.Pages.Customer
                     }
                 }
             }
+            return Page();
         }
     }
 }

@@ -186,26 +186,6 @@
         </main>
     </div>
 
-    <!-- Modal xác nhận lưu -->
-    <div class="modal fade" id="saveConfirmModal" tabindex="-1" aria-labelledby="saveConfirmModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="saveConfirmModalLabel">Xác nhận lưu phân quyền</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Bạn có chắc chắn muốn lưu các thay đổi phân quyền?</p>
-                    <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> Thao tác này sẽ thay đổi quyền hạn của người dùng trong hệ thống.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-primary" onclick="confirmSavePermissions()">Xác nhận lưu</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let changedPermissions = new Map();
@@ -314,11 +294,6 @@
                 return;
             }
             
-            new bootstrap.Modal(document.getElementById('saveConfirmModal')).show();
-        }
-
-        // Xác nhận lưu phân quyền
-        function confirmSavePermissions() {
             const permissionsArray = Array.from(changedPermissions.values());
             
             fetch('/api/authorization/permissions/update-matrix', {
@@ -331,9 +306,12 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    bootstrap.Modal.getInstance(document.getElementById('saveConfirmModal')).hide();
                     changedPermissions.clear();
                     showToast('Cập nhật phân quyền thành công!', 'success');
+                    // Reload trang sau khi lưu thành công
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
                 } else {
                     showToast('Lỗi: ' + (data.message || 'Có lỗi xảy ra'), 'danger');
                 }

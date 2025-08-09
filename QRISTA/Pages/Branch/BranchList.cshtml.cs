@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
 using Microsoft.Data.SqlClient;
+using System.Text.Json;
 
 namespace QRB.Pages.Branch
 {
@@ -12,6 +13,7 @@ namespace QRB.Pages.Branch
         {
             _configuration = configuration;
         }
+        
         public class BranchInfo
         {
             public Guid ID { get; set; }
@@ -24,6 +26,24 @@ namespace QRB.Pages.Branch
         public List<BranchInfo> Branches { get; set; } = new List<BranchInfo>();
         public string? CurrentUserDisplayName { get; set; }
 
+        private bool HasPermission(string permissionName)
+        {
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public IActionResult OnGet()
         {
             var userId = HttpContext.Session.GetString("UserId");
@@ -31,6 +51,13 @@ namespace QRB.Pages.Branch
             {
                 return Redirect("/Index");
             }
+
+            // Kiểm tra quyền truy cập
+            if (!HasPermission("Full Branches"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Branches&module=Branches");
+            }
+
             CurrentUserDisplayName = HttpContext.Session.GetString("DisplayName");
 
             var connectionString = _configuration.GetConnectionString("DefaultConnection");

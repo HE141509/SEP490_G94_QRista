@@ -68,9 +68,24 @@ public class IndexModel : PageModel
                     }
                     else
                     {
-                        ErrorMessage = "Số điện thoại chưa đăng ký!";
-                        ModelState.AddModelError("PhoneNumber", ErrorMessage);
-                        return Page();
+                        // Chưa đăng ký, thêm mới khách hàng
+                        string insertSql = @"INSERT INTO KhachHang (ID, TenKhachHang, SDT, GiaTriDonHang, IsDelete, CreateTime) 
+                                           VALUES (@ID, @TenKhachHang, @SDT, @GiaTriDonHang, @IsDelete, @CreateTime)";
+                        using (var insertCommand = new Microsoft.Data.SqlClient.SqlCommand(insertSql, connection))
+                        {
+                            insertCommand.Parameters.AddWithValue("@ID", Guid.NewGuid());
+                            insertCommand.Parameters.AddWithValue("@TenKhachHang", PhoneNumber.Trim());
+                            insertCommand.Parameters.AddWithValue("@SDT", PhoneNumber.Trim());
+                            insertCommand.Parameters.AddWithValue("@GiaTriDonHang", 0);
+                            insertCommand.Parameters.AddWithValue("@IsDelete", false);
+                            insertCommand.Parameters.AddWithValue("@CreateTime", DateTime.Now);
+                            
+                            insertCommand.ExecuteNonQuery();
+                        }
+                        
+                        // Lưu số điện thoại vào session và chuyển đến menu
+                        HttpContext.Session.SetString("PhoneNumber", PhoneNumber.Trim());
+                        return RedirectToPage("/Menu/Menu");
                     }
                 }
             }

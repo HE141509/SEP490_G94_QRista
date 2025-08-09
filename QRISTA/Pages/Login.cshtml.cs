@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using QRB.Data;
 using QRB.Models;
+using QRB.Services;
+using System.Text.Json;
 
 namespace QRB.Pages
 {
@@ -10,11 +12,13 @@ namespace QRB.Pages
     {
         private readonly QRBDbContext _context;
         private readonly IConfiguration _config;
+        private readonly IPermissionService _permissionService;
 
-        public LoginModel(QRBDbContext context, IConfiguration config)
+        public LoginModel(QRBDbContext context, IConfiguration config, IPermissionService permissionService)
         {
             _context = context;
             _config = config;
+            _permissionService = permissionService;
         }
 
         [BindProperty]
@@ -67,6 +71,11 @@ namespace QRB.Pages
                     HttpContext.Session.SetString("ChiNhanhId", user.IDChiNhanh.ToString());
                     HttpContext.Session.SetString("ChiNhanhName", user.ChiNhanh.TenChiNhanh);
                     HttpContext.Session.SetString("VaiTro", user.VaiTro); // Thêm vai trò vào session
+                    
+                    // Lấy tất cả các permissions của user từ RolePermissions và lưu vào session
+                    var userPermissions = await _permissionService.GetUserPermissionsAsync(user.ID.ToString());
+                    var permissionsJson = JsonSerializer.Serialize(userPermissions);
+                    HttpContext.Session.SetString("UserPermissions", permissionsJson);
 
                     if (RememberMe)
                     {
@@ -88,20 +97,43 @@ namespace QRB.Pages
                     // Kiểm tra tài khoản demo
                     if (Username == "admin" && Password == "123456")
                     {
-                        HttpContext.Session.SetString("UserId", Guid.NewGuid().ToString());
+                        var adminUserId = Guid.NewGuid().ToString();
+                        HttpContext.Session.SetString("UserId", adminUserId);
                         HttpContext.Session.SetString("Username", "admin");
                         HttpContext.Session.SetString("DisplayName", "Quản trị viên");
                         HttpContext.Session.SetString("ChiNhanhId", Guid.NewGuid().ToString());
                         HttpContext.Session.SetString("ChiNhanhName", "QRB Coffee - Chi nhánh chính");
+                        HttpContext.Session.SetString("VaiTro", "Quản trị viên");
+                        
+                        // Tạo permissions demo cho admin (full access)
+                        var adminPermissions = new List<string> {
+                            "View Dashboard", "View Users", "Create Users", "Update Users", "Delete Users",
+                            "View Roles", "Create Roles", "Update Roles", "Delete Roles",
+                            "View Permissions", "Assign Permissions",
+                            "View Customers", "Create Customers", "Update Customers", "Delete Customers",
+                            "View Branches", "Create Branches", "Update Branches", "Delete Branches"
+                        };
+                        HttpContext.Session.SetString("UserPermissions", JsonSerializer.Serialize(adminPermissions));
+                        
                         return RedirectToPage("/Dashboard");
                     }
                     else if (Username == "staff" && Password == "123456")
                     {
-                        HttpContext.Session.SetString("UserId", Guid.NewGuid().ToString());
+                        var staffUserId = Guid.NewGuid().ToString();
+                        HttpContext.Session.SetString("UserId", staffUserId);
                         HttpContext.Session.SetString("Username", "staff");
                         HttpContext.Session.SetString("DisplayName", "Nhân viên");
                         HttpContext.Session.SetString("ChiNhanhId", Guid.NewGuid().ToString());
                         HttpContext.Session.SetString("ChiNhanhName", "QRB Coffee - Chi nhánh chính");
+                        HttpContext.Session.SetString("VaiTro", "Nhân viên");
+                        
+                        // Tạo permissions demo cho staff (limited access)
+                        var staffPermissions = new List<string> {
+                            "View Dashboard", "View Customers", "Create Customers", "Update Customers",
+                            "View Orders", "Create Orders", "Update Orders"
+                        };
+                        HttpContext.Session.SetString("UserPermissions", JsonSerializer.Serialize(staffPermissions));
+                        
                         return RedirectToPage("/Dashboard");
                     }
                     else

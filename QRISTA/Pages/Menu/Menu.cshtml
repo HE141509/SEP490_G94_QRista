@@ -27,6 +27,7 @@
             }
         </div>
     </div>
+
     <div class="menu-content d-flex">
         <aside class="menu-sidebar">
             <select class="menu-dropdown">
@@ -45,6 +46,15 @@
             </ul>
         </aside>
         <div class="menu-main flex-grow-1">
+            <!-- Search Box -->
+            <div class="menu-search-container" style="padding: 15px 20px; background: #f8f9fa; border-bottom: 1px solid #e0e0e0; margin-bottom: 10px;">
+                <div class="search-box" style="max-width: 100%; position: relative;">
+                    <input type="text" id="menu-search-input" placeholder="Tìm kiếm sản phẩm..." 
+                           style="width: 100%; padding: 12px 20px 12px 45px; font-size: 16px; border: 2px solid #1976d2; border-radius: 25px; background: white; outline: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" />
+                    <button id="clear-search-btn" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #666; cursor: pointer; font-size: 18px; display: none;">✕</button>
+                </div>
+            </div>
+            
             <section class="menu-items" id="menu-items-section">
 <script>
 if (!window.qrbMenuState) {
@@ -233,6 +243,7 @@ function loadProductsByGroup(maNhom) {
                     Qty: 0
                 }));
                 window.qrbMenuState.filteredItems = window.qrbMenuState.allItems;
+                applyCurrentSearch(); // Áp dụng tìm kiếm hiện tại nếu có
                 window.qrbMenuState.currentPage = 1;
                 window.qrbMenuState.totalPages = Math.ceil(window.qrbMenuState.filteredItems.length / window.qrbMenuState.itemsPerPage);
                 renderMenuItems(window.qrbMenuState.filteredItems.slice(0, window.qrbMenuState.itemsPerPage));
@@ -242,6 +253,43 @@ function loadProductsByGroup(maNhom) {
             }
         })
         .catch(() => renderMenuItems([]));
+}
+
+// Hàm tìm kiếm sản phẩm
+function searchProducts(searchTerm) {
+    if (!searchTerm || searchTerm.trim() === '') {
+        window.qrbMenuState.filteredItems = window.qrbMenuState.allItems;
+        document.getElementById('clear-search-btn').style.display = 'none';
+    } else {
+        const term = searchTerm.toLowerCase().trim();
+        window.qrbMenuState.filteredItems = window.qrbMenuState.allItems.filter(item => {
+            return item.TenSanPham.toLowerCase().includes(term) || 
+                   item.MaSanPham.toLowerCase().includes(term);
+        });
+        document.getElementById('clear-search-btn').style.display = 'block';
+        
+        // Reset về danh mục "Tất cả" khi tìm kiếm
+        document.querySelectorAll('.menu-sidebar li').forEach(li => li.classList.remove('active'));
+        document.querySelector('.menu-sidebar li[data-manhom="all"]').classList.add('active');
+        document.querySelector('.menu-dropdown').value = 'all';
+    }
+    
+    window.qrbMenuState.currentPage = 1;
+    window.qrbMenuState.totalPages = Math.ceil(window.qrbMenuState.filteredItems.length / window.qrbMenuState.itemsPerPage);
+    renderMenuItems(window.qrbMenuState.filteredItems.slice(0, window.qrbMenuState.itemsPerPage));
+    updatePagination();
+}
+
+// Áp dụng tìm kiếm hiện tại (dùng khi load lại products)
+function applyCurrentSearch() {
+    const searchInput = document.getElementById('menu-search-input');
+    if (searchInput && searchInput.value.trim() !== '') {
+        const term = searchInput.value.toLowerCase().trim();
+        window.qrbMenuState.filteredItems = window.qrbMenuState.allItems.filter(item => {
+            return item.TenSanPham.toLowerCase().includes(term) || 
+                   item.MaSanPham.toLowerCase().includes(term);
+        });
+    }
 }
 
 function arrayBufferToBase64(buffer) {
@@ -257,18 +305,59 @@ function arrayBufferToBase64(buffer) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Event listeners cho sidebar và dropdown
     document.querySelectorAll('.menu-sidebar li').forEach(li => {
         li.addEventListener('click', function() {
             document.querySelectorAll('.menu-sidebar li').forEach(tab => tab.classList.remove('active'));
             this.classList.add('active');
             const maNhom = this.dataset.manhom;
+            // Xóa search khi chọn danh mục
+            document.getElementById('menu-search-input').value = '';
+            document.getElementById('clear-search-btn').style.display = 'none';
             loadProductsByGroup(maNhom);
         });
     });
+    
     document.querySelector('.menu-dropdown').addEventListener('change', function() {
         const maNhom = this.value;
+        // Xóa search khi chọn danh mục
+        document.getElementById('menu-search-input').value = '';
+        document.getElementById('clear-search-btn').style.display = 'none';
         loadProductsByGroup(maNhom);
     });
+    
+    // Event listeners cho search box
+    const searchInput = document.getElementById('menu-search-input');
+    const clearSearchBtn = document.getElementById('clear-search-btn');
+    
+    // Tìm kiếm khi nhập
+    let searchTimeout;
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        const searchTerm = this.value.trim();
+        
+        // Debounce search để tránh tìm kiếm quá nhiều
+        searchTimeout = setTimeout(() => {
+            searchProducts(searchTerm);
+        }, 300);
+    });
+    
+    // Tìm kiếm khi nhấn Enter
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            clearTimeout(searchTimeout);
+            searchProducts(this.value.trim());
+        }
+    });
+    
+    // Xóa search
+    clearSearchBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        searchProducts('');
+        searchInput.focus();
+    });
+    
+    // Load dữ liệu ban đầu
     loadProductsByGroup('all');
 });
 </script>

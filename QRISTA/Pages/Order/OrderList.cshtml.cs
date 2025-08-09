@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
+using System.Text.Json;
 
 namespace QRB.Pages.Order
 {
@@ -18,6 +19,23 @@ namespace QRB.Pages.Order
         public OrderListModel(QRBDbContext context)
         {
             _context = context;
+        }
+        private bool HasPermission(string permissionName)
+        {
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public string CurrentBranchName { get; set; } = string.Empty;
@@ -53,6 +71,10 @@ namespace QRB.Pages.Order
             {
                 // Chưa đăng nhập, redirect về trang login
                 return RedirectToPage("/Login");
+            }
+            if (!HasPermission("Full Invoices"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Invoices&module=Invoices");
             }
 
             Orders = _context.DonHangs
