@@ -55,3 +55,7 @@ INSERT INTO Permissions (Id, Name, Description, Module, CreatedAt) VALUES
 INSERT INTO Permissions (Id, Name, Description, Module, CreatedAt) VALUES 
 (NEWID(), N'Full Permission Matrix', N'Quyền ma trận phân quyền', N'Permission Matrix', GETDATE());
 
+-- Authorization Dashboard Module
+INSERT INTO Permissions (Id, Name, Description, Module, CreatedAt) VALUES 
+(NEWID(), N'Full Dashboard', N'Quyền bảng thống kê', N'Dashboard', GETDATE());
+

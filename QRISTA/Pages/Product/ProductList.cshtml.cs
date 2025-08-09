@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace QRB.Pages.Product
 {
@@ -22,6 +23,23 @@ namespace QRB.Pages.Product
                 context.Result = new RedirectToPageResult("/Login");
             }
             base.OnPageHandlerExecuting(context);
+        }
+        private bool HasPermission(string permissionName)
+        {
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public class SanPhamViewModel
@@ -54,8 +72,19 @@ namespace QRB.Pages.Product
             public string TenChiNhanh { get; set; } = string.Empty;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Redirect("/Index");
+            }
+
+            if (!HasPermission("Full Products"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Products&module=Products");
+            }
+
             var connectionString = _configuration.GetConnectionString("DefaultConnection");
             using (var connection = new SqlConnection(connectionString))
             {
@@ -116,6 +145,7 @@ namespace QRB.Pages.Product
                     }
                 }
             }
+            return Page();
         }
         // ...
     }
