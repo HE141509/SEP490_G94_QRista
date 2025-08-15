@@ -5,6 +5,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System;
+using System.Text.Json;
 
 namespace QRB.Pages.UuDai
 {
@@ -17,42 +18,63 @@ public class MaUuDaiListModel : PageModel
     {
         _configuration = configuration;
     }
-    public IActionResult OnGet()
-    {
-        // Kiểm tra session login
-        if (HttpContext.Session.GetString("UserId") == null)
+    private bool HasPermission(string permissionName)
         {
-            return Redirect("/Login");
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
         }
-        string connectionString = _configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
-        using (var connection = new SqlConnection(connectionString))
+    public IActionResult OnGet()
         {
-            connection.Open();
-            string sql = @"SELECT mud.ID, kh.TenKhachHang, mud.MaGiamGia, mud.TienGiam, mud.TrangThaiSuDung, mud.CreateTime, mud.UpdateTime, mud.IsDelete
+            // Kiểm tra session login
+            if (HttpContext.Session.GetString("UserId") == null)
+            {
+                return Redirect("/Login");
+            }
+            if (!HasPermission("Full Promotions"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Promotions&module=Promotions");
+            }
+            string connectionString = _configuration.GetConnectionString("DefaultConnection") ?? string.Empty;
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                string sql = @"SELECT mud.ID, kh.TenKhachHang, mud.MaGiamGia, mud.TienGiam, mud.TrangThaiSuDung, mud.CreateTime, mud.UpdateTime, mud.IsDelete
                                 FROM MaUuDai mud
                                 JOIN KhachHang kh ON mud.IDKhachHang = kh.ID
                                 ORDER BY mud.CreateTime DESC";
-            using (var command = new SqlCommand(sql, connection))
-            using (var reader = command.ExecuteReader())
-            {
-                while (reader.Read())
+                using (var command = new SqlCommand(sql, connection))
+                using (var reader = command.ExecuteReader())
                 {
-                    MaUuDaiList.Add(new MaUuDaiViewModel
+                    while (reader.Read())
                     {
-                        ID = reader.GetGuid(0),
-                        TenKhachHang = reader.GetString(1),
-                        MaGiamGia = reader.GetString(2),
-                        TienGiam = reader.GetString(3),
-                        TrangThaiSuDung = reader.GetBoolean(4),
-                        CreateTime = reader.GetDateTime(5),
-                        UpdateTime = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6),
-                        IsDelete = reader.GetBoolean(7)
-                    });
+                        MaUuDaiList.Add(new MaUuDaiViewModel
+                        {
+                            ID = reader.GetGuid(0),
+                            TenKhachHang = reader.GetString(1),
+                            MaGiamGia = reader.GetString(2),
+                            TienGiam = reader.GetString(3),
+                            TrangThaiSuDung = reader.GetBoolean(4),
+                            CreateTime = reader.GetDateTime(5),
+                            UpdateTime = reader.IsDBNull(6) ? (DateTime?)null : reader.GetDateTime(6),
+                            IsDelete = reader.GetBoolean(7)
+                        });
+                    }
                 }
             }
+            return Page();
         }
-        return Page();
-    }
     public class MaUuDaiViewModel
     {
         public Guid ID { get; set; }

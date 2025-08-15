@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using QRB.Data;
 using QRB.Models;
+using System.Text.Json;
 
 namespace QRB.Pages.Authorization
 {
@@ -30,7 +31,23 @@ namespace QRB.Pages.Authorization
 
         [BindProperty(SupportsGet = true)]
         public string StatusFilter { get; set; } = "";
-
+        private bool HasPermission(string permissionName)
+        {
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         public async Task<IActionResult> OnGetAsync(int pageNumber = 1, int pageSize = 10)
         {
             // Kiểm tra đăng nhập
@@ -38,7 +55,11 @@ namespace QRB.Pages.Authorization
             {
                 return RedirectToPage("/Login");
             }
-
+            // Kiểm tra quyền truy cập
+            if (!HasPermission("Full Users"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Users&module=Users");
+            }
             // Lấy vai trò người dùng từ session
             CurrentUserRole = HttpContext.Session.GetString("VaiTro") ?? "Người dùng";
 
@@ -91,12 +112,12 @@ namespace QRB.Pages.Authorization
             if (!await _context.NguoiDungs.AnyAsync(u => !u.IsDelete))
             {
                 var sampleUsers = new List<NguoiDung>();
-                
+
                 // Tạo 25 user mẫu để test phân trang
                 var roles = new[] { "Admin", "Manager", "Staff", "Cashier" };
                 var names = new[] { "Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Phan", "Vũ", "Võ", "Đặng", "Bùi" };
                 var firstName = new[] { "Văn", "Thị", "Đức", "Minh", "Hồng", "Tuấn", "Linh", "Hương", "Sơn", "Mai" };
-                
+
                 for (int i = 0; i < 25; i++)
                 {
                     var role = roles[i % roles.Length];
@@ -105,7 +126,7 @@ namespace QRB.Pages.Authorization
                     var username = $"user{i + 1:D2}";
                     var displayName = $"{lastName} {first} {i + 1}";
                     var email = $"{username}@qrb.com";
-                    
+
                     sampleUsers.Add(new NguoiDung
                     {
                         ID = Guid.NewGuid(),

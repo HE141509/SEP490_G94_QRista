@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using QRB.Data;
 using QRB.Models.Authorization;
+using System.Text.Json;
 
 namespace QRB.Pages.Authorization
 {
@@ -17,13 +18,34 @@ namespace QRB.Pages.Authorization
 
         public List<RoleWithUserCount> Roles { get; set; } = new List<RoleWithUserCount>();
         public string CurrentUserRole { get; private set; } = string.Empty;
-
+        private bool HasPermission(string permissionName)
+        {
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         public async Task<IActionResult> OnGetAsync()
         {
             // Kiểm tra đăng nhập
             if (string.IsNullOrEmpty(HttpContext.Session.GetString("Username")))
             {
                 return RedirectToPage("/Login");
+            }
+            // Kiểm tra quyền truy cập
+            if (!HasPermission("Full Roles"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Roles&module=Roles");
             }
 
             // Lấy vai trò người dùng từ session
@@ -33,7 +55,7 @@ namespace QRB.Pages.Authorization
             {
                 // Lấy tất cả roles để JavaScript phân trang client-side
                 var roles = await _context.Roles.ToListAsync();
-                
+
                 Roles = roles.Select(r => new RoleWithUserCount
                 {
                     Id = r.Id,
@@ -42,12 +64,12 @@ namespace QRB.Pages.Authorization
                     IsActive = r.IsActive ?? true, // Xử lý NULL thành true
                     UserCount = _context.NguoiDungs.Count(u => u.VaiTro == r.Name && !u.IsDelete)
                 }).ToList();
-                
+
                 // Nếu không có dữ liệu, tạo dữ liệu mẫu
                 if (!Roles.Any())
                 {
                     await CreateSampleRolesIfNeeded();
-                    
+
                     roles = await _context.Roles.ToListAsync();
                     Roles = roles.Select(r => new RoleWithUserCount
                     {
@@ -63,7 +85,7 @@ namespace QRB.Pages.Authorization
             {
                 // Nếu lỗi, tạo dữ liệu mẫu
                 await CreateSampleRolesIfNeeded();
-                
+
                 var roles = await _context.Roles.ToListAsync();
                 Roles = roles.Select(r => new RoleWithUserCount
                 {

@@ -448,6 +448,9 @@ namespace QRB.Models
 
         public bool IsDelete { get; set; } = false;
 
+        [StringLength(500)]
+        public string? NoiDungTuChoi { get; set; }
+
         // Navigation properties (nếu cần)
         public virtual NguyenLieu? NguoiGui { get; set; }
         public virtual ChiNhanh? ChiNhanhGui { get; set; }
