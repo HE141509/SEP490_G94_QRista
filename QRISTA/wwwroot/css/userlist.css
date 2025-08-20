@@ -298,6 +298,7 @@ footer {
     color: #666;
     text-align: right;
 }
+<<<<<<< HEAD
 
 /* CSS cho pagination container */
 .userlist-pagination-container {
@@ -370,6 +371,8 @@ footer {
     color: #666;
     font-weight: 500;
 }
+=======
+>>>>>>> origin/anh0612
 
 /* Popup thêm mới user đẹp, hiện đại */
 .userlist-add-modal-content {

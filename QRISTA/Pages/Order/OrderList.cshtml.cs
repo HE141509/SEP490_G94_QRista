@@ -7,7 +7,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
+<<<<<<< HEAD
 using System.Text.Json;
+=======
+>>>>>>> origin/anh0612
 
 namespace QRB.Pages.Order
 {
@@ -72,10 +75,13 @@ namespace QRB.Pages.Order
                 // Chưa đăng nhập, redirect về trang login
                 return RedirectToPage("/Login");
             }
+<<<<<<< HEAD
             if (!HasPermission("Full Invoices"))
             {
                 return Redirect($"/AccessDenied?permission=Full Invoices&module=Invoices");
             }
+=======
+>>>>>>> origin/anh0612
 
             Orders = _context.DonHangs
                 .Where(x => !x.IsDelete)

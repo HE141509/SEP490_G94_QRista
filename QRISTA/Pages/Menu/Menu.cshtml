@@ -255,6 +255,7 @@ function loadProductsByGroup(maNhom) {
         .catch(() => renderMenuItems([]));
 }
 
+<<<<<<< HEAD
 // Hàm tìm kiếm sản phẩm
 function searchProducts(searchTerm) {
     if (!searchTerm || searchTerm.trim() === '') {
@@ -292,6 +293,8 @@ function applyCurrentSearch() {
     }
 }
 
+=======
+>>>>>>> origin/anh0612
 function arrayBufferToBase64(buffer) {
     if (!buffer) return '';
     if (typeof buffer === 'string') return buffer;
@@ -325,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('clear-search-btn').style.display = 'none';
         loadProductsByGroup(maNhom);
     });
+<<<<<<< HEAD
     
     // Event listeners cho search box
     const searchInput = document.getElementById('menu-search-input');
@@ -358,6 +362,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Load dữ liệu ban đầu
+=======
+>>>>>>> origin/anh0612
     loadProductsByGroup('all');
 });
 </script>

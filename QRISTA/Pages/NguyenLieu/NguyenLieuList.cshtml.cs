@@ -46,11 +46,14 @@ namespace QRB.Pages.NguyenLieu
                 // Chưa đăng nhập, redirect về trang login
                 return RedirectToPage("/Login");
             }
+<<<<<<< HEAD
             if (!HasPermission("Full Raw Materials"))
             {
                 return Redirect($"/AccessDenied?permission=Full Raw Materials&module=RawMaterials");
             }
 
+=======
+>>>>>>> origin/anh0612
 
             if (string.IsNullOrEmpty(status) || status == "active")
             {
