@@ -8,9 +8,13 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 <<<<<<< HEAD
+<<<<<<< HEAD
 using System.Text.Json;
 =======
 >>>>>>> origin/anh0612
+=======
+using System.Text.Json;
+>>>>>>> origin/phuong2
 
 namespace QRB.Pages.Order
 {
@@ -76,12 +80,18 @@ namespace QRB.Pages.Order
                 return RedirectToPage("/Login");
             }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/phuong2
             if (!HasPermission("Full Invoices"))
             {
                 return Redirect($"/AccessDenied?permission=Full Invoices&module=Invoices");
             }
+<<<<<<< HEAD
 =======
 >>>>>>> origin/anh0612
+=======
+>>>>>>> origin/phuong2
 
             Orders = _context.DonHangs
                 .Where(x => !x.IsDelete)

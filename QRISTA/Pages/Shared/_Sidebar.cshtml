@@ -27,6 +27,9 @@
         
         <ul class="nav-menu">
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/phuong2
             @if (HasPermission("Full Dashboard"))
             {
                 <li class="nav-item">
@@ -67,7 +70,11 @@
                 </li>
             }
             
+<<<<<<< HEAD
             @if (HasPermission("Full Products") || HasPermission("Full Product Groups"))
+=======
+            @if (HasPermission("Full Products") || HasPermission("Full Product Groups") || HasPermission("Full Product Types"))
+>>>>>>> origin/phuong2
             {
                 <li class="nav-item sidebar-product-parent">
                     <a href="#" class="nav-link sidebar-product-toggle@(currentPath.StartsWith("/product") ? " active" : "")" onclick="toggleSidebarProductMenu(event)">
@@ -123,7 +130,11 @@
                 </li>
             }
             
+<<<<<<< HEAD
             @if (HasPermission("Full Purchase Requests"))
+=======
+            @if (HasPermission("Full Purchase Suggestions"))
+>>>>>>> origin/phuong2
             {
                 <li class="nav-item">
                     <a href="/DeXuatMuaSam/DeXuatMuaSamList" class="nav-link@(currentPath.StartsWith("/dexuatmuasam") ? " active" : "")">
@@ -157,6 +168,7 @@
                     </ul>
                 </li>
             }
+<<<<<<< HEAD
 =======
             <li class="nav-item">
                 <a href="/Dashboard" class="nav-link@(currentPath == "/dashboard" ? " active" : "")">
@@ -230,6 +242,8 @@
                 </a>
             </li>
 >>>>>>> origin/anh0612
+=======
+>>>>>>> origin/phuong2
         </ul>
     </div>
 </nav>
@@ -264,10 +278,14 @@
         font-weight: 600;
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     .sidebar-authorization-toggle {
 =======
     .sidebar-kho-toggle {
 >>>>>>> origin/anh0612
+=======
+    .sidebar-authorization-toggle {
+>>>>>>> origin/phuong2
         font-weight: 600;
     }
 </style>
@@ -282,6 +300,9 @@ function toggleSidebarProductMenu(e) {
     }
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/phuong2
 function toggleSidebarAuthorizationMenu(e) {
     e.preventDefault();
     var submenu = document.getElementById('sidebar-authorization-submenu');
@@ -291,8 +312,11 @@ function toggleSidebarAuthorizationMenu(e) {
         submenu.style.display = 'none';
     }
 }
+<<<<<<< HEAD
 =======
 >>>>>>> origin/anh0612
+=======
+>>>>>>> origin/phuong2
 
 function toggleSidebarKhoMenu(e) {
     e.preventDefault();

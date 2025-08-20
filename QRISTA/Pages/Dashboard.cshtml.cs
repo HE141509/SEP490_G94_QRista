@@ -2,57 +2,72 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using QRB.Data;
+using System.Text.Json;
 
 namespace QRB.Pages
 {
     public class DashboardModel : PageModel
     {
         private readonly QRBDbContext _context;
-        
         public DashboardModel(QRBDbContext context)
         {
             _context = context;
         }
+<<<<<<< HEAD
 
         public string UserName { get; private set; } = string.Empty;
         public string CurrentUserRole { get; private set; } = string.Empty;
         public bool IsLoggedIn { get; private set; }
-        
         // Bộ lọc ngày
         [BindProperty(SupportsGet = true)]
         public DateTime? FromDate { get; set; }
-        
+
         [BindProperty(SupportsGet = true)]
         public DateTime? ToDate { get; set; }
-        
+
+>>>>>>> origin/phuong2
         // Thống kê bán hàng
         public int SoLuotNguoiMuaTrongNgay { get; set; }
         public decimal TongGiaTriMua { get; set; }
         public int SoLuongSanPhamMua { get; set; }
-        public int SoLuongHoaDonTrongNgay { get; set; }
-        
         // So sánh với khoảng thời gian trước đó
         public int ThayDoiNguoiMua { get; set; }
         public decimal ThayDoiGiaTri { get; set; }
         public int ThayDoiSanPham { get; set; }
         public int ThayDoiHoaDon { get; set; }
-        
         // Dữ liệu cho biểu đồ biến động
         public List<string> ChartLabels { get; set; } = new List<string>();
         public List<int> ChartOrderData { get; set; } = new List<int>();
         public List<int> ChartQuantityData { get; set; } = new List<int>();
-        
+
         // Dữ liệu cho biểu đồ phân tích thứ trong tuần
         public List<string> WeekdayLabels { get; set; } = new List<string>();
         public List<int> WeekdayOrderData { get; set; } = new List<int>();
-        
+
         // Dữ liệu cho biểu đồ phân tích số bàn
         public List<string> TableLabels { get; set; } = new List<string>();
         public List<int> TableUsageData { get; set; } = new List<int>();
-        
+
         // Dữ liệu cho danh sách sản phẩm bán chạy
         public List<TopProductModel> TopProducts { get; set; } = new List<TopProductModel>();
 
+        private bool HasPermission(string permissionName)
+        {
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         public async Task<IActionResult> OnGetAsync()
         {
             // Kiểm tra session đăng nhập
@@ -63,6 +78,11 @@ namespace QRB.Pages
             {
                 // Chưa đăng nhập, chuyển về trang login
                 return RedirectToPage("/Login");
+            }
+
+            if (!HasPermission("Full Dashboard"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Dashboard&module=Dashboard");
             }
 
             IsLoggedIn = true;
@@ -77,13 +97,13 @@ namespace QRB.Pages
 
             // Lấy thống kê bán hàng
             await LoadSalesStatistics();
-            
+
             // Lấy dữ liệu biểu đồ
             await LoadChartData();
-            
+
             // Lấy dữ liệu biểu đồ phân tích
             await LoadAnalysisChartData();
-            
+
             // Lấy dữ liệu sản phẩm bán chạy
             await LoadTopProducts();
 
@@ -94,10 +114,10 @@ namespace QRB.Pages
         {
             var fromDate = FromDate ?? DateTime.Today;
             var toDate = ToDate ?? DateTime.Today;
-            
+
             // Đảm bảo toDate bao gồm cả ngày (đến 23:59:59)
             var toDateEnd = toDate.Date.AddDays(1).AddSeconds(-1);
-            
+
             // Tính khoảng thời gian trước đó để so sánh
             var daysDiff = (toDate - fromDate).Days + 1;
             var compareFromDate = fromDate.AddDays(-daysDiff);
@@ -155,7 +175,6 @@ namespace QRB.Pages
         {
             var fromDate = FromDate ?? DateTime.Today;
             var toDate = ToDate ?? DateTime.Today;
-            
             // Tạo danh sách các ngày trong khoảng thời gian
             var dates = new List<DateTime>();
             for (var date = fromDate; date <= toDate; date = date.AddDays(1))
@@ -172,7 +191,6 @@ namespace QRB.Pages
                 // Lấy dữ liệu cho ngày này
                 var dayStart = date.Date;
                 var dayEnd = date.Date.AddDays(1).AddSeconds(-1);
-                
                 var ordersOnDay = await _context.DonHangs
                     .Where(d => d.CreateTime >= dayStart && d.CreateTime <= dayEnd && d.TrangThaiThanhToan == true)
                     .Include(d => d.ChiTietDonHangs)
@@ -247,12 +265,10 @@ namespace QRB.Pages
                 // Dữ liệu mặc định khi có lỗi
                 WeekdayLabels.AddRange(new[] { "Chủ nhật", "Thứ hai", "Thứ ba", "Thứ tư", "Thứ năm", "Thứ sáu", "Thứ bảy" });
                 WeekdayOrderData.AddRange(new[] { 0, 0, 0, 0, 0, 0, 0 });
-                
                 TableLabels.AddRange(new[] { "Bàn 1", "Bàn 2", "Bàn 3", "Bàn 4", "Bàn 5" });
                 TableUsageData.AddRange(new[] { 0, 0, 0, 0, 0 });
             }
         }
-        
         private async Task LoadTopProducts()
         {
             try
@@ -280,13 +296,13 @@ namespace QRB.Pages
                 }
 
                 TopProducts.Clear();
-                
                 if (allChiTietDonHangs.Any())
                 {
                     // Nhóm theo sản phẩm và tính tổng
                     var groupedProducts = allChiTietDonHangs
                         .GroupBy(ct => new { ct.IDSanPham, ct.SanPham.TenSanPham, ct.SanPham.MaSanPham })
-                        .Select(g => new {
+                        .Select(g => new
+                        {
                             IDSanPham = g.Key.IDSanPham,
                             TenSanPham = g.Key.TenSanPham,
                             MaSanPham = g.Key.MaSanPham,
@@ -302,10 +318,10 @@ namespace QRB.Pages
                     {
                         var product = groupedProducts[i];
                         var rank = i + 1;
-                        
+
                         string rankIcon = "";
                         string rankColor = "";
-                        
+
                         switch (rank)
                         {
                             case 1:
@@ -329,7 +345,6 @@ namespace QRB.Pages
                                 rankColor = "#9B59B6"; // Tím
                                 break;
                         }
-                        
                         TopProducts.Add(new TopProductModel
                         {
                             TenSanPham = product.TenSanPham,
@@ -355,7 +370,6 @@ namespace QRB.Pages
                 // TODO: Log exception nếu cần
             }
         }
-        
         private void CreateSampleTopProducts()
         {
             var sampleProducts = new[]
@@ -366,16 +380,15 @@ namespace QRB.Pages
                 new { Name = "Nước cam", Code = "NC001", Qty = 0, Revenue = 0m },
                 new { Name = "Trà đá", Code = "TD001", Qty = 0, Revenue = 0m }
             };
-            
             TopProducts.Clear();
             for (int i = 0; i < sampleProducts.Length; i++)
             {
                 var product = sampleProducts[i];
                 var rank = i + 1;
-                
+
                 string rankIcon = "";
                 string rankColor = "";
-                
+
                 switch (rank)
                 {
                     case 1:
@@ -399,7 +412,6 @@ namespace QRB.Pages
                         rankColor = "#9B59B6";
                         break;
                 }
-                
                 TopProducts.Add(new TopProductModel
                 {
                     TenSanPham = product.Name,
@@ -417,7 +429,7 @@ namespace QRB.Pages
         {
             // Xóa session
             HttpContext.Session.Clear();
-            
+
             // Xóa cookie remember me nếu có
             if (Request.Cookies.ContainsKey("RememberMe"))
             {
@@ -427,7 +439,6 @@ namespace QRB.Pages
             return RedirectToPage("/Login");
         }
     }
-    
     // Model cho sản phẩm bán chạy
     public class TopProductModel
     {

@@ -1,0 +1,75 @@
+@page
+@model QRB.Pages.Payment.PaymentModel
+@{
+    Layout = null;
+    ViewData["Title"] = "QRB - Thanh toán";
+}
+
+<div class="payment-bg">
+    <div class="payment-center">
+        <div class="payment-card">
+            <div class="payment-logo-row">
+                <img src="/images/Logo_FPT.png" alt="Logo" class="payment-logo" />
+                <span class="payment-brand">QRista Cafe</span>
+            </div>
+            
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="payment-error">
+                    <h3>Có lỗi xảy ra</h3>
+                    <p>@Model.ErrorMessage</p>
+                    <a href="/Menu" class="payment-back-btn">Quay lại Menu</a>
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(Model.PaymentUrl))
+            {
+                <h2 class="payment-title">Đang chuyển hướng thanh toán</h2>
+                <div class="payment-amount">
+                    Mã đơn hàng: <strong>@Model.OrderId</strong><br>
+                    Số tiền cần thanh toán: <span>@Model.Amount.ToString("N0") đ</span>
+                </div>
+                <div class="payment-qr-wrapper">
+                    <span>Đang chuyển hướng sang cổng thanh toán VNPAY...</span>
+                </div>
+                <div class="payment-desc">
+                    Bạn sẽ được chuyển sang cổng thanh toán VNPAY. 
+                    Nếu không tự động chuyển, <a href="@Html.Raw(Model.PaymentUrl)" class="payment-vnpay-btn">bấm vào đây</a>.
+                </div>
+                <script>
+                    setTimeout(function() {
+                        window.location.href = "@Html.Raw(Model.PaymentUrl)";
+                    }, 2000);
+                </script>
+            }
+            else
+            {
+                <div class="payment-error">
+                    <h3>Không thể tạo liên kết thanh toán</h3>
+                    <p>Vui lòng thử lại sau.</p>
+                </div>
+            }
+            
+            <a href="/Menu" class="payment-back-btn">&larr; Quay lại Menu</a>
+        </div>
+    </div>
+</div>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/payment.css" />
+    <style>
+        .payment-error {
+            color: #d32f2f;
+            text-align: center;
+            padding: 20px;
+        }
+        .payment-error h3 {
+            margin-bottom: 10px;
+            color: #d32f2f;
+        }
+        .payment-amount strong {
+            color: #1976d2;
+            font-weight: 600;
+        }
+    </style>
+</head>

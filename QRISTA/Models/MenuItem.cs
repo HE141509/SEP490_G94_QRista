@@ -447,6 +447,12 @@ namespace QRB.Models
         public DateTime? UpdateTime { get; set; }
 
         public bool IsDelete { get; set; } = false;
+<<<<<<< HEAD
+=======
+
+        [StringLength(500)]
+        public string? NoiDungTuChoi { get; set; }
+>>>>>>> origin/phuong2
 
         // Navigation properties (nếu cần)
         public virtual NguyenLieu? NguoiGui { get; set; }

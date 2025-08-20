@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using QRB.Data;
 using QRB.Models.Authorization;
+using System.Text.Json;
 
 namespace QRB.Pages.Authorization
 {
@@ -20,7 +21,23 @@ namespace QRB.Pages.Authorization
         public List<AppRolePermission> RolePermissions { get; set; } = new List<AppRolePermission>();
         public Dictionary<string, List<AppPermission>> PermissionGroups { get; set; } = new Dictionary<string, List<AppPermission>>();
         public string CurrentUserRole { get; private set; } = string.Empty;
-
+        private bool HasPermission(string permissionName)
+        {
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         public async Task<IActionResult> OnGetAsync()
         {
             // Kiểm tra đăng nhập
@@ -28,7 +45,11 @@ namespace QRB.Pages.Authorization
             {
                 return RedirectToPage("/Login");
             }
-
+            // Kiểm tra quyền truy cập
+            if (!HasPermission("Full Permission Matrix"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Permission Matrix&module=Permissions");
+            }
             // Lấy vai trò người dùng từ session
             CurrentUserRole = HttpContext.Session.GetString("VaiTro") ?? "Người dùng";
 
@@ -70,15 +91,15 @@ namespace QRB.Pages.Authorization
                 await CreateSampleRolesIfNeeded();
                 await CreateSamplePermissionsIfNeeded();
                 await CreateSampleRolePermissionsIfNeeded();
-                
+
                 Roles = await _context.Roles.Where(r => r.IsActive == true).OrderBy(r => r.Name).ToListAsync();
                 Permissions = await _context.Permissions.OrderBy(p => p.Module ?? "ZZZ").ThenBy(p => p.Name).ToListAsync();
                 RolePermissions = await _context.RolePermissions.ToListAsync();
-                
+
                 PermissionGroups = Permissions.GroupBy(p => p.Module ?? "Other")
                     .ToDictionary(g => g.Key, g => g.ToList());
             }
-            
+
             return Page();
         }
 
@@ -154,11 +175,11 @@ namespace QRB.Pages.Authorization
                         // Admin có tất cả quyền
                         foreach (var permission in permissions)
                         {
-                            _context.RolePermissions.Add(new AppRolePermission 
-                            { 
+                            _context.RolePermissions.Add(new AppRolePermission
+                            {
                                 Id = Guid.NewGuid().ToString(),
-                                RoleId = adminRole.Id, 
-                                PermissionId = permission.Id 
+                                RoleId = adminRole.Id,
+                                PermissionId = permission.Id
                             });
                         }
                     }
@@ -167,19 +188,19 @@ namespace QRB.Pages.Authorization
                     if (managerRole != null)
                     {
                         // Manager có quyền quản lý sản phẩm, đơn hàng và xem báo cáo
-                        var managerPermissionNames = new[] { "View Products", "Create Products", "Edit Products", 
-                                                           "View Orders", "Create Orders", "Edit Orders", 
+                        var managerPermissionNames = new[] { "View Products", "Create Products", "Edit Products",
+                                                           "View Orders", "Create Orders", "Edit Orders",
                                                            "View Reports", "Export Reports" };
                         foreach (var permissionName in managerPermissionNames)
                         {
                             var permission = permissions.FirstOrDefault(p => p.Name == permissionName);
                             if (permission != null)
                             {
-                                _context.RolePermissions.Add(new AppRolePermission 
-                                { 
+                                _context.RolePermissions.Add(new AppRolePermission
+                                {
                                     Id = Guid.NewGuid().ToString(),
-                                    RoleId = managerRole.Id, 
-                                    PermissionId = permission.Id 
+                                    RoleId = managerRole.Id,
+                                    PermissionId = permission.Id
                                 });
                             }
                         }

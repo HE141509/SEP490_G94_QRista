@@ -423,9 +423,7 @@ namespace QRB.Models
 
         [Required]
         [StringLength(50)]
-        public string Status { get; set; } = "PENDING";
-
-        public bool IsDelete { get; set; } = false;
+        public string Status { get; set; } = string.Empty;
 
         public DateTime CreateTime { get; set; } = DateTime.Now;
 
@@ -435,19 +433,13 @@ namespace QRB.Models
 
         public DateTime? UpdateTime { get; set; }
 
-        // Navigation properties
-        [ForeignKey("IDNguoiGui")]
-        public virtual NguoiDung NguoiGui { get; set; } = null!;
+        public bool IsDelete { get; set; } = false;
 
-        [ForeignKey("IDChiNhanhGui")]
-        public virtual ChiNhanh ChiNhanhGui { get; set; } = null!;
-
-        [ForeignKey("IDNguoiNhan")]
-        public virtual NguoiDung NguoiNhan { get; set; } = null!;
-
-        [ForeignKey("IDChiNhanhNhan")]
-        public virtual ChiNhanh ChiNhanhNhan { get; set; } = null!;
-
+        // Navigation properties (nếu cần)
+        public virtual NguyenLieu? NguoiGui { get; set; }
+        public virtual ChiNhanh? ChiNhanhGui { get; set; }
+        public virtual NguyenLieu? NguoiNhan { get; set; }
+        public virtual ChiNhanh? ChiNhanhNhan { get; set; }
         public virtual ICollection<ChiTietDonDeXuat> ChiTietDonDeXuats { get; set; } = new List<ChiTietDonDeXuat>();
     }
 

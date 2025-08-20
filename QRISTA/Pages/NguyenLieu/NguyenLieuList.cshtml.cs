@@ -47,13 +47,19 @@ namespace QRB.Pages.NguyenLieu
                 return RedirectToPage("/Login");
             }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/phuong2
             if (!HasPermission("Full Raw Materials"))
             {
                 return Redirect($"/AccessDenied?permission=Full Raw Materials&module=RawMaterials");
             }
 
+<<<<<<< HEAD
 =======
 >>>>>>> origin/anh0612
+=======
+>>>>>>> origin/phuong2
 
             if (string.IsNullOrEmpty(status) || status == "active")
             {

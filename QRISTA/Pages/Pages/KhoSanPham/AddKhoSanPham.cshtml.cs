@@ -74,9 +74,24 @@ namespace QRB.Pages.KhoSanPham
                 
                 if (existingKho != null)
                 {
-                    return new JsonResult(new { success = false, message = "Nguyên liệu này đã tồn tại trong kho của chi nhánh này." });
+                    // Nếu đã tồn tại, cộng thêm số lượng mới vào số lượng cũ
+                    if (int.TryParse(existingKho.SoLuongConLai, out var currentQuantity))
+                    {
+                        var newTotalQuantity = currentQuantity + data.SoLuongConLai;
+                        existingKho.SoLuongConLai = newTotalQuantity.ToString();
+                        existingKho.UpdateTime = DateTime.Now;
+                        
+                        _context.KhoSanPhams.Update(existingKho);
+                        await _context.SaveChangesAsync();
+                        return new JsonResult(new { success = true, message = $"Đã cập nhật số lượng! Số lượng hiện tại: {newTotalQuantity:N0}" });
+                    }
+                    else
+                    {
+                        return new JsonResult(new { success = false, message = "Lỗi dữ liệu số lượng trong cơ sở dữ liệu." });
+                    }
                 }
 
+                // Nếu chưa tồn tại, thêm mới
                 var kho = new QRB.Models.KhoSanPham
                 {
                     ID = Guid.NewGuid(),

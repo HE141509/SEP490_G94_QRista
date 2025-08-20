@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace QRB.Pages.ProductType
 {
@@ -49,10 +50,41 @@ namespace QRB.Pages.ProductType
         public List<SanPhamItem> SanPhams { get; set; } = new();
         public List<ChiNhanhItem> ChiNhanhs { get; set; } = new();
 
-
-
-        public void OnGet()
+        private bool HasPermission(string permissionName)
         {
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public IActionResult OnGet()
+        {
+            // Kiểm tra session đăng nhập
+            var userId = HttpContext.Session.GetString("UserId");
+            var username = HttpContext.Session.GetString("Username");
+
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(username))
+            {
+                // Chưa đăng nhập, chuyển về trang login
+                return RedirectToPage("/Login");
+            }
+
+            if (!HasPermission("Full Product Types"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Product Types&module=ProductType");
+            }
+
             string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
             using (var connection = new SqlConnection(connectionString))
             {
@@ -112,6 +144,7 @@ namespace QRB.Pages.ProductType
                     }
                 }
             }
+            return Page();
         }
 
         public JsonResult OnGetSanPhamByChiNhanh(Guid chiNhanhId)

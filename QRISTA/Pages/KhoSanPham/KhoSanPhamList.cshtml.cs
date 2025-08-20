@@ -5,6 +5,10 @@ using QRB.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+<<<<<<< HEAD
+=======
+using System.Text.Json;
+>>>>>>> origin/phuong2
 
 namespace QRB.Pages.KhoSanPham
 {
@@ -47,6 +51,26 @@ namespace QRB.Pages.KhoSanPham
             public Guid ID { get; set; }
             public string TenChiNhanh { get; set; } = string.Empty;
         }
+<<<<<<< HEAD
+=======
+        private bool HasPermission(string permissionName)
+        {
+            var permissionsJson = HttpContext.Session.GetString("UserPermissions");
+            if (string.IsNullOrEmpty(permissionsJson))
+            {
+                return false;
+            }
+            try
+            {
+                var permissions = JsonSerializer.Deserialize<List<string>>(permissionsJson);
+                return permissions?.Contains(permissionName) ?? false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+>>>>>>> origin/phuong2
         public async Task<IActionResult> OnGetAsync(string? status = "active")
         {
             // Kiểm tra đăng nhập - bắt buộc phải đăng nhập mới được truy cập
@@ -56,22 +80,40 @@ namespace QRB.Pages.KhoSanPham
                 // Chưa đăng nhập, redirect về trang login
                 return RedirectToPage("/Login");
             }
+<<<<<<< HEAD
 
             Status = status ?? "active";
             
+=======
+            if (!HasPermission("Full Inventory"))
+            {
+                return Redirect($"/AccessDenied?permission=Full Inventory&module=Inventory");
+            }
+
+            Status = status ?? "active";
+
+>>>>>>> origin/phuong2
             // Lấy thông tin chi nhánh của user đang đăng nhập
             if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out userGuid))
             {
                 var currentUser = await _context.NguoiDungs
                     .Where(u => u.ID == userGuid && !u.IsDelete)
                     .FirstOrDefaultAsync();
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> origin/phuong2
                 if (currentUser != null)
                 {
                     CurrentUserBranchId = currentUser.IDChiNhanh;
                 }
             }
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> origin/phuong2
             // Lấy danh sách nguyên liệu
             NguyenLieuList = await _context.NguyenLieus
                 .Where(n => !n.IsDelete)
@@ -82,7 +124,11 @@ namespace QRB.Pages.KhoSanPham
                 })
                 .OrderBy(n => n.TenNguyenLieu)
                 .ToListAsync();
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> origin/phuong2
             // Lấy danh sách chi nhánh (chỉ chi nhánh của user hiện tại)
             ChiNhanhList = await _context.ChiNhanhs
                 .Where(c => !c.IsDelete && c.ID == CurrentUserBranchId)
@@ -93,7 +139,11 @@ namespace QRB.Pages.KhoSanPham
                 })
                 .OrderBy(c => c.TenChiNhanh)
                 .ToListAsync();
+<<<<<<< HEAD
             
+=======
+
+>>>>>>> origin/phuong2
             // Lấy danh sách kho sản phẩm chỉ thuộc chi nhánh của user hiện tại
             var query = _context.KhoSanPhams
                 .Where(k => k.IDChiNhanh == CurrentUserBranchId) // Chỉ lấy kho sản phẩm của chi nhánh hiện tại

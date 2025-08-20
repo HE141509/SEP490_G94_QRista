@@ -212,6 +212,29 @@
         .action-btn:hover i {
             transform: scale(1.1);
         }
+
+        /* Rejection reason column styling */
+        .rejection-reason-column {
+            max-width: 200px;
+            min-width: 150px;
+        }
+        
+        .rejection-reason-column span {
+            display: block;
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.4;
+            padding: 4px 0;
+        }
+        
+        .rejection-reason-column .full-reason {
+            font-size: 13px;
+            background: #fff2f2;
+            border: 1px solid #f8d7da;
+            border-radius: 4px;
+            padding: 6px 8px;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
@@ -308,6 +331,7 @@
                                 <th>Người nhận</th>
                                 <th>Chi nhánh nhận</th>
                                 <th>Trạng thái</th>
+                                <th class="rejection-reason-column" style="display: none;">Lý do từ chối</th>
                                 <th>Ngày tạo</th>
                                 <th>Thao tác</th>
                             </tr>
@@ -370,6 +394,30 @@
                                                     <span>@item.Status</span>
                                                     break;
                                             }
+                                        }
+                                    </td>
+                                    <td class="rejection-reason-column" style="display: none;">
+                                        @if (item.Status == "rejected" && !string.IsNullOrEmpty(item.NoiDungTuChoi))
+                                        {
+                                            @if (item.NoiDungTuChoi.Length > 50)
+                                            {
+                                                <span style="color: #dc3545; font-style: italic; cursor: pointer;" 
+                                                      title="@item.NoiDungTuChoi" 
+                                                      onclick="showFullReason('@item.NoiDungTuChoi.Replace("'", "\\'").Replace("\r\n", "\\n").Replace("\n", "\\n")')">
+                                                    @item.NoiDungTuChoi.Substring(0, 50)...
+                                                    <small style="color: #6c757d;">(nhấp để xem đầy đủ)</small>
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span style="color: #dc3545; font-style: italic;">
+                                                    @item.NoiDungTuChoi
+                                                </span>
+                                            }
+                                        }
+                                        else if (item.Status == "rejected")
+                                        {
+                                            <span style="color: #6c757d; font-style: italic;">Không có lý do</span>
                                         }
                                     </td>
                                     <td>@item.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
@@ -767,6 +815,16 @@
                     </div>
                 </div>
                 
+                <!-- Nội dung từ chối (hiển thị khi đã bị từ chối) -->
+                <div class="userlist-add-form-group" id="viewNoiDungTuChoiContainer" style="display: none;">
+                    <label style="color: #dc3545; font-weight: 600;">
+                        <i class="fas fa-comment-slash"></i> Nội dung từ chối
+                    </label>
+                    <textarea id="viewNoiDungTuChoi" class="userlist-input" rows="3" readonly 
+                              style="background-color: #fff2f2; border-color: #dc3545; resize: none;"
+                              placeholder="Không có nội dung từ chối"></textarea>
+                </div>
+                
                 <!-- Danh sách nguyên liệu yêu cầu -->
                 <div class="userlist-add-form-group">
                     <label style="font-weight: 600; color: #333; margin-bottom: 15px; display: block;">
@@ -802,12 +860,31 @@
                         <p style="margin: 0 0 15px 0; color: #6c757d; font-size: 14px;">
                             Vui lòng chọn một trong hai hành động dưới đây để xử lý đề xuất này:
                         </p>
+                        
+                        <!-- Ô nhập nội dung từ chối -->
+                        <div id="rejectReasonContainer" style="display: none; margin-bottom: 15px;">
+                            <label style="color: #dc3545; font-weight: 600; margin-bottom: 8px; display: block;">
+                                <i class="fas fa-edit"></i> Nhập lý do từ chối
+                            </label>
+                            <textarea id="rejectReasonInput" class="userlist-input" rows="3" 
+                                      style="resize: none; border-color: #dc3545;"
+                                      placeholder="Vui lòng nhập lý do từ chối đề xuất này..."></textarea>
+                        </div>
+                        
                         <div style="display: flex; gap: 15px; justify-content: center;">
                             <button type="button" id="approveBtn" class="action-btn approve-btn" onclick="approveDeXuat()">
                                 <i class="fas fa-check"></i> Phê duyệt
                             </button>
-                            <button type="button" id="rejectBtn" class="action-btn reject-btn" onclick="rejectDeXuat()">
+                            <button type="button" id="rejectBtn" class="action-btn reject-btn" onclick="showRejectInput()">
                                 <i class="fas fa-times"></i> Từ chối
+                            </button>
+                            <button type="button" id="confirmRejectBtn" class="action-btn reject-btn" 
+                                    onclick="confirmRejectWithReason()" style="display: none;">
+                                <i class="fas fa-check"></i> Xác nhận từ chối
+                            </button>
+                            <button type="button" id="cancelRejectBtn" class="userlist-add-cancel-btn" 
+                                    onclick="cancelReject()" style="display: none;">
+                                <i class="fas fa-undo"></i> Hủy
                             </button>
                             <button type="button" onclick="closeViewDeXuatMuaSamModal()" class="userlist-add-cancel-btn">
                                 <i class="fas fa-times-circle"></i> Đóng
@@ -906,6 +983,16 @@
             // Filter table rows based on status
             const rows = document.querySelectorAll('#deXuatMuaSamListTable tbody tr');
             let visibleCount = 0;
+            
+            // Show/hide rejection reason column based on tab
+            const rejectionColumns = document.querySelectorAll('.rejection-reason-column');
+            rejectionColumns.forEach(column => {
+                if (status === 'rejected') {
+                    column.style.display = '';
+                } else {
+                    column.style.display = 'none';
+                }
+            });
             
             rows.forEach(row => {
                 const rowStatus = row.getAttribute('data-status');
@@ -1244,6 +1331,66 @@
             updatePaginationInfo(visibleCount, currentStatus);
         }
 
+        // Show full rejection reason in a modal
+        function showFullReason(reason) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 9999;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 24px;
+                border-radius: 8px;
+                max-width: 500px;
+                max-height: 70vh;
+                overflow-y: auto;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            `;
+            
+            content.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid #dc3545; padding-bottom: 12px;">
+                    <h5 style="margin: 0; color: #dc3545; font-weight: 600;">
+                        <i class="fas fa-comment-slash"></i> Lý do từ chối
+                    </h5>
+                    <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #6c757d;">
+                        &times;
+                    </button>
+                </div>
+                <div style="color: #333; line-height: 1.5; font-size: 14px; background: #fff2f2; padding: 12px; border-radius: 6px; border-left: 4px solid #dc3545;">
+                    ${reason.replace(/\n/g, '<br>')}
+                </div>
+            `;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function escapeHandler(e) {
+                if (e.key === 'Escape') {
+                    modal.remove();
+                    document.removeEventListener('keydown', escapeHandler);
+                }
+            });
+        }
+
         // Xử lý form thêm mới đề xuất mua sắm
         document.getElementById('addDeXuatMuaSamForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -1423,6 +1570,18 @@
                         const createDate = new Date(deXuat.createTime);
                         document.getElementById('viewCreateTime').value = createDate.toLocaleString('vi-VN');
                         
+                        // Hiển thị nội dung từ chối nếu đã bị từ chối
+                        const noiDungTuChoiContainer = document.getElementById('viewNoiDungTuChoiContainer');
+                        const noiDungTuChoiTextarea = document.getElementById('viewNoiDungTuChoi');
+                        
+                        if (deXuat.status === 'rejected') {
+                            noiDungTuChoiContainer.style.display = 'block';
+                            noiDungTuChoiTextarea.value = deXuat.noiDungTuChoi || 'Không có nội dung từ chối';
+                        } else {
+                            noiDungTuChoiContainer.style.display = 'none';
+                            noiDungTuChoiTextarea.value = '';
+                        }
+                        
                         // Hiển thị và enable/disable action buttons dựa trên điều kiện
                         const actionButtons = document.getElementById('viewActionButtons');
                         const approveBtn = document.getElementById('approveBtn');
@@ -1494,21 +1653,116 @@
             updateDeXuatStatus(deXuatId, 'accepted', 'Đề xuất đã được phê duyệt thành công!');
         }
 
-        // Từ chối đề xuất
+        // Từ chối đề xuất (hàm cũ - giữ lại để tương thích)
         function rejectDeXuat() {
-            console.log('rejectDeXuat called');
+            showRejectInput();
+        }
+
+        // Hiển thị ô input để nhập lý do từ chối
+        function showRejectInput() {
+            console.log('showRejectInput called');
             const rejectBtn = document.getElementById('rejectBtn');
-            console.log('rejectBtn.disabled:', rejectBtn.disabled);
             
             if (rejectBtn.disabled) {
                 alert('Bạn không có quyền thực hiện thao tác này!');
                 return;
             }
             
+            // Hiển thị ô nhập lý do
+            const reasonContainer = document.getElementById('rejectReasonContainer');
+            const confirmBtn = document.getElementById('confirmRejectBtn');
+            const cancelBtn = document.getElementById('cancelRejectBtn');
+            const approveBtn = document.getElementById('approveBtn');
+            
+            reasonContainer.style.display = 'block';
+            confirmBtn.style.display = 'inline-block';
+            cancelBtn.style.display = 'inline-block';
+            rejectBtn.style.display = 'none';
+            approveBtn.style.display = 'none';
+            
+            // Focus vào textarea
+            document.getElementById('rejectReasonInput').focus();
+        }
+
+        // Hủy việc từ chối
+        function cancelReject() {
+            const reasonContainer = document.getElementById('rejectReasonContainer');
+            const confirmBtn = document.getElementById('confirmRejectBtn');
+            const cancelBtn = document.getElementById('cancelRejectBtn');
+            const rejectBtn = document.getElementById('rejectBtn');
+            const approveBtn = document.getElementById('approveBtn');
+            
+            reasonContainer.style.display = 'none';
+            confirmBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
+            rejectBtn.style.display = 'inline-block';
+            approveBtn.style.display = 'inline-block';
+            
+            // Xóa nội dung đã nhập
+            document.getElementById('rejectReasonInput').value = '';
+        }
+
+        // Xác nhận từ chối với lý do
+        function confirmRejectWithReason() {
             const deXuatId = document.getElementById('viewDeXuatId').value;
+            const rejectReason = document.getElementById('rejectReasonInput').value.trim();
+            
             if (!deXuatId) return;
             
-            updateDeXuatStatus(deXuatId, 'rejected', 'Đề xuất đã được từ chối!');
+            if (!rejectReason) {
+                alert('Vui lòng nhập lý do từ chối!');
+                document.getElementById('rejectReasonInput').focus();
+                return;
+            }
+            
+            // Gọi hàm cập nhật với lý do
+            updateDeXuatStatusWithReason(deXuatId, 'rejected', rejectReason);
+        }
+
+        // Hàm cập nhật trạng thái với lý do từ chối
+        function updateDeXuatStatusWithReason(deXuatId, newStatus, reason) {
+            // Lấy anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            
+            // Tạo FormData
+            const formData = new FormData();
+            formData.append('id', deXuatId);
+            formData.append('status', newStatus);
+            formData.append('reason', reason || '');
+            formData.append('__RequestVerificationToken', token);
+            
+            fetch('/DeXuatMuaSam/DeXuatMuaSamList?handler=UpdateStatusWithReason', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    return response.text().then(text => {
+                        console.log('Response text:', text);
+                        throw new Error('Server không trả về JSON. Response: ' + text.substring(0, 200));
+                    });
+                }
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('Đề xuất đã được từ chối với lý do: ' + reason);
+                    closeViewDeXuatMuaSamModal();
+                    window.location.reload();
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra: ' + error.message);
+            });
         }
 
         // Cập nhật trạng thái đề xuất
