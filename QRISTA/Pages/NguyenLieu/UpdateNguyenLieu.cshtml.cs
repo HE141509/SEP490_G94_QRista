@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Models;
 using QRB.Data;
+using QRB.Services;
 using System.Threading.Tasks;
 
 namespace QRB.Pages.NguyenLieu
@@ -9,9 +10,12 @@ namespace QRB.Pages.NguyenLieu
     public class UpdateNguyenLieuModel : PageModel
     {
         private readonly QRBDbContext _context;
-        public UpdateNguyenLieuModel(QRBDbContext context)
+        private readonly IIngredientService _ingredientService;
+        
+        public UpdateNguyenLieuModel(QRBDbContext context, IIngredientService ingredientService)
         {
             _context = context;
+            _ingredientService = ingredientService;
         }
 
         [BindProperty]
@@ -36,23 +40,26 @@ namespace QRB.Pages.NguyenLieu
                 TempData["UpdateNguyenLieuError"] = "Vui lòng nhập đầy đủ thông tin.";
                 return RedirectToPage("/NguyenLieu/NguyenLieuList");
             }
-            var nl = await _context.Set<QRB.Models.NguyenLieu>().FindAsync(ID);
-            if (nl == null || nl.IsDelete)
+            
+            var nguyenLieu = await _ingredientService.GetIngredientByIdAsNguyenLieuAsync(ID);
+            if (nguyenLieu == null)
             {
                 TempData["UpdateNguyenLieuError"] = "Không tìm thấy nguyên liệu hoặc đã bị xóa.";
                 return RedirectToPage("/NguyenLieu/NguyenLieuList");
             }
+            
             // Kiểm tra trùng mã (trừ chính nó)
-            if (_context.Set<QRB.Models.NguyenLieu>().Any(x => x.MaNguyenLieu == MaNguyenLieu && x.ID != ID && !x.IsDelete))
+            if (await _ingredientService.IngredientCodeExistsAsync(MaNguyenLieu, ID))
             {
                 TempData["UpdateNguyenLieuError"] = "Mã nguyên liệu đã tồn tại.";
                 return RedirectToPage("/NguyenLieu/NguyenLieuList");
             }
-            nl.TenNguyenLieu = TenNguyenLieu.Trim();
-            nl.MaNguyenLieu = MaNguyenLieu.Trim();
-            nl.DonViTinh = DonViTinh.Trim();
-            nl.UpdateTime = DateTime.Now;
-            await _context.SaveChangesAsync();
+            
+            nguyenLieu.TenNguyenLieu = TenNguyenLieu.Trim();
+            nguyenLieu.MaNguyenLieu = MaNguyenLieu.Trim();
+            nguyenLieu.DonViTinh = DonViTinh.Trim();
+            
+            await _ingredientService.UpdateIngredientAsync(nguyenLieu);
             TempData["UpdateNguyenLieuSuccess"] = "Cập nhật nguyên liệu thành công!";
             return RedirectToPage("/NguyenLieu/NguyenLieuList");
         }

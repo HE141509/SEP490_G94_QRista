@@ -28,7 +28,6 @@ builder.Services.AddDbContext<QRBDbContext>(options =>
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<AuthorizationSeeder>();
 builder.Services.AddScoped<AuthorizationService>();
-builder.Services.AddScoped<IPermissionService, PermissionService>();
 
 var app = builder.Build();
 

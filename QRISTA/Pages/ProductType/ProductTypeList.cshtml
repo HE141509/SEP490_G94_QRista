@@ -13,6 +13,37 @@
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="/css/userlist.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Validation Error Styles */
+        .validation-error {
+            border: 2px solid #e74c3c !important;
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.3) !important;
+            background-color: #fdf2f2 !important;
+        }
+        
+        .validation-error:focus {
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 12px rgba(231, 76, 60, 0.4) !important;
+            outline: none !important;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 4px;
+            display: block;
+            font-weight: 500;
+        }
+        
+        .userlist-add-form-group {
+            position: relative;
+        }
+        
+        /* Smooth transitions for validation states */
+        .userlist-input {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+    </style>
 </head>
 <body>
     @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
@@ -117,7 +148,7 @@
             <div class="userlist-add-modal-title"><i class="fas fa-box"></i> Thêm loại sản phẩm mới</div>
             <form id="addProductTypeForm" autocomplete="off">
                 <div class="userlist-add-form-group">
-                    <label for="addIDChiNhanh">Chi nhánh</label>
+                    <label for="addIDChiNhanh">Chi nhánh <span style="color: #e74c3c;">*</span></label>
                     <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required onchange="loadSanPhamByChiNhanh(this.value)">
                         <option value="">-- Chọn chi nhánh --</option>
                         @foreach (var cn in Model.ChiNhanhs)
@@ -127,21 +158,21 @@
                     </select>
                 </div>
                 <div class="userlist-add-form-group">
-                    <label for="addIDSanPham">Sản phẩm</label>
+                    <label for="addIDSanPham">Sản phẩm <span style="color: #e74c3c;">*</span></label>
                     <select id="addIDSanPham" name="IDSanPham" class="userlist-input" required>
                         <option value="">-- Chọn sản phẩm --</option>
                     </select>
                 </div>
                 <div class="userlist-add-form-group">
-                    <label for="addTenLoai">Tên loại</label>
+                    <label for="addTenLoai">Tên loại <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="addTenLoai" name="TenLoai" class="userlist-input" required />
                 </div>
                 <div class="userlist-add-form-group">
-                    <label for="addMaLoai">Mã loại</label>
+                    <label for="addMaLoai">Mã loại <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="addMaLoai" name="MaLoai" class="userlist-input" required />
                 </div>
                 <div class="userlist-add-form-group">
-                    <label for="addDonGia">Đơn giá</label>
+                    <label for="addDonGia">Đơn giá <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="addDonGia" name="DonGia" class="userlist-input" required oninput="formatDonGiaInput(this)" />
                 </div>
                 <div class="userlist-add-form-group">
@@ -172,7 +203,7 @@
                     <input type="text" id="editIDSanPham" class="userlist-input" readonly />
                 </div>
                 <div class="userlist-add-form-group">
-                    <label for="editTenLoai">Tên loại</label>
+                    <label for="editTenLoai">Tên loại <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="editTenLoai" name="TenLoai" class="userlist-input" required />
                 </div>
                 <div class="userlist-add-form-group">
@@ -180,7 +211,7 @@
                     <input type="text" id="editMaLoai" class="userlist-input" readonly />
                 </div>
                 <div class="userlist-add-form-group">
-                    <label for="editDonGia">Đơn giá</label>
+                    <label for="editDonGia">Đơn giá <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="editDonGia" name="DonGia" class="userlist-input" required oninput="formatDonGiaInput(this)" />
                 </div>
                 <div class="userlist-add-form-group">
@@ -301,6 +332,13 @@ function openAddProductTypeModal() {
 function closeAddProductTypeModal() {
     document.getElementById('addProductTypeModal').style.display = 'none';
     document.getElementById('addProductTypeForm').reset();
+    
+    // Clear all validation errors
+    const form = document.getElementById('addProductTypeForm');
+    const inputs = form.querySelectorAll('.userlist-input');
+    inputs.forEach(input => {
+        clearValidationErrors(input);
+    });
 }
 function formatDonGiaInput(input) {
     // Chỉ cho nhập số, làm tròn xuống hàng nghìn và định dạng xxx,000 (dấu phẩy)
@@ -363,11 +401,105 @@ window.addEventListener('DOMContentLoaded', function() {
     productTypePageSize = parseInt(document.getElementById('productTypePageSize').value) || 10;
     setTimeout(updateProductTypePagination, 0);
 
+    // Add real-time validation for Add form
+    const addIDChiNhanh = document.getElementById('addIDChiNhanh');
+    const addIDSanPham = document.getElementById('addIDSanPham');
+    const addTenLoai = document.getElementById('addTenLoai');
+    const addMaLoai = document.getElementById('addMaLoai');
+    const addDonGia = document.getElementById('addDonGia');
+    
+    if (addIDChiNhanh) {
+        addIDChiNhanh.addEventListener('blur', function() {
+            validateField(this, 'Vui lòng chọn chi nhánh');
+        });
+        addIDChiNhanh.addEventListener('change', function() {
+            if (this.value.trim()) {
+                clearValidationErrors(this);
+            }
+        });
+    }
+    
+    if (addIDSanPham) {
+        addIDSanPham.addEventListener('blur', function() {
+            validateField(this, 'Vui lòng chọn sản phẩm');
+        });
+        addIDSanPham.addEventListener('change', function() {
+            if (this.value.trim()) {
+                clearValidationErrors(this);
+            }
+        });
+    }
+    
+    if (addTenLoai) {
+        addTenLoai.addEventListener('blur', function() {
+            validateField(this, 'Tên loại không được để trống');
+        });
+        addTenLoai.addEventListener('input', function() {
+            if (this.value.trim()) {
+                clearValidationErrors(this);
+            }
+        });
+    }
+    
+    if (addMaLoai) {
+        addMaLoai.addEventListener('blur', function() {
+            validateField(this, 'Mã loại không được để trống');
+        });
+        addMaLoai.addEventListener('input', function() {
+            if (this.value.trim()) {
+                clearValidationErrors(this);
+            }
+        });
+    }
+    
+    if (addDonGia) {
+        addDonGia.addEventListener('blur', function() {
+            validateField(this, 'Đơn giá không được để trống');
+        });
+        addDonGia.addEventListener('input', function() {
+            if (this.value.trim()) {
+                clearValidationErrors(this);
+            }
+        });
+    }
+    
+    // Add real-time validation for Edit form
+    const editTenLoai = document.getElementById('editTenLoai');
+    const editDonGia = document.getElementById('editDonGia');
+    
+    if (editTenLoai) {
+        editTenLoai.addEventListener('blur', function() {
+            validateField(this, 'Tên loại không được để trống');
+        });
+        editTenLoai.addEventListener('input', function() {
+            if (this.value.trim()) {
+                clearValidationErrors(this);
+            }
+        });
+    }
+    
+    if (editDonGia) {
+        editDonGia.addEventListener('blur', function() {
+            validateField(this, 'Đơn giá không được để trống');
+        });
+        editDonGia.addEventListener('input', function() {
+            if (this.value.trim()) {
+                clearValidationErrors(this);
+            }
+        });
+    }
+
     // Xử lý submit form thêm loại sản phẩm bằng AJAX
     const addForm = document.getElementById('addProductTypeForm');
     if (addForm) {
         addForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            // Validate form before submission
+            if (!validateAddForm()) {
+                return false;
+            }
+            
             const formData = new FormData(addForm);
             // Đảm bảo gửi đúng tên trường cho Razor Page
             formData.set('IsDeletePost', formData.get('IsDelete'));
@@ -414,6 +546,12 @@ window.addEventListener('DOMContentLoaded', function() {
     if (editForm) {
         editForm.addEventListener('submit', function(e) {
             e.preventDefault();
+            
+            // Validate form before submission
+            if (!validateEditForm()) {
+                return false;
+            }
+            
             // Đảm bảo DonGia gửi về là số nguyên
             let donGiaInput = editForm.querySelector('[name="DonGia"]');
             if (donGiaInput) {
@@ -479,5 +617,98 @@ function openEditProductTypeModal(data) {
 }
 function closeEditProductTypeModal() {
     document.getElementById('editProductTypeModal').style.display = 'none';
+    
+    // Clear all validation errors
+    const form = document.getElementById('editProductTypeForm');
+    const inputs = form.querySelectorAll('.userlist-input');
+    inputs.forEach(input => {
+        clearValidationErrors(input);
+    });
+}
+
+// Validation Functions
+function validateField(field, errorMessage) {
+    const value = field.value.trim();
+    const isValid = value !== '';
+    
+    // Remove existing error styling and messages
+    clearValidationErrors(field);
+    
+    if (!isValid) {
+        // Add error styling
+        field.classList.add('validation-error');
+        
+        // Add error message
+        const errorElement = document.createElement('span');
+        errorElement.className = 'error-message';
+        errorElement.textContent = errorMessage;
+        field.parentNode.appendChild(errorElement);
+        
+        return false;
+    }
+    
+    return true;
+}
+
+function clearValidationErrors(field) {
+    // Remove error styling
+    field.classList.remove('validation-error');
+    
+    // Remove error message
+    const errorMessage = field.parentNode.querySelector('.error-message');
+    if (errorMessage) {
+        errorMessage.remove();
+    }
+}
+
+function validateAddForm() {
+    let isValid = true;
+    
+    // Validate required fields
+    const idChiNhanh = document.getElementById('addIDChiNhanh');
+    const idSanPham = document.getElementById('addIDSanPham');
+    const tenLoai = document.getElementById('addTenLoai');
+    const maLoai = document.getElementById('addMaLoai');
+    const donGia = document.getElementById('addDonGia');
+    
+    if (!validateField(idChiNhanh, 'Vui lòng chọn chi nhánh')) {
+        isValid = false;
+    }
+    
+    if (!validateField(idSanPham, 'Vui lòng chọn sản phẩm')) {
+        isValid = false;
+    }
+    
+    if (!validateField(tenLoai, 'Tên loại không được để trống')) {
+        isValid = false;
+    }
+    
+    if (!validateField(maLoai, 'Mã loại không được để trống')) {
+        isValid = false;
+    }
+    
+    if (!validateField(donGia, 'Đơn giá không được để trống')) {
+        isValid = false;
+    }
+    
+    return isValid;
+}
+
+function validateEditForm() {
+    let isValid = true;
+    
+    // Validate required fields (only editable fields)
+    const tenLoai = document.getElementById('editTenLoai');
+    const donGia = document.getElementById('editDonGia');
+    
+    if (!validateField(tenLoai, 'Tên loại không được để trống')) {
+        isValid = false;
+    }
+    
+    if (!validateField(donGia, 'Đơn giá không được để trống')) {
+        isValid = false;
+    }
+    
+    return isValid;
 }
 </script>

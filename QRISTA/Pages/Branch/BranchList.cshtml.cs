@@ -64,7 +64,7 @@ namespace QRB.Pages.Branch
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                var command = new SqlCommand(@"SELECT ID, MaChiNhanh, TenChiNhanh, ISNULL(IsDelete,0), ISNULL(CreateTime, GETDATE()) FROM ChiNhanh", connection);
+                var command = new SqlCommand(@"SELECT ID, DepartmentCode, DepartmentName, ISNULL(IsDelete,0), ISNULL(CreateTime, GETDATE()) FROM Department", connection);
                 using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())

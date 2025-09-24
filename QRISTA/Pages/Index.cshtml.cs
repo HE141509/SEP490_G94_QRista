@@ -55,10 +55,10 @@ public class IndexModel : PageModel
             using (var connection = new Microsoft.Data.SqlClient.SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "SELECT COUNT(1) FROM KhachHang WHERE SDT = @SDT AND IsDelete = 0";
+                string sql = "SELECT COUNT(1) FROM Customer WHERE Phone = @Phone AND IsDelete = 0";
                 using (var command = new Microsoft.Data.SqlClient.SqlCommand(sql, connection))
                 {
-                    command.Parameters.AddWithValue("@SDT", PhoneNumber.Trim());
+                    command.Parameters.AddWithValue("@Phone", PhoneNumber.Trim());
                     int count = (int)command.ExecuteScalar();
                     if (count > 0)
                     {
@@ -69,13 +69,13 @@ public class IndexModel : PageModel
                     else
                     {
                         // Chưa đăng ký, thêm mới khách hàng
-                        string insertSql = @"INSERT INTO KhachHang (ID, TenKhachHang, SDT, GiaTriDonHang, IsDelete, CreateTime) 
-                                           VALUES (@ID, @TenKhachHang, @SDT, @GiaTriDonHang, @IsDelete, @CreateTime)";
+                        string insertSql = @"INSERT INTO Customer (ID, CustomerName, Phone, GiaTriDonHang, IsDelete, CreateTime) 
+                                           VALUES (@ID, @CustomerName, @Phone, @GiaTriDonHang, @IsDelete, @CreateTime)";
                         using (var insertCommand = new Microsoft.Data.SqlClient.SqlCommand(insertSql, connection))
                         {
                             insertCommand.Parameters.AddWithValue("@ID", Guid.NewGuid());
-                            insertCommand.Parameters.AddWithValue("@TenKhachHang", PhoneNumber.Trim());
-                            insertCommand.Parameters.AddWithValue("@SDT", PhoneNumber.Trim());
+                            insertCommand.Parameters.AddWithValue("@CustomerName", PhoneNumber.Trim());
+                            insertCommand.Parameters.AddWithValue("@Phone", PhoneNumber.Trim());
                             insertCommand.Parameters.AddWithValue("@GiaTriDonHang", 0);
                             insertCommand.Parameters.AddWithValue("@IsDelete", false);
                             insertCommand.Parameters.AddWithValue("@CreateTime", DateTime.Now);

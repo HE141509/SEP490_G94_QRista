@@ -32,7 +32,7 @@ namespace QRB.Pages.Branch
                     using (var connection = new SqlConnection(connectionString))
                     {
                         connection.Open();
-                        var cmd = new SqlCommand("UPDATE ChiNhanh SET IsDelete = 1 WHERE ID = @ID", connection);
+                        var cmd = new SqlCommand("UPDATE Department SET IsDelete = 1 WHERE ID = @ID", connection);
                         cmd.Parameters.AddWithValue("@ID", input.id);
                         int rows = cmd.ExecuteNonQuery();
                         if (rows > 0)

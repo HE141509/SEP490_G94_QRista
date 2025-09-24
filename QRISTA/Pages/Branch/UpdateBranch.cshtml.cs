@@ -37,10 +37,22 @@ namespace QRB.Pages.Branch
                     using (var connection = new SqlConnection(connectionString))
                     {
                         connection.Open();
-                        var cmd = new SqlCommand("UPDATE ChiNhanh SET MaChiNhanh = @MaChiNhanh, TenChiNhanh = @TenChiNhanh, IsDelete = @IsDelete WHERE ID = @ID", connection);
+                        
+                        // Kiểm tra mã chi nhánh đã tồn tại chưa (trừ chính nó)
+                        var checkCmd = new SqlCommand("SELECT COUNT(*) FROM Department WHERE DepartmentCode = @DepartmentCode AND ID != @ID", connection);
+                        checkCmd.Parameters.AddWithValue("@DepartmentCode", input.MaChiNhanh.Trim());
+                        checkCmd.Parameters.AddWithValue("@ID", input.ID);
+                        var count = (int)checkCmd.ExecuteScalar();
+                        
+                        if (count > 0)
+                        {
+                            return new JsonResult(new { success = false, message = "Mã chi nhánh đã tồn tại!" });
+                        }
+                        
+                        var cmd = new SqlCommand("UPDATE Department SET DepartmentCode = @DepartmentCode, DepartmentName = @DepartmentName, IsDelete = @IsDelete WHERE ID = @ID", connection);
                         cmd.Parameters.AddWithValue("@ID", input.ID);
-                        cmd.Parameters.AddWithValue("@MaChiNhanh", input.MaChiNhanh.Trim());
-                        cmd.Parameters.AddWithValue("@TenChiNhanh", input.TenChiNhanh.Trim());
+                        cmd.Parameters.AddWithValue("@DepartmentCode", input.MaChiNhanh.Trim());
+                        cmd.Parameters.AddWithValue("@DepartmentName", input.TenChiNhanh.Trim());
                         cmd.Parameters.AddWithValue("@IsDelete", input.IsDelete);
                         int rows = cmd.ExecuteNonQuery();
                         if (rows > 0)

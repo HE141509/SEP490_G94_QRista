@@ -40,12 +40,12 @@ namespace QRB.Pages.User
                 string key = _config["PasswordKey"] ?? "";
                 string matKhauHash = EncodePasswordMd5(matKhau, key);
                 string trangThai = root.TryGetProperty("TrangThai", out var tt) ? tt.GetString() : "active";
-                string idChiNhanhStr = root.TryGetProperty("IDChiNhanh", out var cn) ? cn.GetString() : null;
-                if (string.IsNullOrWhiteSpace(tenHienThi) || string.IsNullOrWhiteSpace(tenNguoiDung) || string.IsNullOrWhiteSpace(matKhau) || string.IsNullOrWhiteSpace(idChiNhanhStr))
+                string? idDepartmentStr = root.TryGetProperty("IDDepartment", out var cn) ? cn.GetString() : null;
+                if (string.IsNullOrWhiteSpace(tenHienThi) || string.IsNullOrWhiteSpace(tenNguoiDung) || string.IsNullOrWhiteSpace(matKhau) || string.IsNullOrWhiteSpace(idDepartmentStr))
                 {
                     return new JsonResult(new { success = false, message = "Thiếu thông tin bắt buộc." });
                 }
-                if (!Guid.TryParse(idChiNhanhStr, out Guid idChiNhanh))
+                if (!Guid.TryParse(idDepartmentStr, out Guid idDepartment))
                 {
                     return new JsonResult(new { success = false, message = "Chi nhánh không hợp lệ." });
                 }
@@ -55,22 +55,22 @@ namespace QRB.Pages.User
                 {
                     await connection.OpenAsync();
                     // Kiểm tra trùng tên đăng nhập
-                    var checkCmd = new SqlCommand("SELECT COUNT(*) FROM NguoiDung WHERE TenNguoiDung = @TenNguoiDung AND (IsDelete = 0 OR IsDelete IS NULL)", connection);
-                    checkCmd.Parameters.AddWithValue("@TenNguoiDung", tenNguoiDung);
+                    var checkCmd = new SqlCommand("SELECT COUNT(*) FROM [User] WHERE Account = @Account AND (IsDelete = 0 OR IsDelete IS NULL)", connection);
+                    checkCmd.Parameters.AddWithValue("@Account", tenNguoiDung);
                     int count = (int)await checkCmd.ExecuteScalarAsync();
                     if (count > 0)
                     {
                         return new JsonResult(new { success = false, message = "Tên đăng nhập đã tồn tại." });
                     }
 
-                    var insertCmd = new SqlCommand(@"INSERT INTO NguoiDung (ID, TenHienThi, TenNguoiDung, MatKhau, IsDelete, IDChiNhanh, CreateTime) VALUES (@ID, @TenHienThi, @TenNguoiDung, @MatKhau, @IsDelete, @IDChiNhanh, @CreateTime)", connection);
+                    var insertCmd = new SqlCommand(@"INSERT INTO [User] (ID, UserName, Account, Password, IsDelete, IDDepartment, CreateTime) VALUES (@ID, @UserName, @Account, @Password, @IsDelete, @IDDepartment, @CreateTime)", connection);
                     Guid newId = Guid.NewGuid();
                     insertCmd.Parameters.AddWithValue("@ID", newId);
-                    insertCmd.Parameters.AddWithValue("@TenHienThi", tenHienThi);
-                    insertCmd.Parameters.AddWithValue("@TenNguoiDung", tenNguoiDung);
-                    insertCmd.Parameters.AddWithValue("@MatKhau", matKhauHash); // Đã mã hóa MD5 + key
+                    insertCmd.Parameters.AddWithValue("@UserName", tenHienThi);
+                    insertCmd.Parameters.AddWithValue("@Account", tenNguoiDung);
+                    insertCmd.Parameters.AddWithValue("@Password", matKhauHash); // Đã mã hóa MD5 + key
                     insertCmd.Parameters.AddWithValue("@IsDelete", trangThai == "active" ? 0 : 1);
-                    insertCmd.Parameters.AddWithValue("@IDChiNhanh", idChiNhanh);
+                    insertCmd.Parameters.AddWithValue("@IDDepartment", idDepartment);
                     insertCmd.Parameters.AddWithValue("@CreateTime", DateTime.Now);
 
                     int rows = await insertCmd.ExecuteNonQueryAsync();

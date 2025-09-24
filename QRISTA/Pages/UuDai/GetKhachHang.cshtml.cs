@@ -24,7 +24,7 @@ namespace QRB.Pages.UuDai
             using (var conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                var cmd = new SqlCommand(@"SELECT TOP 20 Id, TenKhachHang, SDT FROM KhachHang WHERE IsDelete = 0 AND (TenKhachHang LIKE @search OR SDT LIKE @search) ORDER BY CreateTime DESC", conn);
+                var cmd = new SqlCommand(@"SELECT TOP 20 Id, CustomerName, Phone FROM Customer WHERE IsDelete = 0 AND (CustomerName LIKE @search OR Phone LIKE @search) ORDER BY CreateTime DESC", conn);
                 cmd.Parameters.AddWithValue("@search", "%" + (search ?? "") + "%");
                 using (var reader = cmd.ExecuteReader())
                 {
@@ -32,8 +32,8 @@ namespace QRB.Pages.UuDai
                     {
                         result.Add(new {
                             ID = reader["Id"] == DBNull.Value ? string.Empty : reader["Id"].ToString(),
-                            TenKhachHang = reader["TenKhachHang"] == DBNull.Value ? string.Empty : reader["TenKhachHang"].ToString(),
-                            SoDienThoai = reader["SDT"] == DBNull.Value ? string.Empty : reader["SDT"].ToString()
+                            TenKhachHang = reader["CustomerName"] == DBNull.Value ? string.Empty : reader["CustomerName"].ToString(),
+                            SoDienThoai = reader["Phone"] == DBNull.Value ? string.Empty : reader["Phone"].ToString()
                         });
                     }
                 }

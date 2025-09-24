@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Data;
 using QRB.Models;
 using Microsoft.EntityFrameworkCore;
-<<<<<<< HEAD
-=======
 using System.Text.Json;
->>>>>>> origin/phuong2
+using System.Collections.Generic;
+using System.Linq;
 
 namespace QRB.Pages.DeXuatMuaSam
 {
@@ -36,10 +35,7 @@ namespace QRB.Pages.DeXuatMuaSam
             public Guid IDNguoiNhan { get; set; }
             public Guid IDChiNhanhNhan { get; set; }
             public bool IsDelete { get; set; }
-<<<<<<< HEAD
-=======
             public string? NoiDungTuChoi { get; set; }
->>>>>>> origin/phuong2
         }
 
         public class NguoiDungViewModel
@@ -59,20 +55,12 @@ namespace QRB.Pages.DeXuatMuaSam
         public List<ChiNhanhViewModel> ChiNhanhList { get; set; } = new();     // Cho dropdown (đã lọc)
         public List<NguoiDungViewModel> AllNguoiDungList { get; set; } = new(); // Cho hiển thị bảng (không lọc)
         public List<ChiNhanhViewModel> AllChiNhanhList { get; set; } = new();   // Cho hiển thị bảng (không lọc)
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> origin/phuong2
         // User info
         public string CurrentUserBranchCode { get; set; } = string.Empty;
         public Guid CurrentUserId { get; set; } = Guid.Empty;
         public Guid CurrentUserBranchId { get; set; } = Guid.Empty;
-<<<<<<< HEAD
-        
-=======
 
->>>>>>> origin/phuong2
         // Pagination properties
         public int CurrentPage { get; set; } = 1;
         public int PageSize { get; set; } = 10;
@@ -85,9 +73,6 @@ namespace QRB.Pages.DeXuatMuaSam
         public int DaDuyetCount { get; set; } = 0;
         public int DaTuChoiCount { get; set; } = 0;
         public int DaXoaCount { get; set; } = 0;
-<<<<<<< HEAD
-
-=======
         private bool HasPermission(string permissionName)
         {
             var permissionsJson = HttpContext.Session.GetString("UserPermissions");
@@ -105,7 +90,6 @@ namespace QRB.Pages.DeXuatMuaSam
                 return false;
             }
         }
->>>>>>> origin/phuong2
         public async Task<IActionResult> OnGetAsync(int pageNumber = 1, int pageSize = 10)
         {
             try
@@ -117,49 +101,31 @@ namespace QRB.Pages.DeXuatMuaSam
                     // Chưa đăng nhập, redirect về trang login
                     return RedirectToPage("/Login");
                 }
-<<<<<<< HEAD
-=======
                 if (!HasPermission("Full Purchase Suggestions"))
                 {
                     return Redirect($"/AccessDenied?permission=Full Purchase Suggestions&module=PurchaseSuggestions");
                 }
 
->>>>>>> origin/phuong2
 
                 CurrentPage = pageNumber < 1 ? 1 : pageNumber;
                 PageSize = pageSize < 5 ? 10 : (pageSize > 100 ? 100 : pageSize);
 
                 // Lấy thông tin chi nhánh của user đang đăng nhập
                 CurrentUserId = userGuid;
-<<<<<<< HEAD
-                    
-=======
 
->>>>>>> origin/phuong2
                 var currentUser = await _context.NguoiDungs
                     .Where(u => u.ID == userGuid && !u.IsDelete)
-                    .Join(_context.ChiNhanhs, u => u.IDChiNhanh, c => c.ID, (u, c) => new { u, c })
+                    .Join(_context.Departments, u => u.IDChiNhanh, c => c.ID, (u, c) => new { u, c })
                     .FirstOrDefaultAsync();
-<<<<<<< HEAD
-                
-                if (currentUser != null)
-                {
-                    CurrentUserBranchId = currentUser.c.ID;
-                    
-                    // Ưu tiên MaChiNhanh, nếu không có thì dùng 3 ký tự đầu của TenChiNhanh
-                    CurrentUserBranchCode = !string.IsNullOrWhiteSpace(currentUser.c.MaChiNhanh) 
-                        ? currentUser.c.MaChiNhanh 
-=======
 
                 if (currentUser != null)
                 {
                     CurrentUserBranchId = currentUser.c.ID;
 
-                    // Ưu tiên MaChiNhanh, nếu không có thì dùng 3 ký tự đầu của TenChiNhanh
-                    CurrentUserBranchCode = !string.IsNullOrWhiteSpace(currentUser.c.MaChiNhanh)
-                        ? currentUser.c.MaChiNhanh
->>>>>>> origin/phuong2
-                        : (currentUser.c.TenChiNhanh.Length >= 3 ? currentUser.c.TenChiNhanh.Substring(0, 3).ToUpper() : currentUser.c.TenChiNhanh.ToUpper());
+                    // Ưu tiên DepartmentCode, nếu không có thì dùng 3 ký tự đầu của DepartmentName
+                    CurrentUserBranchCode = !string.IsNullOrWhiteSpace(currentUser.c.DepartmentCode)
+                        ? currentUser.c.DepartmentCode
+                        : (currentUser.c.DepartmentName.Length >= 3 ? currentUser.c.DepartmentName.Substring(0, 3).ToUpper() : currentUser.c.DepartmentName.ToUpper());
                 }
                 else
                 {
@@ -191,45 +157,14 @@ namespace QRB.Pages.DeXuatMuaSam
                 // Đếm tổng số bản ghi (bao gồm cả đã xóa)
                 TotalRecords = await _context.DeXuatMuaSams.CountAsync();
 
-                // Lấy danh sách đề xuất mua sắm với phân trang (bao gồm cả đã xóa)
                 DeXuatMuaSamList = await (from dx in _context.DeXuatMuaSams
-<<<<<<< HEAD
-                                         join nguoiGui in _context.NguoiDungs on dx.IDNguoiGui equals nguoiGui.ID into nguoiGuiGroup
-                                         from nguoiGui in nguoiGuiGroup.DefaultIfEmpty()
-                                         join chiNhanhGui in _context.ChiNhanhs on dx.IDChiNhanhGui equals chiNhanhGui.ID into chiNhanhGuiGroup
-                                         from chiNhanhGui in chiNhanhGuiGroup.DefaultIfEmpty()
-                                         join nguoiNhan in _context.NguoiDungs on dx.IDNguoiNhan equals nguoiNhan.ID into nguoiNhanGroup
-                                         from nguoiNhan in nguoiNhanGroup.DefaultIfEmpty()
-                                         join chiNhanhNhan in _context.ChiNhanhs on dx.IDChiNhanhNhan equals chiNhanhNhan.ID into chiNhanhNhanGroup
-                                         from chiNhanhNhan in chiNhanhNhanGroup.DefaultIfEmpty()
-                                         orderby dx.CreateTime descending
-                                         select new DeXuatMuaSamViewModel
-                                         {
-                                             ID = dx.ID,
-                                             MaDeXuat = dx.MaDeXuat,
-                                             TieuDe = dx.TieuDe,
-                                             NoiDungDeXuat = dx.NoiDungDeXuat,
-                                             TenNguoiGui = nguoiGui != null ? nguoiGui.TenHienThi : "N/A",
-                                             TenChiNhanhGui = chiNhanhGui != null ? chiNhanhGui.TenChiNhanh : "N/A",
-                                             TenNguoiNhan = nguoiNhan != null ? nguoiNhan.TenHienThi : "N/A",
-                                             TenChiNhanhNhan = chiNhanhNhan != null ? chiNhanhNhan.TenChiNhanh : "N/A",
-                                             Status = dx.Status,
-                                             CreateTime = dx.CreateTime,
-                                             ReceiveTime = dx.ReceiveTime,
-                                             IDNguoiGui = dx.IDNguoiGui,
-                                             IDChiNhanhGui = dx.IDChiNhanhGui,
-                                             IDNguoiNhan = dx.IDNguoiNhan,
-                                             IDChiNhanhNhan = dx.IDChiNhanhNhan,
-                                             IsDelete = dx.IsDelete
-                                         })
-=======
                                           join nguoiGui in _context.NguoiDungs on dx.IDNguoiGui equals nguoiGui.ID into nguoiGuiGroup
                                           from nguoiGui in nguoiGuiGroup.DefaultIfEmpty()
-                                          join chiNhanhGui in _context.ChiNhanhs on dx.IDChiNhanhGui equals chiNhanhGui.ID into chiNhanhGuiGroup
+                                          join chiNhanhGui in _context.Departments on dx.IDChiNhanhGui equals chiNhanhGui.ID into chiNhanhGuiGroup
                                           from chiNhanhGui in chiNhanhGuiGroup.DefaultIfEmpty()
                                           join nguoiNhan in _context.NguoiDungs on dx.IDNguoiNhan equals nguoiNhan.ID into nguoiNhanGroup
                                           from nguoiNhan in nguoiNhanGroup.DefaultIfEmpty()
-                                          join chiNhanhNhan in _context.ChiNhanhs on dx.IDChiNhanhNhan equals chiNhanhNhan.ID into chiNhanhNhanGroup
+                                          join chiNhanhNhan in _context.Departments on dx.IDChiNhanhNhan equals chiNhanhNhan.ID into chiNhanhNhanGroup
                                           from chiNhanhNhan in chiNhanhNhanGroup.DefaultIfEmpty()
                                           orderby dx.CreateTime descending
                                           select new DeXuatMuaSamViewModel
@@ -239,9 +174,9 @@ namespace QRB.Pages.DeXuatMuaSam
                                               TieuDe = dx.TieuDe,
                                               NoiDungDeXuat = dx.NoiDungDeXuat,
                                               TenNguoiGui = nguoiGui != null ? nguoiGui.TenHienThi : "N/A",
-                                              TenChiNhanhGui = chiNhanhGui != null ? chiNhanhGui.TenChiNhanh : "N/A",
+                                              TenChiNhanhGui = chiNhanhGui != null ? chiNhanhGui.DepartmentName : "N/A",
                                               TenNguoiNhan = nguoiNhan != null ? nguoiNhan.TenHienThi : "N/A",
-                                              TenChiNhanhNhan = chiNhanhNhan != null ? chiNhanhNhan.TenChiNhanh : "N/A",
+                                              TenChiNhanhNhan = chiNhanhNhan != null ? chiNhanhNhan.DepartmentName : "N/A",
                                               Status = dx.Status,
                                               CreateTime = dx.CreateTime,
                                               ReceiveTime = dx.ReceiveTime,
@@ -252,7 +187,6 @@ namespace QRB.Pages.DeXuatMuaSam
                                               IsDelete = dx.IsDelete,
                                               NoiDungTuChoi = dx.NoiDungTuChoi
                                           })
->>>>>>> origin/phuong2
                                          .Skip((CurrentPage - 1) * PageSize)
                                          .Take(PageSize)
                                          .ToListAsync();
@@ -269,15 +203,16 @@ namespace QRB.Pages.DeXuatMuaSam
                     .ToListAsync();
 
                 // Lấy danh sách chi nhánh cho dropdown (loại trừ chi nhánh của người gửi)
-                ChiNhanhList = await _context.ChiNhanhs
+                var departments = await _context.Departments
                     .Where(cn => !cn.IsDelete && cn.ID != CurrentUserBranchId)
-                    .Select(cn => new ChiNhanhViewModel
-                    {
-                        ID = cn.ID,
-                        TenChiNhanh = cn.TenChiNhanh
-                    })
-                    .OrderBy(cn => cn.TenChiNhanh)
+                    .OrderBy(cn => cn.DepartmentName)
                     .ToListAsync();
+                
+                ChiNhanhList = departments.Select(cn => new ChiNhanhViewModel
+                {
+                    ID = cn.ID,
+                    TenChiNhanh = cn.DepartmentName
+                }).ToList();
 
                 // Lấy danh sách đầy đủ cho việc hiển thị trong dropdown người gửi và bảng
                 AllNguoiDungList = await _context.NguoiDungs
@@ -290,15 +225,16 @@ namespace QRB.Pages.DeXuatMuaSam
                     .OrderBy(nd => nd.TenHienThi)
                     .ToListAsync();
 
-                AllChiNhanhList = await _context.ChiNhanhs
+                var allDepartments = await _context.Departments
                     .Where(cn => !cn.IsDelete)
-                    .Select(cn => new ChiNhanhViewModel
-                    {
-                        ID = cn.ID,
-                        TenChiNhanh = cn.TenChiNhanh
-                    })
-                    .OrderBy(cn => cn.TenChiNhanh)
+                    .OrderBy(cn => cn.DepartmentName)
                     .ToListAsync();
+                
+                AllChiNhanhList = allDepartments.Select(cn => new ChiNhanhViewModel
+                {
+                    ID = cn.ID,
+                    TenChiNhanh = cn.DepartmentName
+                }).ToList();
             }
             catch (Exception)
             {
@@ -342,7 +278,6 @@ namespace QRB.Pages.DeXuatMuaSam
             }
         }
 
-        // Handler method để lấy chi tiết đề xuất mua sắm
         public async Task<JsonResult> OnGetGetDeXuatDetailAsync(Guid id)
         {
             try
@@ -354,41 +289,13 @@ namespace QRB.Pages.DeXuatMuaSam
                     return new JsonResult(new { success = false, message = "Chưa đăng nhập" });
                 }
                 var deXuat = await (from dx in _context.DeXuatMuaSams
-<<<<<<< HEAD
-                                   join nguoiGui in _context.NguoiDungs on dx.IDNguoiGui equals nguoiGui.ID into nguoiGuiGroup
-                                   from nguoiGui in nguoiGuiGroup.DefaultIfEmpty()
-                                   join chiNhanhGui in _context.ChiNhanhs on dx.IDChiNhanhGui equals chiNhanhGui.ID into chiNhanhGuiGroup
-                                   from chiNhanhGui in chiNhanhGuiGroup.DefaultIfEmpty()
-                                   join nguoiNhan in _context.NguoiDungs on dx.IDNguoiNhan equals nguoiNhan.ID into nguoiNhanGroup
-                                   from nguoiNhan in nguoiNhanGroup.DefaultIfEmpty()
-                                   join chiNhanhNhan in _context.ChiNhanhs on dx.IDChiNhanhNhan equals chiNhanhNhan.ID into chiNhanhNhanGroup
-                                   from chiNhanhNhan in chiNhanhNhanGroup.DefaultIfEmpty()
-                                   where dx.ID == id && !dx.IsDelete
-                                   select new
-                                   {
-                                       id = dx.ID.ToString(),
-                                       maDeXuat = dx.MaDeXuat,
-                                       tieuDe = dx.TieuDe,
-                                       noiDungDeXuat = dx.NoiDungDeXuat,
-                                       status = dx.Status,
-                                       createTime = dx.CreateTime,
-                                       idNguoiGui = dx.IDNguoiGui.ToString(),
-                                       tenNguoiGui = nguoiGui != null ? nguoiGui.TenHienThi : "N/A",
-                                       idChiNhanhGui = dx.IDChiNhanhGui.ToString(),
-                                       tenChiNhanhGui = chiNhanhGui != null ? chiNhanhGui.TenChiNhanh : "N/A",
-                                       idNguoiNhan = dx.IDNguoiNhan.ToString(),
-                                       tenNguoiNhan = nguoiNhan != null ? nguoiNhan.TenHienThi : "N/A",
-                                       idChiNhanhNhan = dx.IDChiNhanhNhan.ToString(),
-                                       tenChiNhanhNhan = chiNhanhNhan != null ? chiNhanhNhan.TenChiNhanh : "N/A"
-                                   })
-=======
                                     join nguoiGui in _context.NguoiDungs on dx.IDNguoiGui equals nguoiGui.ID into nguoiGuiGroup
                                     from nguoiGui in nguoiGuiGroup.DefaultIfEmpty()
-                                    join chiNhanhGui in _context.ChiNhanhs on dx.IDChiNhanhGui equals chiNhanhGui.ID into chiNhanhGuiGroup
+                                    join chiNhanhGui in _context.Departments on dx.IDChiNhanhGui equals chiNhanhGui.ID into chiNhanhGuiGroup
                                     from chiNhanhGui in chiNhanhGuiGroup.DefaultIfEmpty()
                                     join nguoiNhan in _context.NguoiDungs on dx.IDNguoiNhan equals nguoiNhan.ID into nguoiNhanGroup
                                     from nguoiNhan in nguoiNhanGroup.DefaultIfEmpty()
-                                    join chiNhanhNhan in _context.ChiNhanhs on dx.IDChiNhanhNhan equals chiNhanhNhan.ID into chiNhanhNhanGroup
+                                    join chiNhanhNhan in _context.Departments on dx.IDChiNhanhNhan equals chiNhanhNhan.ID into chiNhanhNhanGroup
                                     from chiNhanhNhan in chiNhanhNhanGroup.DefaultIfEmpty()
                                     where dx.ID == id && !dx.IsDelete
                                     select new
@@ -402,19 +309,18 @@ namespace QRB.Pages.DeXuatMuaSam
                                         idNguoiGui = dx.IDNguoiGui.ToString(),
                                         tenNguoiGui = nguoiGui != null ? nguoiGui.TenHienThi : "N/A",
                                         idChiNhanhGui = dx.IDChiNhanhGui.ToString(),
-                                        tenChiNhanhGui = chiNhanhGui != null ? chiNhanhGui.TenChiNhanh : "N/A",
+                                        tenChiNhanhGui = chiNhanhGui != null ? chiNhanhGui.DepartmentName : "N/A",
                                         idNguoiNhan = dx.IDNguoiNhan.ToString(),
                                         tenNguoiNhan = nguoiNhan != null ? nguoiNhan.TenHienThi : "N/A",
                                         idChiNhanhNhan = dx.IDChiNhanhNhan.ToString(),
-                                        tenChiNhanhNhan = chiNhanhNhan != null ? chiNhanhNhan.TenChiNhanh : "N/A",
+                                        tenChiNhanhNhan = chiNhanhNhan != null ? chiNhanhNhan.DepartmentName : "N/A",
                                         noiDungTuChoi = dx.NoiDungTuChoi
                                     })
->>>>>>> origin/phuong2
                                    .FirstOrDefaultAsync();
 
                 if (deXuat == null)
                 {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
+                    return new JsonResult(new { success = false, message = "Không tìm thấy phiếu đề xuất" });
                 }
 
                 return new JsonResult(new { success = true, data = deXuat });
@@ -440,11 +346,7 @@ namespace QRB.Pages.DeXuatMuaSam
                 // Đọc dữ liệu từ form thay vì JSON
                 var idString = Request.Form["id"].ToString();
                 var newStatus = Request.Form["status"].ToString();
-<<<<<<< HEAD
-                
-=======
 
->>>>>>> origin/phuong2
                 if (string.IsNullOrEmpty(idString) || !Guid.TryParse(idString, out Guid deXuatId))
                 {
                     return new JsonResult(new { success = false, message = "ID đề xuất không hợp lệ" });
@@ -462,11 +364,10 @@ namespace QRB.Pages.DeXuatMuaSam
                     return new JsonResult(new { success = false, message = "Vui lòng đăng nhập lại" });
                 }
 
-                // Tìm đề xuất mua sắm
                 var deXuat = await _context.DeXuatMuaSams.FirstOrDefaultAsync(dx => dx.ID == deXuatId && !dx.IsDelete);
                 if (deXuat == null)
                 {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
+                    return new JsonResult(new { success = false, message = "Không tìm thấy phiếu đề xuất" });
                 }
 
                 // Kiểm tra quyền: chỉ người nhận mới được phê duyệt/từ chối
@@ -481,14 +382,125 @@ namespace QRB.Pages.DeXuatMuaSam
                     return new JsonResult(new { success = false, message = "Chỉ có thể xử lý đề xuất ở trạng thái 'Chờ duyệt'" });
                 }
 
+                // Nếu phê duyệt, kiểm tra tồn kho của chi nhánh của tài khoản đang đăng nhập
+                if (newStatus == "accepted")
+                {
+                    var approver = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.ID == userId && !u.IsDelete);
+                    var approverBranchId = approver != null ? approver.IDChiNhanh : Guid.Empty;
+
+                    var chiTietNguyenLieu = await _context.ChiTietDonDeXuats
+                        .Where(ct => ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete)
+                        .ToListAsync();
+
+                    if (chiTietNguyenLieu == null || !chiTietNguyenLieu.Any())
+                    {
+                        return new JsonResult(new { success = false, message = "Không tìm thấy nguyên liệu nào trong đề xuất" });
+                    }
+
+                    var insufficientIngredients = new List<string>();
+
+                    foreach (var ct in chiTietNguyenLieu)
+                    {
+                        var khoSanPham = await _context.KhoSanPhams
+                            .FirstOrDefaultAsync(ksp => ksp.IDNguyenLieu == ct.IDNguyenLieu
+                                                      && ksp.IDChiNhanh == approverBranchId
+                                                      && !ksp.IsDelete);
+
+                        var availableQty = 0;
+                        if (khoSanPham != null)
+                        {
+                            int.TryParse(khoSanPham.SoLuongConLai, out availableQty);
+                        }
+
+                        if (availableQty < ct.SoLuong)
+                        {
+                            var ingredient = await _context.Ingredients.FirstOrDefaultAsync(nl => nl.ID == ct.IDNguyenLieu && !nl.IsDeleted);
+                            var ingredientName = ingredient != null ? ingredient.IngredientName : "[Unknown]";
+                            insufficientIngredients.Add(ingredientName);
+                        }
+                    }
+
+                    if (insufficientIngredients.Any())
+                    {
+                        var message = insufficientIngredients.Count == 1 
+                            ? $"Nguyên liệu {insufficientIngredients[0]} không đủ."
+                            : $"Các nguyên liệu không đủ: {string.Join(", ", insufficientIngredients)}.";
+                        return new JsonResult(new { success = false, message = message });
+                    }
+                }
+
+                // Nếu phê duyệt, kiểm tra tồn kho của chi nhánh của tài khoản đang đăng nhập
+                if (newStatus == "accepted")
+                {
+                    // Lấy chi nhánh của người đang xử lý (người đang đăng nhập)
+                    var approver = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.ID == userId && !u.IsDelete);
+                    var approverBranchId = approver != null ? approver.IDChiNhanh : Guid.Empty;
+
+                    // Lấy danh sách nguyên liệu trong đơn đề xuất
+                    var chiTietNguyenLieu = await _context.ChiTietDonDeXuats
+                        .Where(ct => ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete)
+                        .ToListAsync();
+
+                    if (chiTietNguyenLieu == null || !chiTietNguyenLieu.Any())
+                    {
+                        return new JsonResult(new { success = false, message = "Không tìm thấy nguyên liệu nào trong đề xuất" });
+                    }
+
+                    var insufficientIngredients = new List<string>();
+
+                    foreach (var ct in chiTietNguyenLieu)
+                    {
+                        var khoSanPham = await _context.KhoSanPhams
+                            .FirstOrDefaultAsync(ksp => ksp.IDNguyenLieu == ct.IDNguyenLieu
+                                                      && ksp.IDChiNhanh == approverBranchId
+                                                      && !ksp.IsDelete);
+
+                        var availableQty = 0;
+                        if (khoSanPham != null)
+                        {
+                            int.TryParse(khoSanPham.SoLuongConLai, out availableQty);
+                        }
+
+                        if (availableQty < ct.SoLuong)
+                        {
+                            var ingredient = await _context.Ingredients.FirstOrDefaultAsync(nl => nl.ID == ct.IDNguyenLieu && !nl.IsDeleted);
+                            var ingredientName = ingredient != null ? ingredient.IngredientName : "[Unknown]";
+                            insufficientIngredients.Add(ingredientName);
+                        }
+                    }
+
+                    if (insufficientIngredients.Any())
+                    {
+                        var message = insufficientIngredients.Count == 1 
+                            ? $"Nguyên liệu {insufficientIngredients[0]} không đủ."
+                            : $"Các nguyên liệu không đủ: {string.Join(", ", insufficientIngredients)}.";
+                        return new JsonResult(new { success = false, message = message });
+                    }
+
+                    // Nếu không có nguyên liệu nào thiếu, trừ số lượng trong kho của người duyệt
+                    foreach (var ct in chiTietNguyenLieu)
+                    {
+                        var khoSanPham = await _context.KhoSanPhams
+                            .FirstOrDefaultAsync(ksp => ksp.IDNguyenLieu == ct.IDNguyenLieu
+                                                      && ksp.IDChiNhanh == approverBranchId
+                                                      && !ksp.IsDelete);
+
+                        if (khoSanPham != null)
+                        {
+                            var currentQty = int.TryParse(khoSanPham.SoLuongConLai, out int qty) ? qty : 0;
+                            var newQty = currentQty - ct.SoLuong;
+                            
+                            khoSanPham.SoLuongConLai = newQty.ToString();
+                            khoSanPham.UpdateTime = DateTime.Now;
+                            _context.KhoSanPhams.Update(khoSanPham);
+                        }
+                    }
+                }
+
                 // Cập nhật trạng thái và thời gian tương ứng
                 deXuat.Status = newStatus;
                 deXuat.UpdateTime = DateTime.Now;
-<<<<<<< HEAD
-                
-=======
 
->>>>>>> origin/phuong2
                 if (newStatus == "accepted")
                 {
                     deXuat.AcceptTime = DateTime.Now;
@@ -509,8 +521,6 @@ namespace QRB.Pages.DeXuatMuaSam
             }
         }
 
-<<<<<<< HEAD
-=======
         // Handler để cập nhật trạng thái với nội dung từ chối
         public async Task<IActionResult> OnPostUpdateStatusWithReasonAsync()
         {
@@ -545,11 +555,10 @@ namespace QRB.Pages.DeXuatMuaSam
                     return new JsonResult(new { success = false, message = "Vui lòng đăng nhập lại" });
                 }
 
-                // Tìm đề xuất mua sắm
                 var deXuat = await _context.DeXuatMuaSams.FirstOrDefaultAsync(dx => dx.ID == deXuatId && !dx.IsDelete);
                 if (deXuat == null)
                 {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
+                    return new JsonResult(new { success = false, message = "Không tìm thấy phiếu đề xuất" });
                 }
 
                 // Kiểm tra quyền: chỉ người nhận mới được phê duyệt/từ chối
@@ -562,6 +571,72 @@ namespace QRB.Pages.DeXuatMuaSam
                 if (deXuat.Status != "pending")
                 {
                     return new JsonResult(new { success = false, message = "Chỉ có thể xử lý đề xuất ở trạng thái 'Chờ duyệt'" });
+                }
+
+                // Nếu phê duyệt, kiểm tra tồn kho của chi nhánh của tài khoản đang đăng nhập
+                if (newStatus == "accepted")
+                {
+                    var approver = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.ID == userId && !u.IsDelete);
+                    var approverBranchId = approver != null ? approver.IDChiNhanh : Guid.Empty;
+
+                    var chiTietNguyenLieu = await _context.ChiTietDonDeXuats
+                        .Where(ct => ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete)
+                        .ToListAsync();
+
+                    if (chiTietNguyenLieu == null || !chiTietNguyenLieu.Any())
+                    {
+                        return new JsonResult(new { success = false, message = "Không tìm thấy nguyên liệu nào trong đề xuất" });
+                    }
+
+                    var insufficientIngredients = new List<string>();
+
+                    foreach (var ct in chiTietNguyenLieu)
+                    {
+                        var khoSanPham = await _context.KhoSanPhams
+                            .FirstOrDefaultAsync(ksp => ksp.IDNguyenLieu == ct.IDNguyenLieu
+                                                      && ksp.IDChiNhanh == approverBranchId
+                                                      && !ksp.IsDelete);
+
+                        var availableQty = 0;
+                        if (khoSanPham != null)
+                        {
+                            int.TryParse(khoSanPham.SoLuongConLai, out availableQty);
+                        }
+
+                        if (availableQty < ct.SoLuong)
+                        {
+                            var ingredient = await _context.Ingredients.FirstOrDefaultAsync(nl => nl.ID == ct.IDNguyenLieu && !nl.IsDeleted);
+                            var ingredientName = ingredient != null ? ingredient.IngredientName : "[Unknown]";
+                            insufficientIngredients.Add(ingredientName);
+                        }
+                    }
+
+                    if (insufficientIngredients.Any())
+                    {
+                        var message = insufficientIngredients.Count == 1 
+                            ? $"Nguyên liệu {insufficientIngredients[0]} không đủ."
+                            : $"Các nguyên liệu không đủ: {string.Join(", ", insufficientIngredients)}.";
+                        return new JsonResult(new { success = false, message = message });
+                    }
+
+                    // Nếu không có nguyên liệu nào thiếu, trừ số lượng trong kho của người duyệt
+                    foreach (var ct in chiTietNguyenLieu)
+                    {
+                        var khoSanPham = await _context.KhoSanPhams
+                            .FirstOrDefaultAsync(ksp => ksp.IDNguyenLieu == ct.IDNguyenLieu
+                                                      && ksp.IDChiNhanh == approverBranchId
+                                                      && !ksp.IsDelete);
+
+                        if (khoSanPham != null)
+                        {
+                            var currentQty = int.TryParse(khoSanPham.SoLuongConLai, out int qty) ? qty : 0;
+                            var newQty = currentQty - ct.SoLuong;
+                            
+                            khoSanPham.SoLuongConLai = newQty.ToString();
+                            khoSanPham.UpdateTime = DateTime.Now;
+                            _context.KhoSanPhams.Update(khoSanPham);
+                        }
+                    }
                 }
 
                 // Cập nhật trạng thái và thời gian tương ứng
@@ -589,7 +664,6 @@ namespace QRB.Pages.DeXuatMuaSam
             }
         }
 
->>>>>>> origin/phuong2
         // Handler để cập nhật thời gian nhận hàng
         public async Task<IActionResult> OnPostReceiveOrderAsync()
         {
@@ -605,11 +679,7 @@ namespace QRB.Pages.DeXuatMuaSam
 
                 // Đọc dữ liệu từ form
                 var idString = Request.Form["id"].ToString();
-<<<<<<< HEAD
-                
-=======
 
->>>>>>> origin/phuong2
                 if (string.IsNullOrEmpty(idString) || !Guid.TryParse(idString, out Guid deXuatId))
                 {
                     return new JsonResult(new { success = false, message = "ID đề xuất không hợp lệ" });
@@ -622,11 +692,10 @@ namespace QRB.Pages.DeXuatMuaSam
                     return new JsonResult(new { success = false, message = "Vui lòng đăng nhập lại" });
                 }
 
-                // Tìm đề xuất mua sắm
                 var deXuat = await _context.DeXuatMuaSams.FirstOrDefaultAsync(dx => dx.ID == deXuatId && !dx.IsDelete);
                 if (deXuat == null)
                 {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
+                    return new JsonResult(new { success = false, message = "Không tìm thấy phiếu đề xuất" });
                 }
 
                 // Kiểm tra quyền: chỉ người tạo đơn mới được nhận hàng
@@ -651,6 +720,15 @@ namespace QRB.Pages.DeXuatMuaSam
                 deXuat.ReceiveTime = DateTime.Now;
                 deXuat.UpdateTime = DateTime.Now;
 
+                // Lấy chi nhánh của người đăng nhập (người nhận hàng)
+                var receiver = await _context.NguoiDungs.FirstOrDefaultAsync(u => u.ID == userId && !u.IsDelete);
+                var receiverBranchId = receiver != null ? receiver.IDChiNhanh : Guid.Empty;
+
+                if (receiverBranchId == Guid.Empty)
+                {
+                    return new JsonResult(new { success = false, message = "Không tìm thấy thông tin chi nhánh của người nhận hàng" });
+                }
+
                 // Lấy danh sách nguyên liệu trong đơn đề xuất
                 var chiTietNguyenLieu = await _context.ChiTietDonDeXuats
                     .Where(ct => ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete)
@@ -661,25 +739,16 @@ namespace QRB.Pages.DeXuatMuaSam
                     return new JsonResult(new { success = false, message = "Không tìm thấy nguyên liệu nào trong đề xuất" });
                 }
 
-                // Cập nhật số lượng trong kho sản phẩm
+                // Cập nhật số lượng trong kho sản phẩm của chi nhánh người đăng nhập
                 int updatedCount = 0;
                 int createdCount = 0;
-<<<<<<< HEAD
-                
-=======
 
->>>>>>> origin/phuong2
                 foreach (var chiTiet in chiTietNguyenLieu)
                 {
-                    // Tìm bản ghi trong KhoSanPham theo IDNguyenLieu và IDChiNhanh (chi nhánh của người tạo đề xuất)
+                    // Tìm bản ghi trong KhoSanPham theo IDNguyenLieu và IDChiNhanh (chi nhánh của người đăng nhập)
                     var khoSanPham = await _context.KhoSanPhams
-<<<<<<< HEAD
-                        .FirstOrDefaultAsync(ksp => ksp.IDNguyenLieu == chiTiet.IDNguyenLieu 
-                                          && ksp.IDChiNhanh == deXuat.IDChiNhanhGui 
-=======
                         .FirstOrDefaultAsync(ksp => ksp.IDNguyenLieu == chiTiet.IDNguyenLieu
-                                          && ksp.IDChiNhanh == deXuat.IDChiNhanhGui
->>>>>>> origin/phuong2
+                                          && ksp.IDChiNhanh == receiverBranchId
                                           && !ksp.IsDelete);
 
                     if (khoSanPham != null)
@@ -687,38 +756,27 @@ namespace QRB.Pages.DeXuatMuaSam
                         // Cập nhật số lượng: số hiện tại + số trong phiếu
                         var soLuongHienTai = int.TryParse(khoSanPham.SoLuongConLai, out int currentQty) ? currentQty : 0;
                         var soLuongMoi = soLuongHienTai + chiTiet.SoLuong;
-<<<<<<< HEAD
-                        
-                        khoSanPham.SoLuongConLai = soLuongMoi.ToString();
-                        khoSanPham.UpdateTime = DateTime.Now;
-                        
-=======
 
                         khoSanPham.SoLuongConLai = soLuongMoi.ToString();
                         khoSanPham.UpdateTime = DateTime.Now;
 
->>>>>>> origin/phuong2
                         // Update trong database
                         _context.KhoSanPhams.Update(khoSanPham);
                         updatedCount++;
                     }
                     else
                     {
-                        // Nếu chưa có bản ghi, tạo mới cho chi nhánh của người tạo đề xuất
+                        // Nếu chưa có bản ghi, tạo mới cho chi nhánh của người đăng nhập
                         var khoSanPhamMoi = new QRB.Models.KhoSanPham
                         {
                             ID = Guid.NewGuid(),
                             IDNguyenLieu = chiTiet.IDNguyenLieu,
-                            IDChiNhanh = deXuat.IDChiNhanhGui,
+                            IDChiNhanh = receiverBranchId,
                             SoLuongConLai = chiTiet.SoLuong.ToString(),
                             IsDelete = false,
                             CreateTime = DateTime.Now
                         };
-<<<<<<< HEAD
-                        
-=======
 
->>>>>>> origin/phuong2
                         await _context.KhoSanPhams.AddAsync(khoSanPhamMoi);
                         createdCount++;
                     }
@@ -727,16 +785,10 @@ namespace QRB.Pages.DeXuatMuaSam
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-<<<<<<< HEAD
-                return new JsonResult(new { 
-                    success = true, 
-                    message = $"Đã xác nhận nhận hàng và cập nhật kho thành công. Cập nhật: {updatedCount}, Tạo mới: {createdCount}" 
-=======
                 return new JsonResult(new
                 {
                     success = true,
                     message = $"Đã xác nhận nhận hàng và cập nhật kho thành công. Cập nhật: {updatedCount}, Tạo mới: {createdCount}"
->>>>>>> origin/phuong2
                 });
             }
             catch (Exception ex)
@@ -746,7 +798,6 @@ namespace QRB.Pages.DeXuatMuaSam
             }
         }
 
-        // Handler method để lấy chi tiết nguyên liệu của đề xuất mua sắm
         public async Task<JsonResult> OnGetGetNguyenLieuDetailAsync(Guid deXuatId)
         {
             try
@@ -759,29 +810,16 @@ namespace QRB.Pages.DeXuatMuaSam
                 }
 
                 var nguyenLieuDetails = await (from ct in _context.ChiTietDonDeXuats
-<<<<<<< HEAD
-                                             join nl in _context.NguyenLieus on ct.IDNguyenLieu equals nl.ID
-                                             where ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete && !nl.IsDelete
-                                             select new
-                                             {
-                                                 id = nl.ID.ToString(),
-                                                 tenNguyenLieu = nl.TenNguyenLieu,
-                                                 maNguyenLieu = nl.MaNguyenLieu,
-                                                 donViTinh = nl.DonViTinh,
-                                                 soLuong = ct.SoLuong
-                                             })
-=======
-                                               join nl in _context.NguyenLieus on ct.IDNguyenLieu equals nl.ID
-                                               where ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete && !nl.IsDelete
+                                               join nl in _context.Ingredients on ct.IDNguyenLieu equals nl.ID
+                                               where ct.IDDeXuatMuaSam == deXuatId && !ct.IsDelete && !nl.IsDeleted
                                                select new
                                                {
                                                    id = nl.ID.ToString(),
-                                                   tenNguyenLieu = nl.TenNguyenLieu,
-                                                   maNguyenLieu = nl.MaNguyenLieu,
-                                                   donViTinh = nl.DonViTinh,
+                                                   tenNguyenLieu = nl.IngredientName,
+                                                   maNguyenLieu = nl.IngredientCode,
+                                                   donViTinh = nl.UnitOfMeasure,
                                                    soLuong = ct.SoLuong
                                                })
->>>>>>> origin/phuong2
                                              .ToListAsync();
 
                 return new JsonResult(new { success = true, data = nguyenLieuDetails });

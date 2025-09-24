@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Models;
 using QRB.Data;
+using QRB.Services;
 using System.Threading.Tasks;
 
 namespace QRB.Pages.NguyenLieu
@@ -9,9 +10,12 @@ namespace QRB.Pages.NguyenLieu
     public class AddNguyenLieuModel : PageModel
     {
         private readonly QRBDbContext _context;
-        public AddNguyenLieuModel(QRBDbContext context)
+        private readonly IIngredientService _ingredientService;
+        
+        public AddNguyenLieuModel(QRBDbContext context, IIngredientService ingredientService)
         {
             _context = context;
+            _ingredientService = ingredientService;
         }
 
         [BindProperty]
@@ -34,23 +38,22 @@ namespace QRB.Pages.NguyenLieu
                 TempData["AddNguyenLieuError"] = "Vui lòng nhập đầy đủ thông tin.";
                 return RedirectToPage("/NguyenLieu/NguyenLieuList");
             }
-            // Sử dụng QRB.Models.NguyenLieu để tránh lỗi namespace
-            if (_context.Set<QRB.Models.NguyenLieu>().Any(x => x.MaNguyenLieu == MaNguyenLieu && !x.IsDelete))
+            
+            // Kiểm tra mã nguyên liệu đã tồn tại
+            if (await _ingredientService.IngredientCodeExistsAsync(MaNguyenLieu))
             {
                 TempData["AddNguyenLieuError"] = "Mã nguyên liệu đã tồn tại.";
                 return RedirectToPage("/NguyenLieu/NguyenLieuList");
             }
-            var nl = new QRB.Models.NguyenLieu
+            
+            var nguyenLieu = new QRB.Models.NguyenLieu
             {
-                ID = Guid.NewGuid(),
                 TenNguyenLieu = TenNguyenLieu.Trim(),
                 MaNguyenLieu = MaNguyenLieu.Trim(),
-                DonViTinh = DonViTinh.Trim(),
-                CreateTime = DateTime.Now,
-                IsDelete = false
+                DonViTinh = DonViTinh.Trim()
             };
-            _context.Add(nl);
-            await _context.SaveChangesAsync();
+
+            await _ingredientService.AddIngredientAsync(nguyenLieu);
             TempData["AddNguyenLieuSuccess"] = "Thêm nguyên liệu thành công!";
             return RedirectToPage("/NguyenLieu/NguyenLieuList");
         }

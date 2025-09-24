@@ -74,9 +74,9 @@ namespace QRB.Pages.KhoSanPham
                 var userBranchId = currentUser.IDChiNhanh;
 
                 // Kiểm tra nguyên liệu có tồn tại không
-                var nguyenLieu = await _context.NguyenLieus.FindAsync(data.IDNguyenLieu);
+                var nguyenLieu = await _context.Ingredients.FindAsync(data.IDNguyenLieu);
                 
-                if (nguyenLieu == null || nguyenLieu.IsDelete)
+                if (nguyenLieu == null || nguyenLieu.IsDeleted)
                 {
                     return new JsonResult(new { success = false, message = "Nguyên liệu không tồn tại hoặc đã bị xóa." });
                 }

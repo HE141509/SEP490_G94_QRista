@@ -26,150 +26,6 @@
         }
         
         <ul class="nav-menu">
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> origin/phuong2
-            @if (HasPermission("Full Dashboard"))
-            {
-                <li class="nav-item">
-                    <a href="/Dashboard" class="nav-link@(currentPath == "/dashboard" ? " active" : "")">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Thống kê hệ thống</span>
-                    </a>
-                </li>
-            }
-            
-            @if (HasPermission("Full Branches"))
-            {
-                <li class="nav-item">
-                    <a href="/Branch/BranchList" class="nav-link@(currentPath.StartsWith("/branch") ? " active" : "")">
-                        <i class="fas fa-store"></i>
-                        <span>Chi nhánh</span>
-                    </a>
-                </li>
-            }
-            
-            @if (HasPermission("Full Invoices"))
-            {
-                <li class="nav-item">
-                    <a href="/Order/OrderList" class="nav-link@(currentPath.StartsWith("/order/orderlist") ? " active" : "")">
-                        <i class="fas fa-file-invoice"></i>
-                        <span>Hóa đơn</span>
-                    </a>
-                </li>
-            }
-            
-            @if (HasPermission("Full Customers"))
-            {
-                <li class="nav-item">
-                    <a href="/Customer/CustomerList" class="nav-link@(currentPath.StartsWith("/customer") ? " active" : "")">
-                        <i class="fas fa-user-friends"></i>
-                        <span>Khách hàng</span>
-                    </a>
-                </li>
-            }
-            
-<<<<<<< HEAD
-            @if (HasPermission("Full Products") || HasPermission("Full Product Groups"))
-=======
-            @if (HasPermission("Full Products") || HasPermission("Full Product Groups") || HasPermission("Full Product Types"))
->>>>>>> origin/phuong2
-            {
-                <li class="nav-item sidebar-product-parent">
-                    <a href="#" class="nav-link sidebar-product-toggle@(currentPath.StartsWith("/product") ? " active" : "")" onclick="toggleSidebarProductMenu(event)">
-                        <i class="fas fa-box"></i>
-                        <span>Sản phẩm</span>
-                        <i class="fas fa-chevron-down sidebar-chevron" style="float:right;margin-top:4px;"></i>
-                    </a>
-                    <ul class="sidebar-submenu" id="sidebar-product-submenu" style="display:none;">
-                        @if (HasPermission("Full Product Groups"))
-                        {
-                            <li><a href="/ProductGroup/ProductGroupList" class="nav-link@(currentPath.StartsWith("/productgroup") ? " active" : "")">Nhóm sản phẩm</a></li>
-                        }
-                        @if (HasPermission("Full Products"))
-                        {
-                            <li><a href="/Product/ProductList" class="nav-link@(currentPath.StartsWith("/product/") ? " active" : "")">Sản phẩm</a></li>
-                        }
-                        @if (HasPermission("Full Product Types"))
-                        {
-                            <li><a href="/ProductType/ProductTypeList" class="nav-link@(currentPath.StartsWith("/producttype") ? " active" : "")">Loại sản phẩm</a></li>
-                        }
-                    </ul>
-                </li>
-            }
-            
-            @if (HasPermission("Full Inventory") || HasPermission("Full Raw Materials"))
-            {
-                <li class="nav-item sidebar-kho-parent">
-                    <a href="#" class="nav-link sidebar-kho-toggle@(currentPath.StartsWith("/nguyenlieu") || currentPath.StartsWith("/khosanpham") ? " active" : "")" onclick="toggleSidebarKhoMenu(event)">
-                        <i class="fas fa-warehouse"></i>
-                        <span>Quản lý kho</span>
-                        <i class="fas fa-chevron-down sidebar-chevron" style="float:right;margin-top:4px;"></i>
-                    </a>
-                    <ul class="sidebar-submenu" id="sidebar-kho-submenu" style="display:none;">
-                        @if (HasPermission("Full Raw Materials"))
-                        {
-                            <li><a href="/NguyenLieu/NguyenLieuList" class="nav-link@(currentPath.StartsWith("/nguyenlieu") ? " active" : "")">Nguyên liệu</a></li>
-                        }
-                        @if (HasPermission("Full Inventory"))
-                        {
-                            <li><a href="/KhoSanPham/KhoSanPhamList" class="nav-link@(currentPath.StartsWith("/khosanpham") ? " active" : "")">Kho sản phẩm</a></li>
-                        }
-                    </ul>
-                </li>
-            }
-            
-            @if (HasPermission("Full Promotions"))
-            {
-                <li class="nav-item">
-                    <a href="/UuDai/MaUuDaiList" class="nav-link@(currentPath.StartsWith("/uudai") ? " active" : "")">
-                        <i class="fas fa-gift"></i>
-                        <span>Ưu đãi</span>
-                    </a>
-                </li>
-            }
-            
-<<<<<<< HEAD
-            @if (HasPermission("Full Purchase Requests"))
-=======
-            @if (HasPermission("Full Purchase Suggestions"))
->>>>>>> origin/phuong2
-            {
-                <li class="nav-item">
-                    <a href="/DeXuatMuaSam/DeXuatMuaSamList" class="nav-link@(currentPath.StartsWith("/dexuatmuasam") ? " active" : "")">
-                        <i class="fas fa-file-invoice"></i>
-                        <span>Đề xuất mua sắm</span>
-                    </a>
-                </li>
-            }
-            
-            @if (HasPermission("Full Users") || HasPermission("Full Roles") || HasPermission("Full Permission Matrix"))
-            {
-                <li class="nav-item sidebar-authorization-parent">
-                    <a href="#" class="nav-link sidebar-authorization-toggle@(currentPath.StartsWith("/authorization") ? " active" : "")" onclick="toggleSidebarAuthorizationMenu(event)">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>Phân quyền</span>
-                        <i class="fas fa-chevron-down sidebar-chevron" style="float:right;margin-top:4px;"></i>
-                    </a>
-                    <ul class="sidebar-submenu" id="sidebar-authorization-submenu" style="display:none;">
-                        @if (HasPermission("Full Users"))
-                        {
-                            <li><a href="/Authorization/Users" class="nav-link@(currentPath.StartsWith("/authorization/users") ? " active" : "")">Quản lý người dùng</a></li>
-                        }
-                        @if (HasPermission("Full Roles"))
-                        {
-                            <li><a href="/Authorization/Roles" class="nav-link@(currentPath.StartsWith("/authorization/roles") ? " active" : "")">Quản lý vai trò</a></li>
-                        }
-                        @if (HasPermission("Full Permission Matrix"))
-                        {
-                            <li><a href="/Authorization/Permissions" class="nav-link@(currentPath.StartsWith("/authorization/permissions") ? " active" : "")">Ma trận phân quyền</a></li>
-                        }
-                    </ul>
-                </li>
-            }
-<<<<<<< HEAD
-=======
             <li class="nav-item">
                 <a href="/Dashboard" class="nav-link@(currentPath == "/dashboard" ? " active" : "")">
                     <i class="fas fa-chart-bar"></i>
@@ -241,9 +97,6 @@
                     <span>Phân quyền</span>
                 </a>
             </li>
->>>>>>> origin/anh0612
-=======
->>>>>>> origin/phuong2
         </ul>
     </div>
 </nav>
@@ -277,15 +130,7 @@
     .sidebar-product-toggle {
         font-weight: 600;
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-    .sidebar-authorization-toggle {
-=======
     .sidebar-kho-toggle {
->>>>>>> origin/anh0612
-=======
-    .sidebar-authorization-toggle {
->>>>>>> origin/phuong2
         font-weight: 600;
     }
 </style>
@@ -299,24 +144,6 @@ function toggleSidebarProductMenu(e) {
         submenu.style.display = 'none';
     }
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> origin/phuong2
-function toggleSidebarAuthorizationMenu(e) {
-    e.preventDefault();
-    var submenu = document.getElementById('sidebar-authorization-submenu');
-    if (submenu.style.display === 'none' || submenu.style.display === '') {
-        submenu.style.display = 'block';
-    } else {
-        submenu.style.display = 'none';
-    }
-}
-<<<<<<< HEAD
-=======
->>>>>>> origin/anh0612
-=======
->>>>>>> origin/phuong2
 
 function toggleSidebarKhoMenu(e) {
     e.preventDefault();

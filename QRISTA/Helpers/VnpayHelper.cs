@@ -4,11 +4,19 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
+using Microsoft.Extensions.Configuration;
 
 namespace QRB.Helpers
 {
     public static class VnpayHelper
     {
+        private static IConfiguration? _configuration;
+        
+        public static void Initialize(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+        
         public static string CreateVnpayPaymentUrl(
             string tmnCode,
             string hashSecret,
@@ -18,7 +26,7 @@ namespace QRB.Helpers
             string returnUrl,
             string clientIp,
             string txnRef,
-            string bankCode = null // optional
+            string? bankCode = null // optional
         )
         {
             var vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
@@ -64,8 +72,16 @@ namespace QRB.Helpers
             return paymentUrl;
         }
 
-        // Thêm biến public static để lấy secret key (có thể sửa lại cho phù hợp với cấu hình thực tế)
-        public static string Vnp_HashSecret = "PWSHBSJCVDL54CGNA6C1F55ZZIPV6XP2"; // TODO: Thay bằng secret thực tế hoặc lấy từ cấu hình
+        // SECURITY: Load secret key from configuration
+        public static string Vnp_HashSecret 
+        { 
+            get 
+            {
+                if (_configuration != null)
+                    return _configuration["VnpaySettings:HashSecret"] ?? "PWSHBSJCVDL54CGNA6C1F55ZZIPV6XP2";
+                return "PWSHBSJCVDL54CGNA6C1F55ZZIPV6XP2"; // Fallback only
+            }
+        }
 
         public static string HmacSHA512(string key, string inputData)
         {

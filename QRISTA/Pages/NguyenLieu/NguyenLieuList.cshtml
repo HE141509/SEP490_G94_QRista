@@ -14,6 +14,37 @@
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="/css/userlist.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Validation Error Styles */
+        .validation-error {
+            border: 2px solid #e74c3c !important;
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.3) !important;
+            background-color: #fdf2f2 !important;
+        }
+        
+        .validation-error:focus {
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 12px rgba(231, 76, 60, 0.4) !important;
+            outline: none !important;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 4px;
+            display: block;
+            font-weight: 500;
+        }
+        
+        .userlist-add-form-group {
+            position: relative;
+        }
+        
+        /* Smooth transitions for validation states */
+        .userlist-input {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+    </style>
 </head>
 
 <body>
@@ -118,15 +149,15 @@
             <form id="addNguyenLieuForm" method="post" action="/NguyenLieu/AddNguyenLieu" autocomplete="off">
                 @Html.AntiForgeryToken()
                 <div class="userlist-add-form-group">
-                    <label for="addTenNguyenLieu">Tên nguyên liệu</label>
+                    <label for="addTenNguyenLieu">Tên nguyên liệu <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="addTenNguyenLieu" name="TenNguyenLieu" class="userlist-input" required maxlength="100" />
                 </div>
                 <div class="userlist-add-form-group">
-                    <label for="addMaNguyenLieu">Mã nguyên liệu</label>
+                    <label for="addMaNguyenLieu">Mã nguyên liệu <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="addMaNguyenLieu" name="MaNguyenLieu" class="userlist-input" required maxlength="50" />
                 </div>
                 <div class="userlist-add-form-group">
-                    <label for="addDonViTinh">Đơn vị tính</label>
+                    <label for="addDonViTinh">Đơn vị tính <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="addDonViTinh" name="DonViTinh" class="userlist-input" required maxlength="50" />
                 </div>
                 <div class="userlist-add-modal-actions">
@@ -143,15 +174,15 @@
                 @Html.AntiForgeryToken()
                 <input type="hidden" id="editNguyenLieuId" name="ID" />
                 <div class="userlist-add-form-group">
-                    <label for="editTenNguyenLieu">Tên nguyên liệu</label>
+                    <label for="editTenNguyenLieu">Tên nguyên liệu <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="editTenNguyenLieu" name="TenNguyenLieu" class="userlist-input" required maxlength="100" />
                 </div>
                 <div class="userlist-add-form-group">
-                    <label for="editMaNguyenLieu">Mã nguyên liệu</label>
+                    <label for="editMaNguyenLieu">Mã nguyên liệu <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="editMaNguyenLieu" name="MaNguyenLieu" class="userlist-input" required maxlength="50" />
                 </div>
                 <div class="userlist-add-form-group">
-                    <label for="editDonViTinh">Đơn vị tính</label>
+                    <label for="editDonViTinh">Đơn vị tính <span style="color: #e74c3c;">*</span></label>
                     <input type="text" id="editDonViTinh" name="DonViTinh" class="userlist-input" required maxlength="50" />
                 </div>
                 <div class="userlist-add-modal-actions">
@@ -272,6 +303,13 @@
         function closeAddNguyenLieuModal() {
             document.getElementById('addNguyenLieuModal').style.display = 'none';
             document.getElementById('addNguyenLieuForm').reset();
+            
+            // Clear all validation errors
+            const form = document.getElementById('addNguyenLieuForm');
+            const inputs = form.querySelectorAll('.userlist-input');
+            inputs.forEach(input => {
+                clearValidationErrors(input);
+            });
         }
         function showEditNguyenLieuModal(id, tenNguyenLieu, maNguyenLieu, donViTinh) {
             document.getElementById('editNguyenLieuId').value = id;
@@ -283,6 +321,13 @@
         function closeEditNguyenLieuModal() {
             document.getElementById('editNguyenLieuModal').style.display = 'none';
             document.getElementById('editNguyenLieuForm').reset();
+            
+            // Clear all validation errors
+            const form = document.getElementById('editNguyenLieuForm');
+            const inputs = form.querySelectorAll('.userlist-input');
+            inputs.forEach(input => {
+                clearValidationErrors(input);
+            });
         }
         let deleteNguyenLieuId = null;
         function showDeleteNguyenLieuConfirm(id) {
@@ -297,6 +342,187 @@
         // Form thêm mới nguyên liệu đã chuyển sang submit chuẩn Razor Page, không dùng fetch nữa
         // Form sửa nguyên liệu đã chuyển sang submit chuẩn Razor Page, không dùng fetch nữa
         // Đã chuyển chức năng xóa sang trang DeleteNguyenLieu.cshtml
+
+        // Add form submission validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const addForm = document.getElementById('addNguyenLieuForm');
+            const editForm = document.getElementById('editNguyenLieuForm');
+            
+            if (addForm) {
+                addForm.addEventListener('submit', function(e) {
+                    if (!validateAddForm()) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+            
+            if (editForm) {
+                editForm.addEventListener('submit', function(e) {
+                    if (!validateEditForm()) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+
+            // Add real-time validation for Add form
+            const addTenNguyenLieu = document.getElementById('addTenNguyenLieu');
+            const addMaNguyenLieu = document.getElementById('addMaNguyenLieu');
+            const addDonViTinh = document.getElementById('addDonViTinh');
+            
+            if (addTenNguyenLieu) {
+                addTenNguyenLieu.addEventListener('blur', function() {
+                    validateField(this, 'Tên nguyên liệu không được để trống');
+                });
+                addTenNguyenLieu.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        clearValidationErrors(this);
+                    }
+                });
+            }
+            
+            if (addMaNguyenLieu) {
+                addMaNguyenLieu.addEventListener('blur', function() {
+                    validateField(this, 'Mã nguyên liệu không được để trống');
+                });
+                addMaNguyenLieu.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        clearValidationErrors(this);
+                    }
+                });
+            }
+            
+            if (addDonViTinh) {
+                addDonViTinh.addEventListener('blur', function() {
+                    validateField(this, 'Đơn vị tính không được để trống');
+                });
+                addDonViTinh.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        clearValidationErrors(this);
+                    }
+                });
+            }
+            
+            // Add real-time validation for Edit form
+            const editTenNguyenLieu = document.getElementById('editTenNguyenLieu');
+            const editMaNguyenLieu = document.getElementById('editMaNguyenLieu');
+            const editDonViTinh = document.getElementById('editDonViTinh');
+            
+            if (editTenNguyenLieu) {
+                editTenNguyenLieu.addEventListener('blur', function() {
+                    validateField(this, 'Tên nguyên liệu không được để trống');
+                });
+                editTenNguyenLieu.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        clearValidationErrors(this);
+                    }
+                });
+            }
+            
+            if (editMaNguyenLieu) {
+                editMaNguyenLieu.addEventListener('blur', function() {
+                    validateField(this, 'Mã nguyên liệu không được để trống');
+                });
+                editMaNguyenLieu.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        clearValidationErrors(this);
+                    }
+                });
+            }
+            
+            if (editDonViTinh) {
+                editDonViTinh.addEventListener('blur', function() {
+                    validateField(this, 'Đơn vị tính không được để trống');
+                });
+                editDonViTinh.addEventListener('input', function() {
+                    if (this.value.trim()) {
+                        clearValidationErrors(this);
+                    }
+                });
+            }
+        });
+
+        // Validation Functions
+        function validateField(field, errorMessage) {
+            const value = field.value.trim();
+            const isValid = value !== '';
+            
+            // Remove existing error styling and messages
+            clearValidationErrors(field);
+            
+            if (!isValid) {
+                // Add error styling
+                field.classList.add('validation-error');
+                
+                // Add error message
+                const errorElement = document.createElement('span');
+                errorElement.className = 'error-message';
+                errorElement.textContent = errorMessage;
+                field.parentNode.appendChild(errorElement);
+                
+                return false;
+            }
+            
+            return true;
+        }
+
+        function clearValidationErrors(field) {
+            // Remove error styling
+            field.classList.remove('validation-error');
+            
+            // Remove error message
+            const errorMessage = field.parentNode.querySelector('.error-message');
+            if (errorMessage) {
+                errorMessage.remove();
+            }
+        }
+
+        function validateAddForm() {
+            let isValid = true;
+            
+            // Validate required fields
+            const tenNguyenLieu = document.getElementById('addTenNguyenLieu');
+            const maNguyenLieu = document.getElementById('addMaNguyenLieu');
+            const donViTinh = document.getElementById('addDonViTinh');
+            
+            if (!validateField(tenNguyenLieu, 'Tên nguyên liệu không được để trống')) {
+                isValid = false;
+            }
+            
+            if (!validateField(maNguyenLieu, 'Mã nguyên liệu không được để trống')) {
+                isValid = false;
+            }
+            
+            if (!validateField(donViTinh, 'Đơn vị tính không được để trống')) {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        function validateEditForm() {
+            let isValid = true;
+            
+            // Validate required fields
+            const tenNguyenLieu = document.getElementById('editTenNguyenLieu');
+            const maNguyenLieu = document.getElementById('editMaNguyenLieu');
+            const donViTinh = document.getElementById('editDonViTinh');
+            
+            if (!validateField(tenNguyenLieu, 'Tên nguyên liệu không được để trống')) {
+                isValid = false;
+            }
+            
+            if (!validateField(maNguyenLieu, 'Mã nguyên liệu không được để trống')) {
+                isValid = false;
+            }
+            
+            if (!validateField(donViTinh, 'Đơn vị tính không được để trống')) {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
     </script>
 </body>
 

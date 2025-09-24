@@ -91,11 +91,11 @@ namespace QRB.Pages.ProductType
                 connection.Open();
                 // Lấy loại sản phẩm
                 var command = new SqlCommand(@"
-                    SELECT lsp.ID, lsp.IDSanPham, lsp.TenLoai, lsp.MaLoai, lsp.DonGia, lsp.IsDelete, lsp.CreateTime, lsp.UpdateTime, lsp.IDChiNhanh,
-                           ISNULL(cn.TenChiNhanh, N''), ISNULL(sp.TenSanPham, N'')
-                    FROM LoaiSanPham lsp
-                    LEFT JOIN ChiNhanh cn ON lsp.IDChiNhanh = cn.ID
-                    LEFT JOIN SanPham sp ON lsp.IDSanPham = sp.ID
+                    SELECT lsp.ID, lsp.IDProduct, lsp.TypeProductName, lsp.TypeProductCode, lsp.Price, lsp.IsDelete, lsp.CreateTime, lsp.UpdateTime, lsp.IDDepartment,
+                           ISNULL(d.DepartmentName, N''), ISNULL(sp.ProductName, N'')
+                    FROM TypeProduct lsp
+                    LEFT JOIN Department d ON lsp.IDDepartment = d.ID
+                    LEFT JOIN Product sp ON lsp.IDProduct = sp.ID
                 ", connection);
                 using (var reader = command.ExecuteReader())
                 {
@@ -118,7 +118,7 @@ namespace QRB.Pages.ProductType
                     }
                 }
                 // Lấy danh sách sản phẩm
-                var cmdSP = new SqlCommand("SELECT ID, TenSanPham FROM SanPham WHERE IsDelete=0", connection);
+                var cmdSP = new SqlCommand("SELECT ID, ProductName FROM Product WHERE IsDelete=0", connection);
                 using (var reader = cmdSP.ExecuteReader())
                 {
                     while (reader.Read())
@@ -131,7 +131,7 @@ namespace QRB.Pages.ProductType
                     }
                 }
                 // Lấy danh sách chi nhánh
-                var cmdCN = new SqlCommand("SELECT ID, TenChiNhanh FROM ChiNhanh WHERE IsDelete=0", connection);
+                var cmdCN = new SqlCommand("SELECT ID, DepartmentName FROM Department WHERE IsDelete=0", connection);
                 using (var reader = cmdCN.ExecuteReader())
                 {
                     while (reader.Read())
@@ -155,7 +155,7 @@ namespace QRB.Pages.ProductType
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    var command = new SqlCommand(@"SELECT ID, TenSanPham FROM SanPham WHERE IDChiNhanh = @IDChiNhanh", connection);
+                    var command = new SqlCommand(@"SELECT ID, ProductName FROM Product WHERE IDDepartment = @IDChiNhanh", connection);
                     command.Parameters.AddWithValue("@IDChiNhanh", chiNhanhId);
 
                     var reader = command.ExecuteReader();

@@ -39,9 +39,9 @@ namespace QRB.Pages.DeXuatMuaSam
 
                 // Kiểm tra người dùng và chi nhánh có tồn tại không
                 var nguoiGui = await _context.NguoiDungs.FindAsync(data.IDNguoiGui);
-                var chiNhanhGui = await _context.ChiNhanhs.FindAsync(data.IDChiNhanhGui);
+                var chiNhanhGui = await _context.Departments.FindAsync(data.IDChiNhanhGui);
                 var nguoiNhan = await _context.NguoiDungs.FindAsync(data.IDNguoiNhan);
-                var chiNhanhNhan = await _context.ChiNhanhs.FindAsync(data.IDChiNhanhNhan);
+                var chiNhanhNhan = await _context.Departments.FindAsync(data.IDChiNhanhNhan);
                 
                 if (nguoiGui == null || nguoiGui.IsDelete)
                 {
@@ -103,7 +103,7 @@ namespace QRB.Pages.DeXuatMuaSam
                 }
                 
                 await _context.SaveChangesAsync();
-                return new JsonResult(new { success = true, message = "Thêm đề xuất mua sắm thành công!" });
+                return new JsonResult(new { success = true, message = "Thêm phiếu yêu cầu thành công!" });
             }
             catch (Exception ex)
             {

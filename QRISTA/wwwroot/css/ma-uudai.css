@@ -37,6 +37,46 @@
     font-size: 15px;
     margin-bottom: 2px;
 }
+
+/* Required asterisk styling */
+.required-asterisk {
+    color: #ea4335;
+    font-weight: bold;
+    margin-left: 3px;
+}
+
+/* Validation error styling */
+.validation-error {
+    border: 2px solid #ea4335 !important;
+    box-shadow: 0 0 8px rgba(234, 67, 53, 0.2) !important;
+    background: #fff !important;
+    animation: validation-shake 0.3s ease-in-out;
+}
+
+@keyframes validation-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+.validation-error-message {
+    color: #ea4335;
+    font-size: 13px;
+    margin-top: 4px;
+    display: block;
+    font-weight: 500;
+}
+
+.validation-error:focus {
+    border: 2px solid #ea4335 !important;
+    box-shadow: 0 0 12px rgba(234, 67, 53, 0.3) !important;
+}
+
+/* Smooth transition for validation clearing */
+.uudai-form-group input,
+.uudai-form-group select {
+    transition: border 0.3s ease, box-shadow 0.3s ease, background 0.2s ease;
+}
 .uudai-form-group input,
 .uudai-form-group select {
     padding: 9px 14px;

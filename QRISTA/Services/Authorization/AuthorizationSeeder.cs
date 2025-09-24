@@ -92,7 +92,7 @@ namespace QRB.Services.Authorization
         private async Task SeedUsers()
         {
             // Lấy chi nhánh đầu tiên để gán cho người dùng
-            var firstBranch = await _context.ChiNhanhs.FirstOrDefaultAsync();
+            var firstBranch = await _context.Departments.FirstOrDefaultAsync();
             if (firstBranch == null)
             {
                 Console.WriteLine("No branch found for user assignment");

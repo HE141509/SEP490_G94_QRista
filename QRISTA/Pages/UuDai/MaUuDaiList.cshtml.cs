@@ -50,10 +50,10 @@ public class MaUuDaiListModel : PageModel
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = @"SELECT mud.ID, kh.TenKhachHang, mud.MaGiamGia, mud.TienGiam, mud.TrangThaiSuDung, mud.CreateTime, mud.UpdateTime, mud.IsDelete
-                                FROM MaUuDai mud
-                                JOIN KhachHang kh ON mud.IDKhachHang = kh.ID
-                                ORDER BY mud.CreateTime DESC";
+                string sql = @"SELECT v.ID, c.CustomerName, v.VoucherCode, v.Discount, v.Status, v.CreateTime, v.UpdateTime, v.IsDelete
+                                FROM Voucher v
+                                JOIN Customer c ON v.IDCustomer = c.ID
+                                ORDER BY v.CreateTime DESC";
                 using (var command = new SqlCommand(sql, connection))
                 using (var reader = command.ExecuteReader())
                 {

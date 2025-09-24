@@ -20,12 +20,12 @@ namespace QRB.Pages.User
 
         public class UpdateUserRequest
         {
-            public string ID { get; set; }
-            public string TenHienThi { get; set; }
-            public string TenNguoiDung { get; set; }
-            public string MatKhau { get; set; } // Có thể rỗng nếu không đổi
-            public string IDChiNhanh { get; set; }
-            public string TrangThai { get; set; } // "active" hoặc "inactive"
+            public string ID { get; set; } = string.Empty;
+            public string TenHienThi { get; set; } = string.Empty;
+            public string TenNguoiDung { get; set; } = string.Empty;
+            public string MatKhau { get; set; } = string.Empty; // Có thể rỗng nếu không đổi
+            public string IDDepartment { get; set; } = string.Empty;
+            public string TrangThai { get; set; } = string.Empty; // "active" hoặc "inactive"
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -47,23 +47,23 @@ namespace QRB.Pages.User
                 try
                 {
                     var sql = new StringBuilder();
-                    sql.Append("UPDATE NguoiDung SET TenHienThi = @TenHienThi, IDChiNhanh = @IDChiNhanh, IsDelete = @IsDelete");
+                    sql.Append("UPDATE [User] SET UserName = @UserName, IDDepartment = @IDDepartment, IsDelete = @IsDelete");
                     if (!string.IsNullOrEmpty(req.MatKhau))
                     {
-                        sql.Append(", MatKhau = @MatKhau");
+                        sql.Append(", Password = @Password");
                     }
                     sql.Append(" WHERE ID = @ID");
                     var cmd = new SqlCommand(sql.ToString(), conn, tran);
                     cmd.Parameters.AddWithValue("@ID", req.ID);
-                    cmd.Parameters.AddWithValue("@TenHienThi", req.TenHienThi ?? "");
-                    cmd.Parameters.AddWithValue("@IDChiNhanh", req.IDChiNhanh ?? "");
+                    cmd.Parameters.AddWithValue("@UserName", req.TenHienThi ?? "");
+                    cmd.Parameters.AddWithValue("@IDDepartment", req.IDDepartment ?? "");
                     cmd.Parameters.AddWithValue("@IsDelete", req.TrangThai == "inactive" ? 1 : 0);
                     if (!string.IsNullOrEmpty(req.MatKhau))
                     {
                         // Mã hóa MD5 + key từ appsettings
                         var key = _configuration["PasswordKey"] ?? "qrb2025";
                         string hash = GetMd5Hash(req.MatKhau + key);
-                        cmd.Parameters.AddWithValue("@MatKhau", hash);
+                        cmd.Parameters.AddWithValue("@Password", hash);
                     }
                     int rows = await cmd.ExecuteNonQueryAsync();
                     tran.Commit();

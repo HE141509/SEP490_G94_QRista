@@ -11,9 +11,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
-    <link rel="stylesheet" href="~/css/dashboard.css" />
+    <link rel="stylesheet" href="~/css/dashboard.css?v=@DateTime.Now.Ticks" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .stat-card.teal::before {
+            background: linear-gradient(90deg, #14b8a6 0%, #0d9488 100%) !important;
+            box-shadow: 0 2px 8px rgba(20, 184, 166, 0.3) !important;
+        }
+        .stat-card.teal:hover .stat-icon {
+            transform: scale(1.1) !important;
+            box-shadow: 0 6px 16px rgba(20, 184, 166, 0.5) !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -81,6 +91,16 @@
                         <label>Đến:</label>
                         <input type="date" name="ToDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" />
                     </div>
+                   <div class="date-input-group">
+                       <label>Chi nhánh:</label>
+                       <select name="BranchId" class="branch-select">
+                           <option value="tatca" selected="@(Request.Query["BranchId"] == "tatca" ? "selected" : null)">Tất cả</option>
+                           @foreach (var branch in Model.Branches)
+                           {
+                               <option value="@branch.ID" selected="@(Request.Query["BranchId"] == branch.ID.ToString() ? "selected" : null)">@branch.TenChiNhanh</option>
+                           }
+                       </select>
+                   </div>
                     <button type="submit" class="update-btn">
                         <i class="fas fa-sync-alt"></i>
                         Cập nhật
@@ -89,7 +109,7 @@
             </div>
 
             <!-- Stats Cards -->
-            <div class="stats-grid">
+            <div class="stats-grid stats-grid-5">
                 <div class="stat-card blue">
                     <div class="stat-content">
                         <div class="stat-info">
@@ -141,6 +161,19 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="stat-card teal" style="border-left: 4px solid #14b8a6 !important;">
+                    <div class="stat-content">
+                        <div class="stat-info">
+                            <h3 style="color: #0d9488 !important; font-weight: 600 !important;">Khách mới đăng ký</h3>
+                            <div class="stat-number" style="color: #14b8a6 !important; text-shadow: 0 2px 4px rgba(20, 184, 166, 0.2) !important;">@Model.SoKhachMoiDangKy</div>
+                            <div class="stat-change" style="color: #0f766e !important;">@(Model.ThayDoiKhachMoi >= 0 ? "+" : "")@Model.ThayDoiKhachMoi khách so với kỳ trước</div>
+                        </div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.4) !important;">
+                            <i class="fas fa-user-plus" style="color: white !important; font-size: 24px !important;"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Top Products Section -->
@@ -187,6 +220,15 @@
                     </div>
                 </div>
 
+                <!-- Biểu đồ cột đôi - Doanh số và Đơn hàng -->
+                <div class="chart-card">
+                    <h3>So sánh doanh số và số lượng đơn hàng</h3>
+                    <p class="chart-subtitle">Phân tích mối quan hệ giữa doanh số và số lượng đơn hàng theo ngày</p>
+                    <div class="chart-wrapper">
+                        <canvas id="revenueOrderChart" style="height: 400px;"></canvas>
+                    </div>
+                </div>
+
                 <!-- Biểu đồ tròn - hàng ngang -->
                 <div class="pie-charts-row">
                     <div class="pie-chart-card">
@@ -214,6 +256,7 @@
         const chartLabels = @Html.Raw(Json.Serialize(Model.ChartLabels));
         const orderData = @Html.Raw(Json.Serialize(Model.ChartOrderData));
         const quantityData = @Html.Raw(Json.Serialize(Model.ChartQuantityData));
+        const revenueData = @Html.Raw(Json.Serialize(Model.ChartRevenueData.Any() ? Model.ChartRevenueData : Model.ChartOrderData.Select(x => (decimal)(x * 50000)).ToList())); // Dữ liệu doanh thu
         const weekdayLabels = @Html.Raw(Json.Serialize(Model.WeekdayLabels));
         const weekdayOrderData = @Html.Raw(Json.Serialize(Model.WeekdayOrderData));
         const tableLabels = @Html.Raw(Json.Serialize(Model.TableLabels));
@@ -400,7 +443,179 @@
             }
         });
 
-        // 2. Biểu đồ tròn phân tích thứ trong tuần
+        // 2. Biểu đồ cột đôi - Doanh số và Đơn hàng
+        const revenueOrderCtx = document.getElementById('revenueOrderChart').getContext('2d');
+        
+        const revenueOrderChart = new Chart(revenueOrderCtx, {
+            type: 'bar',
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    label: 'Doanh số (VNĐ)',
+                    data: revenueData,
+                    backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                    borderColor: 'rgba(34, 197, 94, 1)',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Số đơn hàng',
+                    data: orderData,
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 2,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            pointStyle: 'rect',
+                            padding: 20,
+                            font: {
+                                size: 14
+                            },
+                            color: '#374151'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#374151',
+                        bodyColor: '#6b7280',
+                        borderColor: '#e5e7eb',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        padding: 12,
+                        displayColors: true,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.datasetIndex === 0) {
+                                    // Doanh số - format tiền
+                                    label += new Intl.NumberFormat('vi-VN', {
+                                        style: 'currency',
+                                        currency: 'VND'
+                                    }).format(context.parsed.y);
+                                } else {
+                                    // Số đơn hàng
+                                    label += context.parsed.y + ' đơn';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Ngày',
+                            color: '#374151',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        grid: {
+                            color: 'rgba(156, 163, 175, 0.2)',
+                            lineWidth: 1
+                        },
+                        ticks: {
+                            color: '#22c55e',
+                            font: {
+                                size: 12
+                            },
+                            callback: function(value) {
+                                return new Intl.NumberFormat('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND',
+                                    notation: 'compact'
+                                }).format(value);
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Doanh số (VNĐ)',
+                            color: '#22c55e',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                        ticks: {
+                            color: '#3b82f6',
+                            font: {
+                                size: 12
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Số đơn hàng',
+                            color: '#3b82f6',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // 3. Biểu đồ tròn phân tích thứ trong tuần
         const weekdayCtx = document.getElementById('weekdayChart').getContext('2d');
         const weekdayColors = [
             '#ef4444', // Chủ nhật - đỏ

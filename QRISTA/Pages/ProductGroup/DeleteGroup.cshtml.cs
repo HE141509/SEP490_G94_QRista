@@ -47,7 +47,7 @@ namespace QRB.Pages.ProductGroup
             {
                 return new JsonResult(new { success = false, message = "ID không hợp lệ" });
             }
-            var group = _context.NhomSanPhams.FirstOrDefault(x => x.ID == id);
+            var group = _context.Categories.FirstOrDefault(x => x.ID == id);
             if (group == null)
             {
                 return new JsonResult(new { success = false, message = "Không tìm thấy nhóm sản phẩm" });

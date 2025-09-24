@@ -13,7 +13,7 @@ namespace QRB.Pages.ProductGroup
     public class ProductGroupListModel : PageModel
     {
         private readonly QRBDbContext _context;
-        public List<NhomSanPham> Groups { get; set; }
+    public List<Category> Groups { get; set; } = new();
 
         public ProductGroupListModel(QRBDbContext context)
         {
@@ -48,7 +48,7 @@ namespace QRB.Pages.ProductGroup
                 return Redirect($"/AccessDenied?permission=Full Product Groups&module=ProductGroup");
             }
 
-            Groups = _context.NhomSanPhams
+            Groups = _context.Categories
                 .OrderByDescending(x => x.CreateTime)
                 .ToList();
             return Page();

@@ -70,7 +70,7 @@ namespace QRB.Pages.DeXuatMuaSam
 
                 if (deXuat == null)
                 {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
+                    return new JsonResult(new { success = false, message = "Không tìm thấy phiếu đề xuất" });
                 }
 
                 // Kiểm tra chỉ cho phép cập nhật khi ở trạng thái "Chờ duyệt"
@@ -88,7 +88,7 @@ namespace QRB.Pages.DeXuatMuaSam
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
-                return new JsonResult(new { success = true, message = "Cập nhật đề xuất mua sắm thành công!" });
+                return new JsonResult(new { success = true, message = "Cập nhật phiếu đề xuất thành công!" });
             }
             catch (Exception ex)
             {
@@ -128,7 +128,7 @@ namespace QRB.Pages.DeXuatMuaSam
 
                 if (deXuat == null)
                 {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm" });
+                    return new JsonResult(new { success = false, message = "Không tìm thấy phiếu đề xuất" });
                 }
 
                 if (deXuat.Status != "pending")
@@ -187,7 +187,7 @@ namespace QRB.Pages.DeXuatMuaSam
                 var deXuat = await _context.DeXuatMuaSams.FindAsync(data.ID);
                 if (deXuat == null || deXuat.IsDelete)
                 {
-                    return new JsonResult(new { success = false, message = "Không tìm thấy đề xuất mua sắm." });
+                    return new JsonResult(new { success = false, message = "Không tìm thấy phiếu đề xuất." });
                 }
 
                 // Kiểm tra chỉ cho phép cập nhật khi ở trạng thái "Chờ duyệt"
@@ -214,7 +214,7 @@ namespace QRB.Pages.DeXuatMuaSam
 
                 _context.DeXuatMuaSams.Update(deXuat);
                 await _context.SaveChangesAsync();
-                return new JsonResult(new { success = true, message = "Cập nhật đề xuất mua sắm thành công!" });
+                return new JsonResult(new { success = true, message = "Cập nhật phiếu đề xuất thành công!" });
             }
             catch (Exception ex)
             {

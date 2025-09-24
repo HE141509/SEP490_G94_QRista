@@ -63,8 +63,126 @@
 .order-item {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 12px;
     font-size: 1.05rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e0e0e0;
+    transition: all 0.2s ease;
+}
+
+.order-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    transform: translateY(-1px);
+}
+
+.order-item-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.order-item-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 4px;
+    font-size: 1.1rem;
+}
+
+.order-item-price {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.order-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.order-qty-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.order-qty-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.order-qty-btn:active {
+    transform: scale(0.95);
+}
+
+.order-qty-minus {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+}
+
+.order-qty-minus:hover {
+    background: linear-gradient(135deg, #ff5252, #e53935);
+}
+
+.order-qty-plus {
+    background: linear-gradient(135deg, #51cf66, #47b35a);
+    color: white;
+}
+
+.order-qty-plus:hover {
+    background: linear-gradient(135deg, #4caf50, #43a047);
+}
+
+.order-qty-display {
+    font-weight: 600;
+    min-width: 30px;
+    text-align: center;
+    color: #2c3e50;
+    padding: 6px 10px;
+    background: linear-gradient(135deg, #fff, #f8f9fa);
+    border-radius: 15px;
+    font-size: 14px;
+    border: 2px solid #e9ecef;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.order-item-delete {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: linear-gradient(135deg, #ff7043, #f4511e);
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-left: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.order-item-delete:hover {
+    background: linear-gradient(135deg, #f4511e, #e64a19);
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.order-item-delete:active {
+    transform: scale(0.95);
 }
 .order-popup-total {
     font-weight: 600;
@@ -374,10 +492,32 @@
 
 /* Responsive user info */
 @media (max-width: 768px) {
+    .menu-header {
+        padding: 12px 16px 8px 16px;
+        flex-wrap: wrap;
+        min-height: 60px;
+    }
+    
+    .menu-logo {
+        flex: 1;
+        min-width: 200px;
+    }
+    
     .menu-user-info {
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-end;
+        flex-direction: row;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        width: 100%;
+        margin-top: 8px;
+    }
+    
+    .customer-phone-label {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        margin-right: 6px !important;
+        white-space: nowrap;
     }
     
     .user-welcome {
@@ -391,6 +531,15 @@
     
     .branch-info {
         font-size: 0.7rem;
+    }
+    
+    .btn {
+        font-size: 0.75rem;
+        padding: 6px 12px;
+    }
+    
+    .menu-content {
+        margin-top: 100px; /* Tăng margin-top để tránh che khuất */
     }
 }
 @media (max-width: 1200px) {
@@ -450,6 +599,39 @@
     }
 }
 @media (max-width: 600px) {
+    .menu-header {
+        padding: 10px 12px 6px 12px;
+        min-height: 70px;
+    }
+    
+    .menu-logo {
+        font-size: 1.1rem;
+    }
+    
+    .menu-title {
+        font-size: 1rem;
+    }
+    
+    .menu-user-info {
+        gap: 4px;
+        margin-top: 6px;
+    }
+    
+    .customer-phone-label {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+        margin-right: 4px !important;
+    }
+    
+    .btn {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+    }
+    
+    .menu-content {
+        margin-top: 110px; /* Tăng thêm cho màn hình nhỏ */
+    }
+    
     .menu-item {
         width: 100%;
         min-width: unset;

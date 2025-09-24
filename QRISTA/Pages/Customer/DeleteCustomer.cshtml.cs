@@ -38,7 +38,7 @@ public class DeleteCustomerModel : PageModel
         using (var connection = new SqlConnection(connectionString))
         {
             connection.Open();
-            string sql = "UPDATE KhachHang SET IsDelete=@IsDelete, UpdateTime=@UpdateTime WHERE ID=@Id";
+            string sql = "UPDATE Customer SET IsDelete=@IsDelete, UpdateTime=@UpdateTime WHERE ID=@Id";
             using (var command = new SqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@Id", input.id);

@@ -25,7 +25,7 @@ namespace QRB.Pages.ProductType
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    var command = new SqlCommand("UPDATE LoaiSanPham SET IsDelete=1 WHERE ID=@id", connection);
+                    var command = new SqlCommand("UPDATE TypeProduct SET IsDelete=1 WHERE ID=@id", connection);
                     command.Parameters.AddWithValue("@id", input.id);
                     int rows = command.ExecuteNonQuery();
                     if (rows > 0)

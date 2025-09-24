@@ -19,6 +19,7 @@ namespace QRB.Pages.Product
             {
                 var maSanPham = Request.Form["maSanPham"];
                 var tenSanPham = Request.Form["tenSanPham"];
+                var noiDung = Request.Form["noiDung"];
                 var nhomSanPhamID = Request.Form["nhomSanPhamID"];
                 var chiNhanhID = Request.Form["chiNhanhID"];
                 var isDelete = Request.Form["isDelete"];
@@ -43,13 +44,14 @@ namespace QRB.Pages.Product
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    var command = new SqlCommand(@"INSERT INTO SanPham (ID, MaSanPham, TenSanPham, HinhAnh, IdNhomSanPham, IDChiNhanh, IsDelete, CreateTime) VALUES (@ID, @MaSanPham, @TenSanPham, @HinhAnh, @IdNhomSanPham, @IDChiNhanh, @IsDelete, @CreateTime)", connection);
+                    var command = new SqlCommand(@"INSERT INTO Product (ID, ProductCode, ProductName, Picture, NoiDung, IdCategory, IDDepartment, IsDelete, CreateTime) VALUES (@ID, @MaSanPham, @TenSanPham, @HinhAnh, @NoiDung, @IdCategory, @IDChiNhanh, @IsDelete, @CreateTime)", connection);
                     var newId = Guid.NewGuid();
                     command.Parameters.AddWithValue("@ID", newId);
                     command.Parameters.AddWithValue("@MaSanPham", maSanPham.ToString());
                     command.Parameters.AddWithValue("@TenSanPham", tenSanPham.ToString());
                     command.Parameters.AddWithValue("@HinhAnh", (object?)hinhAnhData ?? DBNull.Value);
-                    command.Parameters.AddWithValue("@IdNhomSanPham", nhomSanPhamGuid);
+                    command.Parameters.AddWithValue("@NoiDung", string.IsNullOrWhiteSpace(noiDung) ? DBNull.Value : noiDung.ToString());
+                    command.Parameters.AddWithValue("@IdCategory", nhomSanPhamGuid);
                     command.Parameters.AddWithValue("@IDChiNhanh", chiNhanhGuid);
                     command.Parameters.AddWithValue("@IsDelete", isDelete == "true");
                     command.Parameters.AddWithValue("@CreateTime", DateTime.Now);
@@ -70,7 +72,7 @@ namespace QRB.Pages.Product
         {
             public string MaSanPham { get; set; } = string.Empty;
             public string TenSanPham { get; set; } = string.Empty;
-            public Guid IdNhomSanPham { get; set; }
+            public Guid IdCategory { get; set; }
             public Guid IDChiNhanh { get; set; }
             public bool IsDelete { get; set; }
         }

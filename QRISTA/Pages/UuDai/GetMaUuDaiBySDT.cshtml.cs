@@ -34,10 +34,10 @@ namespace QRB.Pages.UuDai
                 await conn.OpenAsync();
                 var cmd = conn.CreateCommand();
                 cmd.CommandText = @"
-                    SELECT mud.ID, mud.MaGiamGia, mud.TienGiam
-                    FROM MaUuDai mud
-                    INNER JOIN KhachHang kh ON mud.IDKhachHang = kh.ID
-                    WHERE kh.SDT = @SoDienThoai AND mud.IsDelete = 0 AND mud.TrangThaiSuDung = 0
+                    SELECT v.ID, v.VoucherCode, v.Discount
+                    FROM Voucher v
+                    INNER JOIN Customer c ON v.IDCustomer = c.ID
+                    WHERE c.Phone = @SoDienThoai AND v.IsDelete = 0 AND v.Status = 0
                 ";
                 cmd.Parameters.AddWithValue("@SoDienThoai", soDienThoai);
                 using (var reader = await cmd.ExecuteReaderAsync())
@@ -47,8 +47,8 @@ namespace QRB.Pages.UuDai
                         result.Add(new MaUuDaiDto
                         {
                             ID = reader["ID"].ToString(),
-                            MaGiamGia = reader["MaGiamGia"].ToString(),
-                            TienGiam = reader["TienGiam"] != DBNull.Value ? Convert.ToDecimal(reader["TienGiam"]) : 0
+                            MaGiamGia = reader["VoucherCode"].ToString(),
+                            TienGiam = reader["Discount"] != DBNull.Value ? Convert.ToDecimal(reader["Discount"]) : 0
                         });
                     }
                 }

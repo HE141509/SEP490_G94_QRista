@@ -48,8 +48,9 @@ namespace QRB.Pages.Product
             public string? MaSanPham { get; set; }
             public string? TenSanPham { get; set; }
             public byte[]? HinhAnh { get; set; }
-            public Guid IdNhomSanPham { get; set; }
-            public string? TenNhom { get; set; }
+            public string? NoiDung { get; set; }
+            public Guid IdCategory { get; set; }
+            public string? CategoryName { get; set; }
             public Guid IDChiNhanh { get; set; }
             public bool IsDelete { get; set; }
             public DateTime CreateTime { get; set; }
@@ -58,13 +59,13 @@ namespace QRB.Pages.Product
         }
 
         public List<SanPhamViewModel> SanPhams { get; set; } = new();
-        public List<NhomSanPhamItem> NhomSanPhams { get; set; } = new();
+    public List<CategoryItem> Categories { get; set; } = new();
         public List<ChiNhanhItem> ChiNhanhs { get; set; } = new();
 
-        public class NhomSanPhamItem
+        public class CategoryItem
         {
             public Guid ID { get; set; }
-            public string TenNhom { get; set; } = string.Empty;
+            public string CategoryName { get; set; } = string.Empty;
         }
         public class ChiNhanhItem
         {
@@ -90,13 +91,13 @@ namespace QRB.Pages.Product
             {
                 connection.Open();
                 var command = new SqlCommand(@"
-                    SELECT sp.ID, sp.MaSanPham, sp.TenSanPham, sp.HinhAnh,
-                           sp.IdNhomSanPham, sp.IDChiNhanh,
-                           ISNULL(nsp.TenNhom, N''), ISNULL(cn.TenChiNhanh, N''), 
+                    SELECT sp.ID, sp.ProductCode, sp.ProductName, sp.Picture, sp.NoiDung,
+                           sp.IdCategory, sp.IDDepartment,
+                           ISNULL(nsp.CategoryName, N''), ISNULL(d.DepartmentName, N''), 
                            ISNULL(sp.IsDelete,0), sp.CreateTime, sp.UpdateTime
-                    FROM SanPham sp
-                    LEFT JOIN NhomSanPham nsp ON sp.IdNhomSanPham = nsp.ID
-                    LEFT JOIN ChiNhanh cn ON sp.IDChiNhanh = cn.ID
+                    FROM Product sp
+                    LEFT JOIN Category nsp ON sp.IdCategory = nsp.ID
+                    LEFT JOIN Department d ON sp.IDDepartment = d.ID
                 ", connection);
                 using (var reader = command.ExecuteReader())
                 {
@@ -108,31 +109,32 @@ namespace QRB.Pages.Product
                             MaSanPham = reader.IsDBNull(1) ? "" : reader.GetString(1),
                             TenSanPham = reader.IsDBNull(2) ? "" : reader.GetString(2),
                             HinhAnh = reader.IsDBNull(3) ? null : (byte[])reader[3],
-                            IdNhomSanPham = reader.IsDBNull(4) ? Guid.Empty : reader.GetGuid(4),
-                            IDChiNhanh = reader.IsDBNull(5) ? Guid.Empty : reader.GetGuid(5),
-                            TenNhom = reader.IsDBNull(6) ? "" : reader.GetString(6),
-                            TenChiNhanh = reader.IsDBNull(7) ? "" : reader.GetString(7),
-                            IsDelete = reader.IsDBNull(8) ? false : reader.GetBoolean(8),
-                            CreateTime = reader.IsDBNull(9) ? DateTime.Now : reader.GetDateTime(9),
-                            UpdateTime = reader.IsDBNull(10) ? null : reader.GetDateTime(10)
+                            NoiDung = reader.IsDBNull(4) ? "" : reader.GetString(4),
+                            IdCategory = reader.IsDBNull(5) ? Guid.Empty : reader.GetGuid(5),
+                            IDChiNhanh = reader.IsDBNull(6) ? Guid.Empty : reader.GetGuid(6),
+                            CategoryName = reader.IsDBNull(7) ? "" : reader.GetString(7),
+                            TenChiNhanh = reader.IsDBNull(8) ? "" : reader.GetString(8),
+                            IsDelete = reader.IsDBNull(9) ? false : reader.GetBoolean(9),
+                            CreateTime = reader.IsDBNull(10) ? DateTime.Now : reader.GetDateTime(10),
+                            UpdateTime = reader.IsDBNull(11) ? null : reader.GetDateTime(11)
                         });
                     }
                 }
                 // Lấy danh sách nhóm sản phẩm
-                var cmdNhom = new SqlCommand("SELECT ID, TenNhom FROM NhomSanPham WHERE IsDelete=0", connection);
+                var cmdNhom = new SqlCommand("SELECT ID, CategoryName FROM Category WHERE IsDelete=0", connection);
                 using (var reader = cmdNhom.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        NhomSanPhams.Add(new NhomSanPhamItem
+                        Categories.Add(new CategoryItem
                         {
                             ID = reader.GetGuid(0),
-                            TenNhom = reader.IsDBNull(1) ? "" : reader.GetString(1)
+                            CategoryName = reader.IsDBNull(1) ? "" : reader.GetString(1)
                         });
                     }
                 }
                 // Lấy danh sách chi nhánh
-                var cmdCN = new SqlCommand("SELECT ID, TenChiNhanh FROM ChiNhanh WHERE IsDelete=0", connection);
+                var cmdCN = new SqlCommand("SELECT ID, DepartmentName FROM Department WHERE IsDelete=0", connection);
                 using (var reader = cmdCN.ExecuteReader())
                 {
                     while (reader.Read())

@@ -19,6 +19,7 @@ namespace QRB.Pages.Product
             {
                 var maSanPham = Request.Form["maSanPham"];
                 var tenSanPham = Request.Form["tenSanPham"];
+                var noiDung = Request.Form["noiDung"];
                 var nhomSanPhamID = Request.Form["nhomSanPhamID"];
                 var chiNhanhID = Request.Form["chiNhanhID"];
                 var idSanPham = Request.Form["idSanPham"];
@@ -42,20 +43,22 @@ namespace QRB.Pages.Product
                     if (hinhAnhFile != null && hinhAnhFile.Length > 0)
                     {
                         // Cập nhật với ảnh mới
-                        query = @"UPDATE SanPham 
-                                SET MaSanPham = @MaSanPham,
-                                    TenSanPham = @TenSanPham, 
-                                    IdNhomSanPham = @IdNhomSanPham, 
-                                    IDChiNhanh = @IDChiNhanh,
+                        query = @"UPDATE Product 
+                                SET ProductCode = @MaSanPham,
+                                    ProductName = @TenSanPham,
+                                    NoiDung = @NoiDung,
+                                    IdCategory = @IdCategory, 
+                                    IDDepartment = @IDChiNhanh,
                                     IsDelete = @IsDelete,
-                                    HinhAnh = @HinhAnh,
+                                    Picture = @HinhAnh,
                                     UpdateTime = @UpdateTime
                                 WHERE ID = @ID";
 
                         command = new SqlCommand(query, connection);
                         command.Parameters.AddWithValue("@MaSanPham", maSanPham.ToString());
                         command.Parameters.AddWithValue("@TenSanPham", tenSanPham.ToString());
-                        command.Parameters.AddWithValue("@IdNhomSanPham", Guid.Parse(nhomSanPhamID.ToString()));
+                        command.Parameters.AddWithValue("@NoiDung", string.IsNullOrWhiteSpace(noiDung) ? DBNull.Value : noiDung.ToString());
+                        command.Parameters.AddWithValue("@IdCategory", Guid.Parse(nhomSanPhamID.ToString()));
                         command.Parameters.AddWithValue("@IDChiNhanh", Guid.Parse(chiNhanhID.ToString()));
                         command.Parameters.AddWithValue("@IsDelete", isDelete == "true");
                         command.Parameters.AddWithValue("@UpdateTime", DateTime.Now);
@@ -71,11 +74,12 @@ namespace QRB.Pages.Product
                     else
                     {
                         // Cập nhật không có ảnh mới
-                        query = @"UPDATE SanPham 
-                                SET MaSanPham = @MaSanPham,
-                                    TenSanPham = @TenSanPham, 
-                                    IdNhomSanPham = @IdNhomSanPham, 
-                                    IDChiNhanh = @IDChiNhanh,
+                        query = @"UPDATE Product 
+                                SET ProductCode = @MaSanPham,
+                                    ProductName = @TenSanPham,
+                                    NoiDung = @NoiDung, 
+                                    IdCategory = @IdCategory, 
+                                    IDDepartment = @IDChiNhanh,
                                     IsDelete = @IsDelete,
                                     UpdateTime = @UpdateTime
                                 WHERE ID = @ID";
@@ -83,7 +87,8 @@ namespace QRB.Pages.Product
                         command = new SqlCommand(query, connection);
                         command.Parameters.AddWithValue("@MaSanPham", maSanPham.ToString());
                         command.Parameters.AddWithValue("@TenSanPham", tenSanPham.ToString());
-                        command.Parameters.AddWithValue("@IdNhomSanPham", Guid.Parse(nhomSanPhamID.ToString()));
+                        command.Parameters.AddWithValue("@NoiDung", string.IsNullOrWhiteSpace(noiDung) ? DBNull.Value : noiDung.ToString());
+                        command.Parameters.AddWithValue("@IdCategory", Guid.Parse(nhomSanPhamID.ToString()));
                         command.Parameters.AddWithValue("@IDChiNhanh", Guid.Parse(chiNhanhID.ToString()));
                         command.Parameters.AddWithValue("@IsDelete", isDelete == "true");
                         command.Parameters.AddWithValue("@UpdateTime", DateTime.Now);

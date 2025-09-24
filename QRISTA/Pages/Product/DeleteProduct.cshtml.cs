@@ -29,7 +29,7 @@ namespace QRB.Pages.Product
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    var command = new SqlCommand("UPDATE SanPham SET IsDelete=1 WHERE ID=@id", connection);
+                    var command = new SqlCommand("UPDATE Product SET IsDelete=1 WHERE ID=@id", connection);
                     command.Parameters.AddWithValue("@id", req.id);
                     int rows = command.ExecuteNonQuery();
                     if (rows > 0)

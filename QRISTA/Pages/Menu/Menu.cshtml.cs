@@ -13,7 +13,8 @@ namespace QRB.Pages.Menu
         public bool IsLoggedIn { get; set; }
         public string DisplayName { get; set; } = string.Empty;
         public string ChiNhanhName { get; set; } = string.Empty;
-        public List<NhomSanPham> ProductGroups { get; set; } = new();
+        public string CustomerPhone { get; set; } = string.Empty;
+    public List<CategoryDto> ProductGroups { get; set; } = new();
 
         public MenuModel(QRBDbContext context)
         {
@@ -29,9 +30,13 @@ namespace QRB.Pages.Menu
                 ChiNhanhName = HttpContext.Session.GetString("ChiNhanhName") ?? "Chi nhánh";
             }
 
-            ProductGroups = _context.NhomSanPhams
+            // Lấy số điện thoại khách hàng từ session
+            CustomerPhone = HttpContext.Session.GetString("PhoneNumber") ?? string.Empty;
+
+            ProductGroups = _context.Categories
                 .Where(x => !x.IsDelete)
-                .OrderBy(x => x.TenNhom)
+                .OrderBy(x => x.CategoryName)
+                .Select(x => new CategoryDto { CategoryCode = x.CategoryCode, CategoryName = x.CategoryName })
                 .ToList();
         }
 
@@ -40,11 +45,25 @@ namespace QRB.Pages.Menu
             var query = _context.SanPhams.Where(x => !x.IsDelete);
             if (!string.IsNullOrEmpty(maNhom) && maNhom != "all")
             {
-                query = query.Where(x => x.NhomSanPham.MaNhom == maNhom);
+                query = query.Where(x => x.Category.CategoryCode == maNhom);
             }
 
+            // Lấy tất cả sản phẩm, không phụ thuộc vào LoaiSanPham
+            var products = query.Select(x => new
+            {
+                x.ID,
+                x.MaSanPham,
+                x.TenSanPham,
+                x.HinhAnh,
+                x.IdCategory,
+                x.IDChiNhanh,
+                x.NoiDung
+            }).ToList();
+
+            // Lấy các loại sản phẩm cho những sản phẩm có LoaiSanPham
+            var productIds = products.Select(p => p.ID).ToList();
             var productTypes = _context.LoaiSanPhams
-                .Where(x => !x.IsDelete && query.Select(p => p.ID).Contains(x.IDSanPham))
+                .Where(x => !x.IsDelete && productIds.Contains(x.IDSanPham))
                 .Select(x => new
                 {
                     x.ID,
@@ -63,17 +82,6 @@ namespace QRB.Pages.Menu
                     DonGia = TryParseDonGia(x.DonGiaRaw)
                 })
                 .ToList();
-
-            var productIdsWithTypes = productTypes.Select(x => x.IDSanPham).Distinct().ToHashSet();
-            var products = query.Where(x => productIdsWithTypes.Contains(x.ID)).Select(x => new
-            {
-                x.ID,
-                x.MaSanPham,
-                x.TenSanPham,
-                x.HinhAnh,
-                x.IdNhomSanPham,
-                x.IDChiNhanh
-            }).ToList();
 
             static decimal? TryParseDonGia(object donGiaObj)
             {
@@ -142,6 +150,12 @@ namespace QRB.Pages.Menu
             Console.WriteLine($"Cart data from session: {cartData ?? "NULL"}");
             return new JsonResult(new { cartData });
         }
+    }
+
+    public class CategoryDto
+    {
+        public string CategoryCode { get; set; } = string.Empty;
+        public string CategoryName { get; set; } = string.Empty;
     }
 
     public class SaveOrderRequest

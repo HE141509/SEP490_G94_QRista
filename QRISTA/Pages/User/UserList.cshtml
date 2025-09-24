@@ -55,20 +55,28 @@
                         <div class="userlist-add-modal-title"><i class="fas fa-user-plus"></i> Thêm người dùng mới</div>
                         <form id="addUserForm" autocomplete="off">
                             <div class="userlist-add-form-group">
-                                <label for="addTenHienThi">Tên hiển thị</label>
-                                <input type="text" id="addTenHienThi" name="TenHienThi" class="userlist-input" required />
+                                <label for="addTenHienThi">Tên hiển thị <span class="required-asterisk">*</span></label>
+                                <input type="text" id="addTenHienThi" name="TenHienThi" class="userlist-input" required 
+                                       oninput="clearValidationError(this)" 
+                                       onblur="validateField(this)" />
                             </div>
                             <div class="userlist-add-form-group">
-                                <label for="addTenNguoiDung">Tên đăng nhập</label>
-                                <input type="text" id="addTenNguoiDung" name="TenNguoiDung" class="userlist-input" required />
+                                <label for="addTenNguoiDung">Tên đăng nhập <span class="required-asterisk">*</span></label>
+                                <input type="text" id="addTenNguoiDung" name="TenNguoiDung" class="userlist-input" required 
+                                       oninput="clearValidationError(this)" 
+                                       onblur="validateField(this)" />
                             </div>
                             <div class="userlist-add-form-group">
-                                <label for="addMatKhau">Mật khẩu</label>
-                                <input type="password" id="addMatKhau" name="MatKhau" class="userlist-input" required />
+                                <label for="addMatKhau">Mật khẩu <span class="required-asterisk">*</span></label>
+                                <input type="password" id="addMatKhau" name="MatKhau" class="userlist-input" required 
+                                       oninput="clearValidationError(this)" 
+                                       onblur="validateField(this)" />
                             </div>
                             <div class="userlist-add-form-group">
-                                <label for="addIDChiNhanh">Chi nhánh</label>
-                                <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required>
+                                <label for="addIDChiNhanh">Chi nhánh <span class="required-asterisk">*</span></label>
+                                <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required 
+                                        onchange="clearValidationError(this); debugDepartmentSelect(this)" 
+                                        onblur="validateField(this)">
                                     <option value="">-- Chọn chi nhánh --</option>
                                     @foreach (var cn in Model.ChiNhanhs)
                                     {
@@ -182,20 +190,27 @@
         <form id="editUserForm" autocomplete="off">
             <input type="hidden" id="editUserId" name="ID" />
             <div class="userlist-add-form-group">
-                <label for="editTenHienThi">Tên hiển thị</label>
-                <input type="text" id="editTenHienThi" name="TenHienThi" class="userlist-input" required />
+                <label for="editTenHienThi">Tên hiển thị <span class="required-asterisk">*</span></label>
+                <input type="text" id="editTenHienThi" name="TenHienThi" class="userlist-input" required 
+                       oninput="clearValidationError(this)" 
+                       onblur="validateField(this)" />
             </div>
             <div class="userlist-add-form-group">
-                <label for="editTenNguoiDung">Tên đăng nhập</label>
-                <input type="text" id="editTenNguoiDung" name="TenNguoiDung" class="userlist-input" required readonly />
+                <label for="editTenNguoiDung">Tên đăng nhập <span class="required-asterisk">*</span></label>
+                <input type="text" id="editTenNguoiDung" name="TenNguoiDung" class="userlist-input" required readonly 
+                       oninput="clearValidationError(this)" 
+                       onblur="validateField(this)" />
             </div>
             <div class="userlist-add-form-group">
                 <label for="editMatKhau">Mật khẩu mới (để trống nếu không đổi)</label>
-                <input type="password" id="editMatKhau" name="MatKhau" class="userlist-input" />
+                <input type="password" id="editMatKhau" name="MatKhau" class="userlist-input" 
+                       oninput="clearValidationError(this)" />
             </div>
             <div class="userlist-add-form-group">
-                <label for="editIDChiNhanh">Chi nhánh</label>
-                <select id="editIDChiNhanh" name="IDChiNhanh" class="userlist-input" required>
+                <label for="editIDChiNhanh">Chi nhánh <span class="required-asterisk">*</span></label>
+                <select id="editIDChiNhanh" name="IDChiNhanh" class="userlist-input" required 
+                        onchange="clearValidationError(this)" 
+                        onblur="validateField(this)">
                     <option value="">-- Chọn chi nhánh --</option>
                     @foreach (var cn in Model.ChiNhanhs)
                     {
@@ -236,6 +251,7 @@ function showEditUserModal(userId) {
         .catch(() => alert('Lỗi khi lấy thông tin user!'));
 }
 function closeEditUserModal() {
+    clearAllValidationErrors();
     document.getElementById('editUserModal').style.display = 'none';
     document.getElementById('editUserForm').reset();
 }
@@ -243,15 +259,25 @@ function closeEditUserModal() {
 
 document.getElementById('editUserForm').onsubmit = function(e) {
     e.preventDefault();
+    
+    // Clear all validation errors first
+    clearAllValidationErrors();
+    
+    // Validate form using improved validation
+    if (!validateUserForm('editUserForm')) {
+        return false;
+    }
+    
     const token = document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]')?.value || '';
     const data = {
         ID: document.getElementById('editUserId').value,
         TenHienThi: document.getElementById('editTenHienThi').value.trim(),
         TenNguoiDung: document.getElementById('editTenNguoiDung').value.trim(),
         MatKhau: document.getElementById('editMatKhau').value, // Có thể rỗng nếu không đổi
-        IDChiNhanh: document.getElementById('editIDChiNhanh').value,
+        IDDepartment: document.getElementById('editIDChiNhanh').value,
         TrangThai: document.getElementById('editTrangThai').value
     };
+    
     fetch('/User/UpdateUser', {
         method: 'POST',
         headers: {
@@ -276,26 +302,165 @@ document.getElementById('editUserForm').onsubmit = function(e) {
 <!-- Đã chuyển toàn bộ CSS userlist sang userlist.css -->
 
     <script>
+    
+    // VALIDATION FUNCTIONS
+    function validateField(field) {
+        if (!field) return false;
+        
+        let value = field.value ? field.value.trim() : '';
+        let isValid = true;
+        let errorMessage = '';
+        
+        // Clear existing validation errors
+        clearValidationError(field);
+        
+        // Check if field is required and empty
+        if (field.hasAttribute('required') && !value) {
+            if (field.tagName === 'SELECT') {
+                errorMessage = 'Vui lòng chọn một tùy chọn';
+            } else if (field.type === 'password') {
+                errorMessage = 'Vui lòng nhập mật khẩu';
+            } else {
+                errorMessage = 'Trường này là bắt buộc';
+            }
+            isValid = false;
+        }
+        
+        // Additional validation rules
+        if (value && field.type === 'text') {
+            if (field.id.includes('TenNguoiDung') && value.length < 3) {
+                errorMessage = 'Tên đăng nhập phải có ít nhất 3 ký tự';
+                isValid = false;
+            }
+            if (field.id.includes('TenHienThi') && value.length < 2) {
+                errorMessage = 'Tên hiển thị phải có ít nhất 2 ký tự';
+                isValid = false;
+            }
+        }
+        
+        if (value && field.type === 'password' && value.length < 6) {
+            errorMessage = 'Mật khẩu phải có ít nhất 6 ký tự';
+            isValid = false;
+        }
+        
+        if (!isValid) {
+            showValidationError(field, errorMessage);
+        }
+        
+        return isValid;
+    }
+    
+    function showValidationError(field, message) {
+        field.classList.add('validation-error');
+        
+        // Remove existing error message
+        let existingError = field.parentNode.querySelector('.validation-error-message');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        // Add error message
+        if (message) {
+            let errorSpan = document.createElement('span');
+            errorSpan.className = 'validation-error-message';
+            errorSpan.textContent = message;
+            field.parentNode.appendChild(errorSpan);
+        }
+    }
+    
+    function clearValidationError(field) {
+        if (!field) return;
+        
+        field.classList.remove('validation-error');
+        
+        // Remove error message
+        let errorMsg = field.parentNode.querySelector('.validation-error-message');
+        if (errorMsg) {
+            errorMsg.remove();
+        }
+    }
+    
+    function clearAllValidationErrors() {
+        document.querySelectorAll('.validation-error').forEach(field => {
+            clearValidationError(field);
+        });
+    }
+    
+    function validateUserForm(formId) {
+        let form = document.getElementById(formId);
+        if (!form) return false;
+        
+        let isValid = true;
+        let requiredFields = form.querySelectorAll('[required]');
+        
+        requiredFields.forEach(field => {
+            if (!validateField(field)) {
+                isValid = false;
+            }
+        });
+        
+        // Focus on first error field
+        if (!isValid) {
+            let firstErrorField = form.querySelector('.validation-error');
+            if (firstErrorField) {
+                firstErrorField.focus();
+            }
+        }
+        
+        return isValid;
+    }
+    
+    // Debug function để kiểm tra giá trị select
+    function debugDepartmentSelect(selectElement) {
+        console.log('=== DEBUG DEPARTMENT SELECT ===');
+        console.log('Selected value:', selectElement.value);
+        console.log('Selected text:', selectElement.options[selectElement.selectedIndex].text);
+        console.log('All options:');
+        for (let i = 0; i < selectElement.options.length; i++) {
+            const option = selectElement.options[i];
+            console.log(`Option ${i}: value="${option.value}", text="${option.text}"`);
+        }
+        console.log('===============================');
+    }
+    
     // Hiển thị popup thêm mới user
     document.querySelector('.userlist-add-btn').onclick = function(e) {
         e.preventDefault();
         document.getElementById('addUserModal').style.display = 'flex';
     };
     function closeAddUserModal() {
+        clearAllValidationErrors();
         document.getElementById('addUserModal').style.display = 'none';
         document.getElementById('addUserForm').reset();
     }
     // Submit form thêm mới user qua AJAX
     document.getElementById('addUserForm').onsubmit = function(e) {
         e.preventDefault();
-        const token = document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]')?.value || '';
+        
+        // Clear all validation errors first
+        clearAllValidationErrors();
+        
+        // Validate form using improved validation
+        if (!validateUserForm('addUserForm')) {
+            return false;
+        }
+        
         const data = {
             TenHienThi: document.getElementById('addTenHienThi').value.trim(),
             TenNguoiDung: document.getElementById('addTenNguoiDung').value.trim(),
             MatKhau: document.getElementById('addMatKhau').value,
-            IDChiNhanh: document.getElementById('addIDChiNhanh').value,
+            IDDepartment: document.getElementById('addIDChiNhanh').value,
             TrangThai: document.getElementById('addTrangThai').value
         };
+        
+        const token = document.querySelector('#antiForgeryForm input[name=__RequestVerificationToken]')?.value || '';
+        
+        console.log('=== DEBUG FORM SUBMIT ===');
+        console.log('Form data being sent:', data);
+        console.log('IDDepartment value:', data.IDDepartment);
+        console.log('Selected department element value:', document.getElementById('addIDChiNhanh').value);
+        console.log('========================');
+        
         fetch('/User/AddUser', {
             method: 'POST',
             headers: {
@@ -306,6 +471,9 @@ document.getElementById('editUserForm').onsubmit = function(e) {
         })
         .then(res => res.json())
         .then(resp => {
+            console.log('=== SERVER RESPONSE ===');
+            console.log('Response:', resp);
+            console.log('=====================');
             if (resp.success) {
                 closeAddUserModal();
                 location.reload();

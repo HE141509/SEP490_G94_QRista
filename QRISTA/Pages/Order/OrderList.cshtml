@@ -20,6 +20,15 @@
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="/css/userlist.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .qty-btn:hover {
+            transform: scale(1.1) !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+        }
+        .qty-btn:active {
+            transform: scale(0.95) !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -29,9 +38,14 @@
         <main class="main-content">
             <div class="dashboard-header userlist-header-flex">
                 <h1 class="page-title">Danh sách hóa đơn</h1>
-                <button class="userlist-add-btn" type="button" id="showAddOrderBtn">
-                    <i class="fas fa-plus"></i> Thêm mới
-                </button>
+                <div style="display: flex; gap: 12px;">
+                    <button class="userlist-add-btn" type="button" id="showAddOrderBtn">
+                        <i class="fas fa-plus"></i> Thêm mới
+                    </button>
+                    <button class="userlist-add-btn" type="button" id="cleanupDraftOrdersBtn" style="background-color: #ea4335;">
+                        <i class="fas fa-trash-alt"></i> Loại bỏ hóa đơn nháp
+                    </button>
+                </div>
                 <div id="addOrderModal" class="modal"
                     style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
                     <div class="modal-content userlist-add-modal-content">
@@ -79,6 +93,8 @@
                                             <th>Tên sản phẩm</th>
                                             <th>Loại sản phẩm</th>
                                             <th>Đơn giá</th>
+                                            <th>Số lượng</th>
+                                            <th>Thành tiền</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -252,7 +268,8 @@
                             if (Array.isArray(orderProductList)) {
                                 orderProductList.forEach(item => {
                                     let donGia = parseFloat(item.DonGia) || 0;
-                                    total += donGia;
+                                    let soLuong = parseInt(item.SoLuong) || 1;
+                                    total += donGia * soLuong;
                                 });
                             }
                             // Trừ tiền ưu đãi nếu có
@@ -386,7 +403,8 @@
                                         IDLoaiSanPham: selectedProductType,
                                         TenSanPham: selectedProduct.TenSanPham,
                                         TenLoaiSanPham: typeDetail.TenLoai ?? typeDetail.tenLoai ?? '',
-                                        DonGia: donGia
+                                        DonGia: donGia,
+                                        SoLuong: 1 // Mặc định số lượng là 1
                                     };
                                     orderProductList.push(record);
                                     renderOrderProductGrid();
@@ -405,6 +423,14 @@
                                     <td>${item.TenSanPham}</td>
                                     <td>${item.TenLoaiSanPham ?? ''}</td>
                                     <td>${formatCurrency(item.DonGia)}</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+                                            <button type="button" onclick="updateQuantity(${idx}, -1)" class="qty-btn" style="width: 30px; height: 30px; border: none; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: white; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">-</button>
+                                            <span style="min-width: 30px; text-align: center; font-weight: 600; padding: 4px 8px; background: #f8f9fa; border-radius: 12px; border: 1px solid #e9ecef;">${item.SoLuong}</span>
+                                            <button type="button" onclick="updateQuantity(${idx}, 1)" class="qty-btn" style="width: 30px; height: 30px; border: none; border-radius: 50%; background: linear-gradient(135deg, #51cf66, #47b35a); color: white; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">+</button>
+                                        </div>
+                                    </td>
+                                    <td style="font-weight: 600; color: #2c3e50;">${formatCurrency(item.DonGia * item.SoLuong)}</td>
                                     <td><button type="button" onclick="removeOrderProduct(${idx})" style="color:#ea4335;background:none;border:none;font-size:16px;cursor:pointer;">&times;</button></td>
                                 `;
                                 orderProductGrid.appendChild(tr);
@@ -415,6 +441,14 @@
                         window.removeOrderProduct = function(idx) {
                             orderProductList.splice(idx, 1);
                             renderOrderProductGrid();
+                        }
+                        
+                        // Cập nhật số lượng sản phẩm
+                        window.updateQuantity = function(idx, change) {
+                            if (orderProductList[idx]) {
+                                orderProductList[idx].SoLuong = Math.max(1, orderProductList[idx].SoLuong + change);
+                                renderOrderProductGrid();
+                            }
                         }
                         // ================== END SẢN PHẨM ==================
                         </script>
@@ -502,6 +536,14 @@
                             <option value="all">Tất cả</option>
                             <option value="delivered">Đã trả hàng</option>
                             <option value="not-delivered">Chưa trả hàng</option>
+                            <option value="refunded">Đã hoàn tiền</option>
+                        </select>
+                        
+                        <label for="filterRefundStatus" style="margin-left: 15px;">Hoàn tiền:</label>
+                        <select id="filterRefundStatus" class="userlist-filter" onchange="filterOrderByRefundStatus()">
+                            <option value="all">Tất cả</option>
+                            <option value="refunded">Đã hoàn tiền</option>
+                            <option value="not-refunded">Chưa hoàn tiền</option>
                         </select>
                     </div>
                     <div class="userlist-toolbar-right">
@@ -529,6 +571,7 @@
                                 <th>Tổng tiền</th>
                                 <th>Trạng thái</th>
                                 <th>Giao hàng</th>
+                                <th>Thời gian phục vụ</th>
                                 <th>Ngày tạo</th>
                                 <th></th>
                             </tr>
@@ -539,24 +582,29 @@
                                 int stt = 1;
                                 foreach (var order in Model.Orders)
                                 {
-                                    var status = order.TrangThaiThanhToan ? "Đã thanh toán" : "Chưa thanh toán";
+                                    var status = (order.PaymentStatus == true) ? "Đã thanh toán" : "Chưa thanh toán";
                                     <tr data-index="@stt" 
-                                        data-status="@(order.TrangThaiThanhToan ? "paid" : "unpaid")" 
-                                        data-delivery="@(order.TrangThaiThanhToan ? (order.DaTraDon == true ? "delivered" : "not-delivered") : "not-applicable")">
+                                        data-status="@((order.PaymentStatus == true) ? "paid" : "unpaid")" 
+                                        data-delivery="@((order.IsRefunded == true) ? "refunded" : (order.PaymentStatus == true) ? ((order.Served == true) ? "delivered" : "not-delivered") : "not-applicable")"
+                                        data-refund="@((order.IsRefunded == true) ? "refunded" : "not-refunded")">
                                         <td>@stt</td>
                                         <td>
                                             <a href="javascript:void(0)" onclick="showOrderDetail('@order.ID')"
-                                                style="color:#007bff;text-decoration:underline;cursor:pointer;">@order.MaDonHang</a>
+                                                style="color:#007bff;text-decoration:underline;cursor:pointer;">@order.OrderCode</a>
                                         </td>
-                                        <td>@order.KhachHang?.TenKhachHang</td>
-                                        <td>@(order.SoBan?.ToString() ?? "")</td>
-                                        <td>@order.ChiNhanh?.TenChiNhanh</td>
-                                        <td>@order.TongTien đ</td>
+                                        <td>@order.Customer?.CustomerName</td>
+                                        <td>@(order.Table?.ToString() ?? "")</td>
+                                        <td>@order.Department?.DepartmentName</td>
+                                        <td>@(string.Format("{0:N0}", decimal.Parse(order.Amount ?? "0")).Replace(",", "."))đ</td>
                                         <td class="order-status">@status</td>
                                         <td class="delivery-status">
-                                            @if (order.TrangThaiThanhToan)
+                                            @if (order.IsRefunded == true)
                                             {
-                                                @if (order.DaTraDon == true)
+                                                <span style="color: #ffc107; font-weight: bold;">Đã hoàn tiền</span>
+                                            }
+                                            else if (order.PaymentStatus == true)
+                                            {
+                                                @if (order.Served == true)
                                                 {
                                                     <span style="color: #28a745; font-weight: bold;">Đã trả hàng</span>
                                                 }
@@ -572,6 +620,32 @@
                                                 <span style="color: #6c757d;">-</span>
                                             }
                                         </td>
+                                        <td class="service-time">
+                                            @if (order.Served == true && order.ServedTime.HasValue)
+                                            {
+                                                var serviceTime = order.ServedTime.Value - order.CreateTime;
+                                                var totalMinutes = (int)serviceTime.TotalMinutes;
+                                                var hours = totalMinutes / 60;
+                                                var minutes = totalMinutes % 60;
+                                                
+                                                if (hours > 0)
+                                                {
+                                                    <span style="color: #007bff; font-weight: bold;">@hours giờ @minutes phút</span>
+                                                }
+                                                else
+                                                {
+                                                    <span style="color: #007bff; font-weight: bold;">@minutes phút</span>
+                                                }
+                                            }
+                                            else if (order.PaymentStatus == true && order.Served != true)
+                                            {
+                                                <span style="color: #ffc107; font-style: italic;">Đang phục vụ...</span>
+                                            }
+                                            else
+                                            {
+                                                <span style="color: #6c757d;">-</span>
+                                            }
+                                        </td>
                                         <td>@order.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
                                         <td>
                                             @* <form method="get" action="/Order/EditOrder" style="display:inline;">
@@ -581,59 +655,47 @@
                                                     <i class="fas fa-pen"></i>
                                                 </button>
                                             </form> *@
-                                            <button type="button" class="userlist-delete-btn" title="Xóa"
-                                                style="margin-left:4px;" onclick="showDeleteOrderConfirm('@order.ID')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-            <script>
-            // Popup xác nhận xóa hóa đơn (chỉ khai báo 1 lần ngoài foreach)
-            let deleteOrderId = null;
-            function showDeleteOrderConfirm(id) {
-                deleteOrderId = id;
-                document.getElementById('deleteOrderModal').style.display = 'flex';
-            }
-            function closeDeleteOrderModal() {
-                deleteOrderId = null;
-                document.getElementById('deleteOrderModal').style.display = 'none';
-            }
-            function confirmDeleteOrder() {
-                if (!deleteOrderId) return;
-                fetch('/Order/DeleteOrder', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': document.querySelector('#antiForgeryFormOrder input[name=__RequestVerificationToken]').value
-                    },
-                    body: JSON.stringify({ id: deleteOrderId })
-                })
-                .then(res => res.json())
-                .then(resp => {
-                    if (resp.success) {
-                        // Xóa dòng khỏi bảng thay vì reload
-                        const rows = document.querySelectorAll('#orderListTable tbody tr');
-                        rows.forEach(row => {
-                            const link = row.querySelector('a[onclick*="' + deleteOrderId + '"]');
-                            if (link) {
-                                row.remove();
-                            }
-                        });
-                        closeDeleteOrderModal();
-                        updateOrderPagination(); // Cập nhật lại pagination
-                    } else {
-                        alert(resp.message || 'Xóa hóa đơn thất bại!');
-                    }
-                });
-            }
-            </script>
-                                            @if (!order.TrangThaiThanhToan)
+                                            @if (order.IsCancelled != true && order.IsRefunded != true)
                                             {
-                                                <form method="get" action="/Order/PayOrder" style="display:inline;">
-                                                    <input type="hidden" name="id" value="@order.ID" />
-                                                    <button type="submit" class="userlist-pay-btn" title="Thanh toán"
-                                                        style="margin-left:4px; background-color:#ffe066; color:#856404; border:none;">
-                                                        <i class="fas fa-money-bill-wave"></i>
+                                                @if (order.PaymentStatus != true)
+                                                {
+                                                    <button type="button" class="userlist-delete-btn" title="Hủy đơn hàng (chưa thanh toán)"
+                                                        style="margin-left:4px;" onclick="showCancelOrderConfirm('@order.ID', 'cancel')">
+                                                        <i class="fas fa-times"></i> Hủy
                                                     </button>
-                                                </form>
+                                                    <form method="get" action="/Order/PayOrder" style="display:inline;">
+                                                        <input type="hidden" name="id" value="@order.ID" />
+                                                        <button type="submit" class="userlist-pay-btn" title="Thanh toán"
+                                                            style="margin-left:4px; background-color:#ffe066; color:#856404; border:none;">
+                                                            <i class="fas fa-money-bill-wave"></i>
+                                                        </button>
+                                                    </form>
+                                                }
+                                                else if (order.Served != true)
+                                                {
+                                                    <button type="button" class="userlist-delete-btn" title="Yêu cầu hoàn tiền (cần duyệt quản lý)"
+                                                        style="margin-left:4px; background-color:#ff9800; color:#fff;" onclick="showRefundRequestConfirm('@order.ID')">
+                                                        <i class="fas fa-undo"></i> Hoàn tiền
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <span style="color:#28a745; font-size:0.9em; font-style:italic;">
+                                                        <i class="fas fa-check-circle"></i> Đã hoàn thành
+                                                    </span>
+                                                }
+                                            }
+                                            else if (order.IsRefunded == true)
+                                            {
+                                                <span style="color:#6c757d; font-size:0.9em; font-style:italic;">
+                                                    <i class="fas fa-undo"></i> Đã hoàn tiền
+                                                </span>
+                                            }
+                                            else if (order.IsCancelled == true)
+                                            {
+                                                <span style="color:#dc3545; font-size:0.9em; font-style:italic;">
+                                                    <i class="fas fa-times-circle"></i> Đã hủy
+                                                </span>
                                             }
                                         </td>
                                     </tr>
@@ -643,7 +705,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="10">Không có dữ liệu hóa đơn.</td>
+                                    <td colspan="11">Không có dữ liệu hóa đơn.</td>
                                 </tr>
                             }
                         </tbody>
@@ -655,6 +717,123 @@
             <form id="antiForgeryFormOrder" style="display:none;">
                 @Html.AntiForgeryToken()
             </form>
+            
+            <script>
+            // Popup xác nhận hủy đơn/hoàn tiền
+            let actionOrderId = null;
+            let actionType = null; // 'cancel' hoặc 'refund'
+            
+            function showCancelOrderConfirm(id, type) {
+                console.log('showCancelOrderConfirm called with id:', id, 'type:', type);
+                actionOrderId = id;
+                actionType = type;
+                console.log('actionOrderId set to:', actionOrderId);
+                document.getElementById('cancelOrderModal').style.display = 'flex';
+            }
+            
+            function showRefundRequestConfirm(id) {
+                actionOrderId = id;
+                actionType = 'refund';
+                document.getElementById('refundRequestModal').style.display = 'flex';
+            }
+            
+            function closeCancelOrderModal() {
+                actionOrderId = null;
+                actionType = null;
+                document.getElementById('cancelOrderModal').style.display = 'none';
+            }
+            
+            function closeRefundRequestModal() {
+                actionOrderId = null;
+                actionType = null;
+                document.getElementById('refundRequestModal').style.display = 'none';
+            }
+            
+            function confirmCancelOrder() {
+                console.log('confirmCancelOrder called, actionOrderId:', actionOrderId);
+                
+                if (!actionOrderId) {
+                    console.log('actionOrderId is null or undefined, returning');
+                    alert('Không có thông tin đơn hàng để hủy');
+                    return;
+                }
+                
+                const reason = document.getElementById('cancelReason').value || 'Hủy đơn hàng';
+                
+                const requestData = { 
+                    orderId: actionOrderId,
+                    reason: reason,
+                    requestType: 'cancel'
+                };
+                
+                console.log('Sending cancel request:', requestData);
+                
+                fetch('/Order/CancelOrder?handler=cancel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('#antiForgeryFormOrder input[name=__RequestVerificationToken]').value
+                    },
+                    body: JSON.stringify(requestData)
+                })
+                .then(res => res.json())
+                .then(resp => {
+                    if (resp.success) {
+                        // Refresh trang để cập nhật trạng thái
+                        location.reload();
+                    } else {
+                        if (resp.requiresManagerApproval) {
+                            const currentOrderId = actionOrderId; // Lưu lại orderID trước khi close modal
+                            closeCancelOrderModal();
+                            showRefundRequestConfirm(currentOrderId);
+                        } else {
+                            alert(resp.message || 'Hủy đơn hàng thất bại!');
+                            closeCancelOrderModal();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi hủy đơn hàng:', error);
+                    alert('Có lỗi xảy ra khi hủy đơn hàng. Vui lòng thử lại.');
+                    closeCancelOrderModal();
+                });
+            }
+            
+            function confirmRefundRequest() {
+                if (!actionOrderId) return;
+                
+                const refundReason = document.getElementById('refundReason').value || 'Yêu cầu hoàn tiền';
+                const refundAmount = document.getElementById('refundAmount').value;
+                
+                fetch('/Order/CancelOrder?handler=approverefund', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('#antiForgeryFormOrder input[name=__RequestVerificationToken]').value
+                    },
+                    body: JSON.stringify({ 
+                        orderId: actionOrderId,
+                        refundReason: refundReason,
+                        refundAmount: refundAmount
+                    })
+                })
+                .then(res => res.json())
+                .then(resp => {
+                    if (resp.success) {
+                        alert('Duyệt hoàn tiền thành công!');
+                        location.reload();
+                    } else {
+                        alert(resp.message || 'Duyệt hoàn tiền thất bại!');
+                        closeRefundRequestModal();
+                    }
+                })
+                .catch(error => {
+                    console.error('Lỗi khi duyệt hoàn tiền:', error);
+                    alert('Có lỗi xảy ra khi duyệt hoàn tiền. Vui lòng thử lại.');
+                    closeRefundRequestModal();
+                });
+            }
+            </script>
             
             <!-- Popup chi tiết và chỉnh sửa hóa đơn -->
             <div id="orderDetailModal" class="modal"
@@ -745,6 +924,16 @@
                             </div>
                         </div>
 
+                        <div class="userlist-add-form-group" style="display:flex; flex-direction:row; gap:16px; align-items:flex-end;">
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <label for="detailPhuongThucThanhToan">Phương thức thanh toán</label>
+                                <input type="text" id="detailPhuongThucThanhToan" class="userlist-input" readonly />
+                            </div>
+                            <div style="flex:1; display:flex; flex-direction:column;">
+                                <!-- Để trống cho cân bằng layout -->
+                            </div>
+                        </div>
+
                         <div class="userlist-add-modal-actions">
                             <button type="button" onclick="closeOrderDetailModal()" class="userlist-add-cancel-btn">Đóng</button>
                             <button type="submit" class="userlist-add-submit-btn">Cập nhật</button>
@@ -753,20 +942,57 @@
                 </div>
             </div>
             
-            <div id="deleteOrderModal" class="modal"
+            <!-- Modal xác nhận hủy đơn hàng -->
+            <div id="cancelOrderModal" class="modal"
                 style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
                 <div class="modal-content"
-                    style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:320px;max-width:90vw;text-align:center;">
-                    <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i
-                            class="fas fa-exclamation-triangle"></i> Xác nhận xóa hóa đơn</div>
-                    <div style="font-size:16px;color:#333;margin-bottom:24px;">Bạn có chắc chắn muốn xóa hóa đơn này
-                        không?</div>
+                    style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:400px;max-width:90vw;text-align:center;">
+                    <div style="font-size:20px;font-weight:600;color:#ff9800;margin-bottom:18px;"><i
+                            class="fas fa-exclamation-triangle"></i> Xác nhận hủy đơn hàng</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:12px;">Bạn có chắc chắn muốn hủy đơn hàng này không?</div>
+                    <div style="font-size:14px;color:#856404;background:#fff3cd;border:1px solid #ffeaa7;padding:12px;border-radius:6px;margin-bottom:16px;">
+                        <i class="fas fa-info-circle"></i> <strong>Lưu ý:</strong> Chỉ có thể hủy đơn hàng chưa trả hàng. Đơn đã thanh toán cần xác nhận quản lý.
+                    </div>
+                    <div style="margin-bottom:24px;text-align:left;">
+                        <label style="display:block;margin-bottom:8px;font-weight:500;">Lý do hủy:</label>
+                        <textarea id="cancelReason" placeholder="Nhập lý do hủy đơn hàng..." 
+                            style="width:100%;height:80px;padding:8px;border:1px solid #ddd;border-radius:4px;resize:vertical;"></textarea>
+                    </div>
                     <div style="display:flex;justify-content:center;gap:18px;">
-                        <button onclick="confirmDeleteOrder()"
-                            style="background:#ea4335;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Xác
-                            nhận</button>
-                        <button onclick="closeDeleteOrderModal()"
-                            style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy</button>
+                        <button onclick="confirmCancelOrder()"
+                            style="background:#ff9800;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Xác nhận hủy</button>
+                        <button onclick="closeCancelOrderModal()"
+                            style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy bỏ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal yêu cầu hoàn tiền (cho quản lý) -->
+            <div id="refundRequestModal" class="modal"
+                style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content"
+                    style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:450px;max-width:90vw;text-align:center;">
+                    <div style="font-size:20px;font-weight:600;color:#dc3545;margin-bottom:18px;"><i
+                            class="fas fa-undo"></i> Duyệt hoàn tiền</div>
+                    <div style="font-size:16px;color:#333;margin-bottom:12px;">Đơn hàng đã thanh toán - Cần xác nhận quản lý để hoàn tiền</div>
+                    <div style="font-size:14px;color:#721c24;background:#f8d7da;border:1px solid #f5c6cb;padding:12px;border-radius:6px;margin-bottom:16px;">
+                        <i class="fas fa-exclamation-circle"></i> <strong>Cảnh báo:</strong> Chỉ quản lý mới có quyền duyệt hoàn tiền cho đơn hàng đã thanh toán.
+                    </div>
+                    <div style="margin-bottom:16px;text-align:left;">
+                        <label style="display:block;margin-bottom:8px;font-weight:500;">Lý do hoàn tiền:</label>
+                        <textarea id="refundReason" placeholder="Nhập lý do hoàn tiền..." 
+                            style="width:100%;height:80px;padding:8px;border:1px solid #ddd;border-radius:4px;resize:vertical;"></textarea>
+                    </div>
+                    <div style="margin-bottom:24px;text-align:left;">
+                        <label style="display:block;margin-bottom:8px;font-weight:500;">Số tiền hoàn (để trống = hoàn toàn bộ):</label>
+                        <input type="text" id="refundAmount" placeholder="VD: 100000" 
+                            style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"/>
+                    </div>
+                    <div style="display:flex;justify-content:center;gap:18px;">
+                        <button onclick="confirmRefundRequest()"
+                            style="background:#dc3545;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Duyệt hoàn tiền</button>
+                        <button onclick="closeRefundRequestModal()"
+                            style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy bỏ</button>
                     </div>
                 </div>
             </div>
@@ -776,6 +1002,7 @@
                 let orderPageSize = 10;
                 let orderCurrentFilter = 'all';
                 let orderCurrentDeliveryFilter = 'all';
+                let orderCurrentRefundFilter = 'all';
                 let orderCurrentSearch = '';
 
                 function getAllOrderRows() {
@@ -792,17 +1019,30 @@
                             return status === orderCurrentFilter;
                         });
                     }
-                    // Lọc theo trạng thái giao hàng (chỉ áp dụng cho đơn đã thanh toán)
+                    // Lọc theo trạng thái giao hàng 
                     if (orderCurrentDeliveryFilter !== 'all') {
                         rows = rows.filter(function (row) {
                             var deliveryStatus = row.getAttribute('data-delivery');
                             var paymentStatus = row.getAttribute('data-status');
-                            // Chỉ lọc nếu đơn hàng đã thanh toán
-                            if (paymentStatus === 'paid') {
+                            var refundStatus = row.getAttribute('data-refund');
+                            
+                            if (orderCurrentDeliveryFilter === 'refunded') {
+                                // Hiển thị đơn đã hoàn tiền
+                                return refundStatus === 'refunded';
+                            }
+                            else if (paymentStatus === 'paid' && refundStatus !== 'refunded') {
+                                // Chỉ lọc đơn đã thanh toán và chưa hoàn tiền
                                 return deliveryStatus === orderCurrentDeliveryFilter;
                             }
-                            // Đối với đơn chưa thanh toán, không hiển thị nếu đang lọc theo delivery
+                            // Đối với đơn chưa thanh toán hoặc đã hoàn tiền, không hiển thị nếu đang lọc theo delivered/not-delivered
                             return false;
+                        });
+                    }
+                    // Lọc theo trạng thái hoàn tiền
+                    if (orderCurrentRefundFilter !== 'all') {
+                        rows = rows.filter(function (row) {
+                            var refundStatus = row.getAttribute('data-refund');
+                            return refundStatus === orderCurrentRefundFilter;
                         });
                     }
                     // Lọc theo search
@@ -890,6 +1130,13 @@
                     updateOrderPagination();
                     saveFilterState(); // Lưu trạng thái khi lọc theo giao hàng
                 }
+                
+                function filterOrderByRefundStatus() {
+                    orderCurrentRefundFilter = document.getElementById('filterRefundStatus').value;
+                    orderCurrentPage = 1;
+                    updateOrderPagination();
+                    saveFilterState(); // Lưu trạng thái khi lọc theo hoàn tiền
+                }
                 window.addEventListener('DOMContentLoaded', function () {
                     orderPageSize = parseInt(document.getElementById('orderPageSize').value) || 10;
                     // Khôi phục trạng thái filter từ URL
@@ -902,6 +1149,7 @@
                     const params = new URLSearchParams();
                     if (orderCurrentFilter !== 'all') params.set('status', orderCurrentFilter);
                     if (orderCurrentDeliveryFilter !== 'all') params.set('delivery', orderCurrentDeliveryFilter);
+                    if (orderCurrentRefundFilter !== 'all') params.set('refund', orderCurrentRefundFilter);
                     if (orderCurrentSearch) params.set('search', orderCurrentSearch);
                     if (orderCurrentPage > 1) params.set('page', orderCurrentPage);
                     if (orderPageSize !== 10) params.set('pageSize', orderPageSize);
@@ -926,6 +1174,12 @@
                         document.getElementById('filterDeliveryStatus').value = orderCurrentDeliveryFilter;
                     }
                     
+                    // Khôi phục filter trạng thái hoàn tiền
+                    if (params.get('refund')) {
+                        orderCurrentRefundFilter = params.get('refund');
+                        document.getElementById('filterRefundStatus').value = orderCurrentRefundFilter;
+                    }
+                    
                     // Khôi phục từ khóa tìm kiếm
                     if (params.get('search')) {
                         orderCurrentSearch = params.get('search');
@@ -946,6 +1200,31 @@
 
                 // Cập nhật trạng thái giao hàng
                 function updateDeliveryStatus(orderId, delivered) {
+                    // Hiển thị modal popup xác nhận
+                    showDeliveryModal(orderId, delivered);
+                }
+
+                // Hiển thị modal xác nhận giao hàng
+                function showDeliveryModal(orderId, delivered) {
+                    const modal = document.getElementById('deliveryConfirmModal');
+                    modal.style.display = 'flex';
+                    
+                    // Xử lý sự kiện xác nhận
+                    document.getElementById('confirmDeliveryBtn').onclick = function() {
+                        confirmDelivery(orderId, delivered);
+                    };
+                }
+
+                // Đóng modal giao hàng
+                function closeDeliveryModal() {
+                    const modal = document.getElementById('deliveryConfirmModal');
+                    modal.style.display = 'none';
+                }
+
+                // Xác nhận giao hàng
+                function confirmDelivery(orderId, delivered) {
+                    closeDeliveryModal();
+                    
                     fetch('/Order/OrderList?handler=UpdateDeliveryStatus', {
                         method: 'POST',
                         headers: {
@@ -960,24 +1239,8 @@
                     .then(res => res.json())
                     .then(response => {
                         if (response.success) {
-                            // Tìm và cập nhật trạng thái trong bảng
-                            const rows = document.querySelectorAll('#orderListTable tbody tr');
-                            rows.forEach(row => {
-                                const link = row.querySelector('a[onclick*="' + orderId + '"]');
-                                if (link) {
-                                    const deliveryCell = row.querySelector('.delivery-status');
-                                    if (deliveryCell) {
-                                        deliveryCell.innerHTML = '<span style="color: #28a745; font-weight: bold;">Đã trả hàng</span>';
-                                    }
-                                    // Cập nhật data-delivery attribute
-                                    row.setAttribute('data-delivery', 'delivered');
-                                }
-                            });
-                            
-                            // Cập nhật lại pagination nếu đang lọc theo trạng thái giao hàng
-                            if (orderCurrentDeliveryFilter !== 'all') {
-                                updateOrderPagination();
-                            }
+                            // Reload trang để cập nhật dữ liệu từ server
+                            location.reload();
                         } else {
                             alert(response.message || 'Cập nhật trạng thái thất bại!');
                         }
@@ -990,11 +1253,17 @@
 
                 // Hiển thị popup chi tiết hóa đơn
                 function showOrderDetail(orderId) {
+                    console.log('Calling showOrderDetail with ID:', orderId);
                     fetch(`/Order/OrderList?handler=GetOrderDetail&id=${orderId}`)
-                        .then(res => res.json())
+                        .then(res => {
+                            console.log('Response status:', res.status);
+                            return res.json();
+                        })
                         .then(response => {
+                            console.log('Response data:', response);
                             if (response.success && response.data) {
                                 const data = response.data;
+                                console.log('Order data:', data);
                                 
                                 // Điền thông tin cơ bản
                                 document.getElementById('detailOrderId').value = data.id;
@@ -1014,6 +1283,7 @@
                                 document.getElementById('detailTienUuDai').value = data.tienUuDai || '0';
                                 document.getElementById('detailTongTien').value = data.tongTien || '0';
                                 document.getElementById('detailTrangThaiThanhToan').value = data.trangThaiThanhToan.toString();
+                                document.getElementById('detailPhuongThucThanhToan').value = data.phuongThucThanhToan || 'Tiền mặt';
                                 
                                 // Hiển thị chi tiết sản phẩm
                                 const productGrid = document.getElementById('orderDetailProductGrid');
@@ -1091,7 +1361,118 @@
                         alert('Có lỗi khi cập nhật hóa đơn');
                     });
                 });
+
+                // Xử lý nút loại bỏ hóa đơn nháp
+                document.getElementById('cleanupDraftOrdersBtn').addEventListener('click', function() {
+                    document.getElementById('cleanupDraftModal').style.display = 'flex';
+                });
+
+                // Xác nhận loại bỏ hóa đơn nháp
+                function confirmCleanupDrafts() {
+                    fetch('/Order/OrderList?handler=CleanupDraftOrders', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(`Đã loại bỏ thành công ${data.deletedCount} hóa đơn nháp`);
+                            location.reload();
+                        } else {
+                            alert(data.message || 'Có lỗi khi loại bỏ hóa đơn nháp');
+                        }
+                        closeCleanupDraftModal();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Có lỗi khi loại bỏ hóa đơn nháp');
+                        closeCleanupDraftModal();
+                    });
+                }
+
+                function closeCleanupDraftModal() {
+                    document.getElementById('cleanupDraftModal').style.display = 'none';
+                }
+
+                // Event listener cho modal giao hàng - đóng khi click bên ngoài
+                document.addEventListener('DOMContentLoaded', function() {
+                    const deliveryModal = document.getElementById('deliveryConfirmModal');
+                    if (deliveryModal) {
+                        deliveryModal.addEventListener('click', function(e) {
+                            if (e.target === deliveryModal) {
+                                closeDeliveryModal();
+                            }
+                        });
+                    }
+                });
             </script>
+
+            <!-- Modal xác nhận loại bỏ hóa đơn nháp -->
+            <div id="cleanupDraftModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
+                <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:400px;max-width:90vw;text-align:center;">
+                    <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;">
+                        <i class="fas fa-exclamation-triangle"></i> Xác nhận loại bỏ hóa đơn nháp
+                    </div>
+                    <div style="font-size:16px;color:#333;margin-bottom:12px;line-height:1.5;">
+                        Bạn có chắc chắn muốn loại bỏ tất cả các hóa đơn chưa thanh toán không?
+                    </div>
+                    <div style="font-size:14px;color:#666;margin-bottom:24px;font-style:italic;">
+                        Hành động này không thể hoàn tác và sẽ xóa tất cả đơn hàng có trạng thái chưa thanh toán.
+                    </div>
+                    <div style="display:flex;justify-content:center;gap:18px;">
+                        <button onclick="confirmCleanupDrafts()" style="background:#ea4335;color:#fff;border:none;padding:10px 24px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">
+                            <i class="fas fa-trash-alt"></i> Xác nhận loại bỏ
+                        </button>
+                        <button onclick="closeCleanupDraftModal()" style="background:#f5f7fa;color:#333;border:none;padding:10px 24px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">
+                            Hủy
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal popup xác nhận giao hàng -->
+            <div id="deliveryConfirmModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;">
+                <div class="modal-content modal-fade-in" style="background:#fff;padding:32px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3);max-width:480px;width:90%;text-align:center;">
+                    <div style="color:#17a2b8;font-size:48px;margin-bottom:20px;">
+                        <i class="fas fa-shipping-fast"></i>
+                    </div>
+                    <div style="font-size:20px;font-weight:600;color:#333;margin-bottom:12px;">
+                        Xác nhận giao hàng
+                    </div>
+                    <div style="font-size:16px;color:#666;margin-bottom:32px;line-height:1.5;">
+                        Bạn có muốn giao đồ cho khách không?
+                    </div>
+                    <div style="display:flex;justify-content:center;gap:16px;">
+                        <button id="confirmDeliveryBtn" class="delivery-confirm-btn" style="background:#17a2b8;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:16px;font-weight:500;cursor:pointer;transition:all 0.3s ease;">
+                            <i class="fas fa-check"></i> Xác nhận giao
+                        </button>
+                        <button onclick="closeDeliveryModal()" class="delivery-cancel-btn" style="background:#6c757d;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:16px;font-weight:500;cursor:pointer;transition:all 0.3s ease;">
+                            <i class="fas fa-times"></i> Hủy
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .modal-fade-in {
+                    animation: modalFadeIn 0.3s ease-out;
+                }
+                
+                .delivery-confirm-btn:hover {
+                    background: #138496 !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+                }
+                
+                .delivery-cancel-btn:hover {
+                    background: #5a6268 !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+                }
+            </style>
         </main>
     </div>
     <footer class="footer">

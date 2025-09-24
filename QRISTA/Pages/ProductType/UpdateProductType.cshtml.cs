@@ -44,7 +44,7 @@ namespace QRB.Pages.ProductType
             using (var connection = new SqlConnection(connectionString))
             {
                 await connection.OpenAsync();
-                var cmd = new SqlCommand(@"SELECT lsp.ID, lsp.IDSanPham, lsp.TenLoai, lsp.MaLoai, lsp.DonGia, lsp.IsDelete, lsp.IDChiNhanh, sp.TenSanPham, cn.TenChiNhanh FROM LoaiSanPham lsp LEFT JOIN SanPham sp ON lsp.IDSanPham = sp.ID LEFT JOIN ChiNhanh cn ON lsp.IDChiNhanh = cn.ID WHERE lsp.ID = @ID", connection);
+                var cmd = new SqlCommand(@"SELECT lsp.ID, lsp.IDProduct, lsp.TypeProductName, lsp.TypeProductCode, lsp.Price, lsp.IsDelete, lsp.IDDepartment, sp.ProductName, d.DepartmentName FROM TypeProduct lsp LEFT JOIN Product sp ON lsp.IDProduct = sp.ID LEFT JOIN Department d ON lsp.IDDepartment = d.ID WHERE lsp.ID = @ID", connection);
                 cmd.Parameters.AddWithValue("@ID", id);
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
@@ -82,7 +82,7 @@ namespace QRB.Pages.ProductType
                 using (var connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
-                    var cmd = new SqlCommand(@"UPDATE LoaiSanPham SET TenLoai=@TenLoai, DonGia=@DonGia, IsDelete=@IsDelete, UpdateTime=GETDATE() WHERE ID=@ID", connection);
+                    var cmd = new SqlCommand(@"UPDATE TypeProduct SET TypeProductName=@TenLoai, Price=@DonGia, IsDelete=@IsDelete, UpdateTime=GETDATE() WHERE ID=@ID", connection);
                     cmd.Parameters.AddWithValue("@ID", ID);
                     cmd.Parameters.AddWithValue("@TenLoai", TenLoai ?? "");
                     cmd.Parameters.AddWithValue("@DonGia", donGiaValue);

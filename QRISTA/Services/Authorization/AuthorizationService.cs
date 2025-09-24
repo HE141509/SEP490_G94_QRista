@@ -99,7 +99,7 @@ namespace QRB.Services.Authorization
                 Role = user.VaiTro ?? "Staff",
                 IsActive = user.TrangThaiHoatDong,
                 Email = user.Email,
-                BranchName = user.ChiNhanh?.TenChiNhanh ?? "",
+                BranchName = user.ChiNhanh?.DepartmentName ?? "",
                 CreatedAt = user.CreateTime
             };
         }

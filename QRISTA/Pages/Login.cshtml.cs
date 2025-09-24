@@ -69,7 +69,7 @@ namespace QRB.Pages
                     HttpContext.Session.SetString("Username", user.TenNguoiDung);
                     HttpContext.Session.SetString("DisplayName", user.TenHienThi);
                     HttpContext.Session.SetString("ChiNhanhId", user.IDChiNhanh.ToString());
-                    HttpContext.Session.SetString("ChiNhanhName", user.ChiNhanh.TenChiNhanh);
+                    HttpContext.Session.SetString("ChiNhanhName", user.ChiNhanh.DepartmentName);
                     HttpContext.Session.SetString("VaiTro", user.VaiTro); // Thêm vai trò vào session
                     
                     // Lấy tất cả các permissions của user từ RolePermissions và lưu vào session
@@ -154,11 +154,11 @@ namespace QRB.Pages
 
         private string HashPassword(string password, string key)
         {
-            using (var md5 = System.Security.Cryptography.MD5.Create())
+            using (var sha256 = System.Security.Cryptography.SHA256.Create())
             {
-                var inputBytes = System.Text.Encoding.UTF8.GetBytes(password + key);
-                var hashBytes = md5.ComputeHash(inputBytes);
-                return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                var inputBytes = System.Text.Encoding.UTF8.GetBytes(password);
+                var hashBytes = sha256.ComputeHash(inputBytes);
+                return Convert.ToBase64String(hashBytes);
             }
         }
 

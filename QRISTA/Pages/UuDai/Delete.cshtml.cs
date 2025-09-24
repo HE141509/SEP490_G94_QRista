@@ -20,7 +20,7 @@ namespace QRB.Pages.UuDai
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "UPDATE MaUuDai SET IsDelete = 1, UpdateTime = GETDATE() WHERE ID = @ID";
+                string sql = "UPDATE Voucher SET IsDelete = 1, UpdateTime = GETDATE() WHERE ID = @ID";
                 using (var command = new SqlCommand(sql, connection))
                 {
                     command.Parameters.AddWithValue("@ID", req.id);

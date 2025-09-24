@@ -58,7 +58,7 @@ namespace QRB.Pages.Customer
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string sql = "SELECT ID, TenKhachHang, SDT, GiaTriDonHang, IsDelete, CreateTime, UpdateTime FROM KhachHang ORDER BY TenKhachHang";
+                string sql = "SELECT ID, CustomerName, Phone, GiaTriDonHang, IsDelete, CreateTime, UpdateTime FROM Customer ORDER BY CustomerName";
                 using (var command = new SqlCommand(sql, connection))
                 {
                     using (var reader = command.ExecuteReader())
@@ -69,8 +69,8 @@ namespace QRB.Pages.Customer
                             var c = new CustomerInfo();
                             c.STT = stt++;
                             c.Id = reader.GetGuid(0);
-                            c.TenKhachHang = reader.GetString(1);
-                            c.SoDienThoai = reader.GetString(2);
+                            c.TenKhachHang = reader.GetString(1);  // CustomerName
+                            c.SoDienThoai = reader.GetString(2);   // Phone
                             c.GiaTriDonHang = reader.IsDBNull(3) ? null : reader.GetString(3);
                             c.IsDelete = reader.IsDBNull(4) ? false : reader.GetBoolean(4);
                             c.CreateTime = reader.IsDBNull(5) ? (DateTime?)null : reader.GetDateTime(5);

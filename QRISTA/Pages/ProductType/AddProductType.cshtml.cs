@@ -38,7 +38,7 @@ namespace QRB.Pages.ProductType
                 using (var connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
-                    var cmd = new SqlCommand(@"INSERT INTO LoaiSanPham (ID, IDSanPham, TenLoai, MaLoai, DonGia, IsDelete, CreateTime, IDChiNhanh)
+                    var cmd = new SqlCommand(@"INSERT INTO TypeProduct (ID, IDProduct, TypeProductName, TypeProductCode, Price, IsDelete, CreateTime, IDDepartment)
                         VALUES (@ID, @IDSanPham, @TenLoai, @MaLoai, @DonGia, @IsDelete, @CreateTime, @IDChiNhanh)", connection);
                     var newId = Guid.NewGuid();
                     cmd.Parameters.AddWithValue("@ID", newId);

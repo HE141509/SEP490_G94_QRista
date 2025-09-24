@@ -55,6 +55,7 @@ namespace QRB.Pages.Authorization
             {
                 // Lấy tất cả roles để JavaScript phân trang client-side
                 var roles = await _context.Roles.ToListAsync();
+
                 Roles = roles.Select(r => new RoleWithUserCount
                 {
                     Id = r.Id,
@@ -63,10 +64,12 @@ namespace QRB.Pages.Authorization
                     IsActive = r.IsActive ?? true, // Xử lý NULL thành true
                     UserCount = _context.NguoiDungs.Count(u => u.VaiTro == r.Name && !u.IsDelete)
                 }).ToList();
+
                 // Nếu không có dữ liệu, tạo dữ liệu mẫu
                 if (!Roles.Any())
                 {
                     await CreateSampleRolesIfNeeded();
+
                     roles = await _context.Roles.ToListAsync();
                     Roles = roles.Select(r => new RoleWithUserCount
                     {
@@ -82,6 +85,7 @@ namespace QRB.Pages.Authorization
             {
                 // Nếu lỗi, tạo dữ liệu mẫu
                 await CreateSampleRolesIfNeeded();
+
                 var roles = await _context.Roles.ToListAsync();
                 Roles = roles.Select(r => new RoleWithUserCount
                 {

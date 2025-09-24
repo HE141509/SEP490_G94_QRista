@@ -76,6 +76,7 @@ namespace QRB.Models.Authorization
         public string Role { get; set; } = "Staff";
         public string? Email { get; set; }
         public string? FullName { get; set; }
+        public string? BranchId { get; set; }
     }
 
     public class UpdateUserRequest

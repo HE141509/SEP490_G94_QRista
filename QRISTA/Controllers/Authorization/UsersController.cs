@@ -143,11 +143,26 @@ namespace QRB.Controllers.Authorization
                     return BadRequest(new { success = false, message = "Tên đăng nhập đã tồn tại" });
                 }
 
-                // Lấy chi nhánh đầu tiên (hoặc theo logic của bạn)
-                var firstBranch = await _context.ChiNhanhs.FirstOrDefaultAsync();
-                if (firstBranch == null)
+                // Xử lý BranchId
+                Guid branchId;
+                if (string.IsNullOrEmpty(request.BranchId) || !Guid.TryParse(request.BranchId, out branchId))
                 {
-                    return BadRequest(new { success = false, message = "Không tìm thấy chi nhánh để gán cho người dùng" });
+                    // Nếu không có BranchId hoặc không hợp lệ, lấy chi nhánh đầu tiên
+                    var firstBranch = await _context.Departments.FirstOrDefaultAsync();
+                    if (firstBranch == null)
+                    {
+                        return BadRequest(new { success = false, message = "Không tìm thấy chi nhánh để gán cho người dùng" });
+                    }
+                    branchId = firstBranch.ID;
+                }
+                else
+                {
+                    // Kiểm tra BranchId có tồn tại không
+                    var branchExists = await _context.Departments.AnyAsync(d => d.ID == branchId);
+                    if (!branchExists)
+                    {
+                        return BadRequest(new { success = false, message = "Chi nhánh được chọn không tồn tại" });
+                    }
                 }
 
                 var user = new NguoiDung
@@ -158,7 +173,7 @@ namespace QRB.Controllers.Authorization
                     VaiTro = request.Role,
                     Email = request.Email,
                     TenHienThi = request.FullName ?? request.Username,
-                    IDChiNhanh = firstBranch.ID,
+                    IDChiNhanh = branchId,
                     TrangThaiHoatDong = true,
                     CreateTime = DateTime.Now,
                     IsDelete = false

@@ -16,8 +16,8 @@ namespace QRB.Pages.ProductGroup
             _context = context;
         }
 
-        [BindProperty]
-        public NhomSanPham? Group { get; set; }
+    [BindProperty]
+    public Category? Group { get; set; }
 
         public async Task<IActionResult> OnPostAsync()
         {
@@ -27,17 +27,17 @@ namespace QRB.Pages.ProductGroup
             {
                 body = await reader.ReadToEndAsync();
             }
-            NhomSanPham? input = Group;
+            Category? input = Group;
             if (!string.IsNullOrEmpty(body))
             {
                 try
                 {
                     var doc = System.Text.Json.JsonDocument.Parse(body);
                     var root = doc.RootElement;
-                    input = new NhomSanPham {
+                    input = new Category {
                         ID = root.TryGetProperty("ID", out var idProp) && Guid.TryParse(idProp.GetString(), out var gid) ? gid : Guid.Empty,
-                        MaNhom = root.TryGetProperty("MaNhom", out var maNhomProp) ? maNhomProp.GetString() : null,
-                        TenNhom = root.TryGetProperty("TenNhom", out var tenNhomProp) ? tenNhomProp.GetString() : null,
+                        CategoryCode = root.TryGetProperty("CategoryCode", out var maNhomProp) ? maNhomProp.GetString() : null,
+                        CategoryName = root.TryGetProperty("CategoryName", out var tenNhomProp) ? tenNhomProp.GetString() : null,
                         IsDelete = root.TryGetProperty("IsDelete", out var isDeleteProp) && isDeleteProp.ValueKind == System.Text.Json.JsonValueKind.True ? true : false
                     };
                 }
@@ -47,13 +47,13 @@ namespace QRB.Pages.ProductGroup
             {
                 return new JsonResult(new { success = false, message = "Dữ liệu không hợp lệ" });
             }
-            var group = _context.NhomSanPhams.FirstOrDefault(x => x.ID == input.ID);
+            var group = _context.Categories.FirstOrDefault(x => x.ID == input.ID);
             if (group == null)
             {
                 return new JsonResult(new { success = false, message = "Không tìm thấy nhóm sản phẩm" });
             }
-            group.MaNhom = input.MaNhom;
-            group.TenNhom = input.TenNhom;
+            group.CategoryCode = input.CategoryCode;
+            group.CategoryName = input.CategoryName;
             group.IsDelete = input.IsDelete;
             group.UpdateTime = DateTime.Now;
             await _context.SaveChangesAsync();

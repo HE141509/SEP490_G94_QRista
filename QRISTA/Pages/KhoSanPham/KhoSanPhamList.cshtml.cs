@@ -2,22 +2,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Data;
 using QRB.Models;
+using QRB.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
-<<<<<<< HEAD
-=======
 using System.Text.Json;
->>>>>>> origin/phuong2
 
 namespace QRB.Pages.KhoSanPham
 {
     public class KhoSanPhamListModel : PageModel
     {
         private readonly QRBDbContext _context;
-        public KhoSanPhamListModel(QRBDbContext context)
+        private readonly IIngredientService _ingredientService;
+        
+        public KhoSanPhamListModel(QRBDbContext context, IIngredientService ingredientService)
         {
             _context = context;
+            _ingredientService = ingredientService;
         }
 
         public class KhoSanPhamViewModel
@@ -51,8 +52,6 @@ namespace QRB.Pages.KhoSanPham
             public Guid ID { get; set; }
             public string TenChiNhanh { get; set; } = string.Empty;
         }
-<<<<<<< HEAD
-=======
         private bool HasPermission(string permissionName)
         {
             var permissionsJson = HttpContext.Session.GetString("UserPermissions");
@@ -70,7 +69,6 @@ namespace QRB.Pages.KhoSanPham
                 return false;
             }
         }
->>>>>>> origin/phuong2
         public async Task<IActionResult> OnGetAsync(string? status = "active")
         {
             // Kiểm tra đăng nhập - bắt buộc phải đăng nhập mới được truy cập
@@ -80,11 +78,6 @@ namespace QRB.Pages.KhoSanPham
                 // Chưa đăng nhập, redirect về trang login
                 return RedirectToPage("/Login");
             }
-<<<<<<< HEAD
-
-            Status = status ?? "active";
-            
-=======
             if (!HasPermission("Full Inventory"))
             {
                 return Redirect($"/AccessDenied?permission=Full Inventory&module=Inventory");
@@ -92,63 +85,46 @@ namespace QRB.Pages.KhoSanPham
 
             Status = status ?? "active";
 
->>>>>>> origin/phuong2
             // Lấy thông tin chi nhánh của user đang đăng nhập
             if (!string.IsNullOrEmpty(userId) && Guid.TryParse(userId, out userGuid))
             {
                 var currentUser = await _context.NguoiDungs
                     .Where(u => u.ID == userGuid && !u.IsDelete)
                     .FirstOrDefaultAsync();
-<<<<<<< HEAD
-                
-=======
 
->>>>>>> origin/phuong2
                 if (currentUser != null)
                 {
                     CurrentUserBranchId = currentUser.IDChiNhanh;
                 }
             }
-<<<<<<< HEAD
-            
-=======
 
->>>>>>> origin/phuong2
             // Lấy danh sách nguyên liệu
-            NguyenLieuList = await _context.NguyenLieus
-                .Where(n => !n.IsDelete)
-                .Select(n => new NguyenLieuViewModel
-                {
-                    ID = n.ID,
-                    TenNguyenLieu = n.TenNguyenLieu
-                })
-                .OrderBy(n => n.TenNguyenLieu)
-                .ToListAsync();
-<<<<<<< HEAD
-                
-=======
+            var nguyenLieuData = await _ingredientService.GetAllIngredientsAsNguyenLieuAsync();
+            NguyenLieuList = nguyenLieuData.Select(n => new NguyenLieuViewModel
+            {
+                ID = n.ID,
+                TenNguyenLieu = n.TenNguyenLieu
+            })
+            .OrderBy(n => n.TenNguyenLieu)
+            .ToList();
 
->>>>>>> origin/phuong2
-            // Lấy danh sách chi nhánh (chỉ chi nhánh của user hiện tại)
-            ChiNhanhList = await _context.ChiNhanhs
+            // Lấy danh sách chi nhánh (chỉ chi nhánh của user hiện tại)  
+            var departments = await _context.Departments
                 .Where(c => !c.IsDelete && c.ID == CurrentUserBranchId)
-                .Select(c => new ChiNhanhViewModel
-                {
-                    ID = c.ID,
-                    TenChiNhanh = c.TenChiNhanh
-                })
-                .OrderBy(c => c.TenChiNhanh)
+                .OrderBy(c => c.DepartmentName)
                 .ToListAsync();
-<<<<<<< HEAD
             
-=======
+            ChiNhanhList = departments.Select(c => new ChiNhanhViewModel
+            {
+                ID = c.ID,
+                TenChiNhanh = c.DepartmentName
+            }).ToList();
 
->>>>>>> origin/phuong2
             // Lấy danh sách kho sản phẩm chỉ thuộc chi nhánh của user hiện tại
             var query = _context.KhoSanPhams
                 .Where(k => k.IDChiNhanh == CurrentUserBranchId) // Chỉ lấy kho sản phẩm của chi nhánh hiện tại
-                .Join(_context.NguyenLieus, k => k.IDNguyenLieu, n => n.ID, (k, n) => new { k, n })
-                .Join(_context.ChiNhanhs, kn => kn.k.IDChiNhanh, c => c.ID, (kn, c) => new { kn.k, kn.n, c });
+                .Join(_context.Ingredients, k => k.IDNguyenLieu, n => n.ID, (k, n) => new { k, n })
+                .Join(_context.Departments, kn => kn.k.IDChiNhanh, c => c.ID, (kn, c) => new { kn.k, kn.n, c });
 
             if (Status == "active")
                 query = query.Where(x => !x.k.IsDelete);
@@ -160,9 +136,9 @@ namespace QRB.Pages.KhoSanPham
                 .Select(x => new KhoSanPhamViewModel
                 {
                     ID = x.k.ID,
-                    TenNguyenLieu = x.n.TenNguyenLieu,
+                    TenNguyenLieu = x.n.IngredientName,
                     SoLuongConLai = x.k.SoLuongConLai,
-                    TenChiNhanh = x.c.TenChiNhanh,
+                    TenChiNhanh = x.c.DepartmentName,
                     CreateTime = x.k.CreateTime,
                     IsDelete = x.k.IsDelete,
                     IDNguyenLieu = x.k.IDNguyenLieu,

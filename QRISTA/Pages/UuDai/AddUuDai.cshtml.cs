@@ -31,12 +31,12 @@ namespace QRB.Pages.UuDai
             using (var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
-                var cmd = new SqlCommand(@"INSERT INTO MaUuDai (ID, IDKhachHang, MaGiamGia, TienGiam, TrangThaiSuDung, IsDelete, CreateTime) VALUES (@ID, @IDKhachHang, @MaGiamGia, @TienGiam, 0, 0, @CreateTime)", conn);
+                var cmd = new SqlCommand(@"INSERT INTO Voucher (ID, IDCustomer, VoucherCode, Discount, Status, IsDelete, CreateTime) VALUES (@ID, @IDCustomer, @VoucherCode, @Discount, 0, 0, @CreateTime)", conn);
                 var id = Guid.NewGuid();
                 cmd.Parameters.AddWithValue("@ID", id);
-                cmd.Parameters.AddWithValue("@IDKhachHang", req.IDKhachHang);
-                cmd.Parameters.AddWithValue("@MaGiamGia", req.MaGiamGia);
-                cmd.Parameters.AddWithValue("@TienGiam", req.TienGiam);
+                cmd.Parameters.AddWithValue("@IDCustomer", req.IDKhachHang);
+                cmd.Parameters.AddWithValue("@VoucherCode", req.MaGiamGia);
+                cmd.Parameters.AddWithValue("@Discount", req.TienGiam);
                 cmd.Parameters.AddWithValue("@CreateTime", DateTime.Now);
                 try
                 {

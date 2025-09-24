@@ -10,9 +10,9 @@ namespace QRB.Pages.User
         public class UserInfo
         {
             public Guid ID { get; set; }
-            public string TenHienThi { get; set; }
-            public string TenNguoiDung { get; set; }
-            public string TenChiNhanh { get; set; }
+            public string TenHienThi { get; set; } = string.Empty;
+            public string TenNguoiDung { get; set; } = string.Empty;
+            public string TenChiNhanh { get; set; } = string.Empty;
             public bool IsDelete { get; set; }
             public DateTime CreateTime { get; set; }
         }
@@ -46,9 +46,9 @@ namespace QRB.Pages.User
             {
                 connection.Open();
                 // Lấy danh sách user
-                var command = new SqlCommand(@"SELECT u.ID, u.TenHienThi, u.TenNguoiDung, c.TenChiNhanh, ISNULL(u.IsDelete,0), u.CreateTime
-FROM NguoiDung u
-LEFT JOIN ChiNhanh c ON u.IDChiNhanh = c.ID
+                var command = new SqlCommand(@"SELECT u.ID, u.UserName, u.Account, c.DepartmentName, ISNULL(u.IsDelete,0), u.CreateTime
+FROM [User] u
+LEFT JOIN Department c ON u.IDDepartment = c.ID
 ORDER BY u.CreateTime DESC", connection);
                 using (var reader = command.ExecuteReader())
                 {
@@ -57,8 +57,8 @@ ORDER BY u.CreateTime DESC", connection);
                         Users.Add(new UserInfo
                         {
                             ID = reader.GetGuid(0),
-                            TenHienThi = reader.GetString(1),
-                            TenNguoiDung = reader.GetString(2),
+                            TenHienThi = reader.GetString(1),  // UserName
+                            TenNguoiDung = reader.GetString(2), // Account  
                             TenChiNhanh = reader.IsDBNull(3) ? "" : reader.GetString(3),
                             IsDelete = reader.GetBoolean(4),
                             CreateTime = reader.GetDateTime(5)
@@ -66,7 +66,7 @@ ORDER BY u.CreateTime DESC", connection);
                     }
                 }
                 // Lấy danh sách chi nhánh
-                var cnCommand = new SqlCommand(@"SELECT ID, TenChiNhanh FROM ChiNhanh WHERE IsDelete = 0 OR IsDelete IS NULL", connection);
+                var cnCommand = new SqlCommand(@"SELECT ID, DepartmentName FROM Department WHERE IsDelete = 0 OR IsDelete IS NULL", connection);
                 using (var reader = cnCommand.ExecuteReader())
                 {
                     while (reader.Read())

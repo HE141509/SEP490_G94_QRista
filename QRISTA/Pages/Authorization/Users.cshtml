@@ -19,6 +19,232 @@
         .filtered-out {
             display: none !important;
         }
+        
+        /* Custom styles for branch assignment modal */
+        .branch-modal .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 0.5rem 0.5rem 0 0;
+        }
+        
+        .branch-modal .modal-header .btn-close {
+            filter: invert(1);
+        }
+        
+        .user-info-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .user-info-card h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .branch-list-container {
+            border: 2px solid #e9ecef;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .branch-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .branch-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            border-color: #007bff;
+        }
+        
+        .branch-item.checked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .branch-item .form-check-input {
+            transform: scale(1.2);
+            margin-right: 0.75rem;
+        }
+        
+        .branch-item .form-check-input:checked {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        
+        .branch-item .branch-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .branch-item .branch-code {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .branch-item.checked .branch-code {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .control-buttons {
+            margin-top: 1rem;
+        }
+        
+        .control-buttons .btn {
+            border-radius: 0.5rem;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .control-buttons .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .loading-spinner .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        .alert-custom {
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .modal-footer {
+            border-top: 2px solid #e9ecef;
+            padding: 1rem 1.5rem;
+        }
+        
+        .modal-footer .btn {
+            border-radius: 0.5rem;
+            font-weight: 500;
+            padding: 0.5rem 1.5rem;
+        }
+        
+        /* Animation keyframes */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @@keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .branch-item:hover {
+            animation: pulse 0.3s ease;
+        }
+
+        /* Custom styles for branch select in add user modal */
+        #addBranch {
+            border: 2px solid #e9ecef;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        #addBranch:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        /* Required asterisk styling */
+        .required-asterisk {
+            color: #dc3545;
+            font-weight: bold;
+            margin-left: 4px;
+            font-size: 16px;
+            display: inline-block;
+            position: relative;
+            top: -1px;
+        }
+
+        /* Validation error styling for Bootstrap forms */
+        .validation-error {
+            border: 2px solid #dc3545 !important;
+            box-shadow: 0 0 8px rgba(220, 53, 69, 0.15) !important;
+            background: #fff !important;
+            animation: validation-shake 0.4s ease-in-out;
+        }
+
+        @@keyframes validation-shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-4px); }
+            40% { transform: translateX(4px); }
+            60% { transform: translateX(-2px); }
+            80% { transform: translateX(2px); }
+        }
+
+        .validation-error-message {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 6px;
+            display: block;
+            font-weight: 500;
+            line-height: 1.3;
+            padding-left: 2px;
+        }
+
+        .validation-error:focus {
+            border: 2px solid #dc3545 !important;
+            box-shadow: 0 0 12px rgba(220, 53, 69, 0.25) !important;
+            outline: none !important;
+        }
+
+        /* Input hover and focus effects */
+        .form-control:hover:not(.validation-error),
+        .form-select:hover:not(.validation-error) {
+            border-color: #0d6efd;
+            box-shadow: 0 0 8px rgba(13, 110, 253, 0.1);
+        }
+
+        .form-control:focus:not(.validation-error),
+        .form-select:focus:not(.validation-error) {
+            border-color: #0d6efd;
+            box-shadow: 0 0 12px rgba(13, 110, 253, 0.2);
+        }
+
+        /* Smooth transition for validation clearing */
+        .form-control,
+        .form-select {
+            transition: border 0.3s ease, box-shadow 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -109,6 +335,11 @@
                                                             title="Chỉnh sửa">
                                                         <i class="fas fa-edit"></i>
                                                     </button>
+                                                    <button type="button" class="btn btn-outline-info" 
+                                                            onclick="assignBranches('@user.ID', '@user.TenNguoiDung')"
+                                                            title="Phân chi nhánh">
+                                                        <i class="fas fa-building"></i>
+                                                    </button>
                                                     <button type="button" class="btn btn-outline-@(user.TrangThaiHoatDong ? "warning" : "success")"
                                                             onclick="toggleUserStatus('@user.ID')"
                                                             title="@(user.TrangThaiHoatDong ? "Khóa tài khoản" : "Kích hoạt tài khoản")">
@@ -152,8 +383,10 @@
                 <div class="modal-body">
                     <form id="addUserForm">
                         <div class="mb-3">
-                            <label for="addUserName" class="form-label">Tên đăng nhập</label>
-                            <input type="text" class="form-control" id="addUserName" required>
+                            <label for="addUserName" class="form-label">Tên đăng nhập <span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="addUserName" required 
+                                   oninput="clearValidationError(this)" 
+                                   onblur="validateField(this)">
                         </div>
                         <div class="mb-3">
                             <label for="addDisplayName" class="form-label">Tên hiển thị</label>
@@ -164,14 +397,27 @@
                             <input type="email" class="form-control" id="addEmail">
                         </div>
                         <div class="mb-3">
-                            <label for="addPassword" class="form-label">Mật khẩu</label>
-                            <input type="password" class="form-control" id="addPassword" required>
+                            <label for="addPassword" class="form-label">Mật khẩu <span class="required-asterisk">*</span></label>
+                            <input type="password" class="form-control" id="addPassword" required 
+                                   oninput="clearValidationError(this)" 
+                                   onblur="validateField(this)">
                         </div>
                         <div class="mb-3">
-                            <label for="addRole" class="form-label">Vai trò</label>
-                            <select class="form-select" id="addRole" required>
+                            <label for="addRole" class="form-label">Vai trò <span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="addRole" required 
+                                    onchange="clearValidationError(this)" 
+                                    onblur="validateField(this)">
                                 <option value="">Chọn vai trò</option>
                                 <!-- Vai trò sẽ được load từ API -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addBranch" class="form-label">Chi nhánh <span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="addBranch" required 
+                                    onchange="clearValidationError(this); debugBranchSelect(this)" 
+                                    onblur="validateField(this)">
+                                <option value="">Chọn chi nhánh</option>
+                                <!-- Chi nhánh sẽ được load từ API -->
                             </select>
                         </div>
                         <div class="mb-3 form-check">
@@ -200,8 +446,10 @@
                     <form id="editUserForm">
                         <input type="hidden" id="editUserId">
                         <div class="mb-3">
-                            <label for="editUserName" class="form-label">Tên đăng nhập</label>
-                            <input type="text" class="form-control" id="editUserName" required>
+                            <label for="editUserName" class="form-label">Tên đăng nhập <span class="required-asterisk">*</span></label>
+                            <input type="text" class="form-control" id="editUserName" required 
+                                   oninput="clearValidationError(this)" 
+                                   onblur="validateField(this)">
                         </div>
                         <div class="mb-3">
                             <label for="editDisplayName" class="form-label">Tên hiển thị</label>
@@ -212,8 +460,10 @@
                             <input type="email" class="form-control" id="editEmail">
                         </div>
                         <div class="mb-3">
-                            <label for="editRole" class="form-label">Vai trò</label>
-                            <select class="form-select" id="editRole" required>
+                            <label for="editRole" class="form-label">Vai trò <span class="required-asterisk">*</span></label>
+                            <select class="form-select" id="editRole" required 
+                                    onchange="clearValidationError(this)" 
+                                    onblur="validateField(this)">
                                 <option value="">Chọn vai trò</option>
                                 <!-- Vai trò sẽ được load từ API -->
                             </select>
@@ -227,6 +477,70 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                     <button type="button" class="btn btn-primary" onclick="updateUser()">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Phân chi nhánh -->
+    <div class="modal fade branch-modal" id="assignBranchModal" tabindex="-1" aria-labelledby="assignBranchModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignBranchModalLabel">
+                        <i class="fas fa-building me-2"></i>Phân chi nhánh cho người dùng
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="assignUserId">
+                    
+                    <!-- User Info Card -->
+                    <div class="user-info-card">
+                        <h6><i class="fas fa-user me-2"></i>Người dùng: <span id="assignUserName" class="fw-bold"></span></h6>
+                    </div>
+                    
+                    <!-- Branch List Section -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold mb-3">
+                            <i class="fas fa-list me-2"></i>Danh sách chi nhánh:
+                        </label>
+                        <div class="branch-list-container">
+                            <div id="branchList">
+                                <!-- Danh sách chi nhánh sẽ được load từ API -->
+                                <div class="loading-spinner">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Đang tải...</span>
+                                    </div>
+                                    <div class="mt-2 text-muted">Đang tải danh sách chi nhánh...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Control Buttons -->
+                    <div class="control-buttons">
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <button type="button" class="btn btn-success w-100" onclick="selectAllBranches()">
+                                    <i class="fas fa-check-double me-2"></i>Chọn tất cả
+                                </button>
+                            </div>
+                            <div class="col-6">
+                                <button type="button" class="btn btn-warning w-100" onclick="deselectAllBranches()">
+                                    <i class="fas fa-times me-2"></i>Bỏ chọn tất cả
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Hủy
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveBranchAssignments()">
+                        <i class="fas fa-save me-2"></i>Lưu phân quyền
+                    </button>
                 </div>
             </div>
         </div>
@@ -368,14 +682,34 @@
             updatePagination();
         }
 
+        // Debug function để kiểm tra giá trị select chi nhánh
+        function debugBranchSelect(selectElement) {
+            console.log('=== DEBUG BRANCH SELECT ===');
+            console.log('Selected value:', selectElement.value);
+            console.log('Selected text:', selectElement.options[selectElement.selectedIndex].text);
+            console.log('All options:');
+            for (let i = 0; i < selectElement.options.length; i++) {
+                const option = selectElement.options[i];
+                console.log(`Option ${i}: value="${option.value}", text="${option.text}"`);
+            }
+            console.log('===========================');
+        }
+
         function saveUser() {
             const userData = {
                 Username: document.getElementById('addUserName').value,
                 FullName: document.getElementById('addDisplayName').value,
                 Email: document.getElementById('addEmail').value,
                 Password: document.getElementById('addPassword').value,
-                Role: document.getElementById('addRole').value
+                Role: document.getElementById('addRole').value,
+                BranchId: document.getElementById('addBranch').value
             };
+
+            console.log('=== DEBUG SAVE USER ===');
+            console.log('Form data being sent:', userData);
+            console.log('BranchId value:', userData.BranchId);
+            console.log('Selected branch element value:', document.getElementById('addBranch').value);
+            console.log('=======================');
 
             fetch('/api/Authorization/Users', {
                 method: 'POST',
@@ -386,8 +720,13 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log('=== SERVER RESPONSE ===');
+                console.log('Response:', data);
+                console.log('=======================');
                 if (data.success) {
                     bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+                    // Reset form
+                    document.getElementById('addUserForm').reset();
                     location.reload();
                 } else {
                     alert('Lỗi: ' + data.message);
@@ -486,6 +825,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             updatePagination();
             loadRoles();
+            loadBranches();
+            
+            // Reset form when modal is hidden
+            document.getElementById('addUserModal').addEventListener('hidden.bs.modal', function () {
+                document.getElementById('addUserForm').reset();
+            });
         });
 
         function loadRoles() {
@@ -502,6 +847,23 @@
                 .catch(error => {
                     console.error('Error loading roles:', error);
                     populateRoleDropdowns([]);
+                });
+        }
+
+        function loadBranches() {
+            fetch('/api/branches')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        populateBranchDropdown(data.data);
+                    } else {
+                        console.error('Error loading branches:', data.message);
+                        populateBranchDropdown([]);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading branches:', error);
+                    populateBranchDropdown([]);
                 });
         }
 
@@ -531,6 +893,357 @@
                 addRoleSelect.appendChild(noRoleOption);
                 editRoleSelect.appendChild(noRoleOption.cloneNode(true));
             }
+        }
+
+        function populateBranchDropdown(branches) {
+            const addBranchSelect = document.getElementById('addBranch');
+            
+            addBranchSelect.innerHTML = '<option value="">Chọn chi nhánh</option>';
+
+            if (branches && branches.length > 0) {
+                branches.forEach(branch => {
+                    const option = new Option(branch.tenChiNhanh, branch.id);
+                    addBranchSelect.appendChild(option);
+                });
+            } else {
+                const noBranchOption = new Option('Không có chi nhánh nào', '');
+                noBranchOption.disabled = true;
+                addBranchSelect.appendChild(noBranchOption);
+            }
+        }
+
+        // Functions for branch assignment
+        function assignBranches(userId, userName) {
+            document.getElementById('assignUserId').value = userId;
+            document.getElementById('assignUserName').textContent = userName;
+            
+            // Show modal
+            new bootstrap.Modal(document.getElementById('assignBranchModal')).show();
+            
+            // Load branches and user's current branch assignments
+            loadBranchesForUser(userId);
+        }
+
+        function loadBranchesForUser(userId) {
+            const branchListContainer = document.getElementById('branchList');
+            branchListContainer.innerHTML = `
+                <div class="loading-spinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <div class="mt-2 text-muted">Đang tải danh sách chi nhánh...</div>
+                </div>
+            `;
+
+            // Load all branches
+            Promise.all([
+                fetch('/api/branches').then(response => response.json()),
+                fetch(`/api/user-branches/${userId}`).then(response => response.json())
+            ])
+            .then(([branchesResult, userBranchesResult]) => {
+                const branches = branchesResult.success ? branchesResult.data : [];
+                const userBranches = userBranchesResult.success ? userBranchesResult.data : [];
+                
+                displayBranches(branches, userBranches);
+            })
+            .catch(error => {
+                console.error('Error loading branches:', error);
+                branchListContainer.innerHTML = `
+                    <div class="alert alert-danger alert-custom">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Lỗi!</strong> Có lỗi xảy ra khi tải danh sách chi nhánh
+                    </div>
+                `;
+            });
+        }
+
+        function displayBranches(branches, userBranches) {
+            const branchListContainer = document.getElementById('branchList');
+            
+            if (!branches || branches.length === 0) {
+                branchListContainer.innerHTML = `
+                    <div class="alert alert-info alert-custom">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Thông báo:</strong> Không có chi nhánh nào trong hệ thống
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            branches.forEach((branch, index) => {
+                const isAssigned = userBranches.some(ub => ub.branchId === branch.id && ub.isActive);
+                html += `
+                    <div class="branch-item ${isAssigned ? 'checked' : ''}" style="animation-delay: ${index * 0.1}s;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="${branch.id}" 
+                                   id="branch_${branch.id}" ${isAssigned ? 'checked' : ''}
+                                   onchange="toggleBranchSelection(this)">
+                            <label class="form-check-label w-100" for="branch_${branch.id}">
+                                <div class="branch-name">${branch.tenChiNhanh}</div>
+                                <div class="branch-code">
+                                    <i class="fas fa-code me-1"></i>Mã: ${branch.maChiNhanh || 'N/A'}
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                `;
+            });
+
+            branchListContainer.innerHTML = html;
+            
+            // Add fade-in animation
+            setTimeout(() => {
+                const items = branchListContainer.querySelectorAll('.branch-item');
+                items.forEach(item => {
+                    item.style.opacity = '0';
+                    item.style.transform = 'translateY(20px)';
+                    item.style.animation = 'fadeInUp 0.5s ease forwards';
+                });
+            }, 50);
+        }
+
+        function toggleBranchSelection(checkbox) {
+            const branchItem = checkbox.closest('.branch-item');
+            if (checkbox.checked) {
+                branchItem.classList.add('checked');
+            } else {
+                branchItem.classList.remove('checked');
+            }
+        }
+
+        function selectAllBranches() {
+            const checkboxes = document.querySelectorAll('#branchList input[type="checkbox"]');
+            const branchItems = document.querySelectorAll('#branchList .branch-item');
+            
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = true;
+                setTimeout(() => {
+                    branchItems[index].classList.add('checked');
+                }, index * 50);
+            });
+        }
+
+        function deselectAllBranches() {
+            const checkboxes = document.querySelectorAll('#branchList input[type="checkbox"]');
+            const branchItems = document.querySelectorAll('#branchList .branch-item');
+            
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = false;
+                setTimeout(() => {
+                    branchItems[index].classList.remove('checked');
+                }, index * 50);
+            });
+        }
+
+        function saveBranchAssignments() {
+            const userId = document.getElementById('assignUserId').value;
+            const checkboxes = document.querySelectorAll('#branchList input[type="checkbox"]');
+            const selectedBranches = [];
+
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedBranches.push(checkbox.value);
+                }
+            });
+
+            const assignmentData = {
+                userId: userId,
+                branchIds: selectedBranches
+            };
+
+            fetch('/api/user-branches/assign', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(assignmentData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('assignBranchModal')).hide();
+                    alert('Phân quyền chi nhánh thành công!');
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi lưu phân quyền chi nhánh');
+            });
+        }
+
+        // VALIDATION FUNCTIONS
+        function validateField(field) {
+            if (!field) return false;
+            
+            let value = field.value ? field.value.trim() : '';
+            let isValid = true;
+            let errorMessage = '';
+            
+            // Clear existing validation errors
+            clearValidationError(field);
+            
+            // Check if field is required and empty
+            if (field.hasAttribute('required') && !value) {
+                if (field.tagName === 'SELECT') {
+                    errorMessage = 'Vui lòng chọn một tùy chọn';
+                } else if (field.type === 'password') {
+                    errorMessage = 'Vui lòng nhập mật khẩu';
+                } else if (field.type === 'email') {
+                    errorMessage = 'Vui lòng nhập email';
+                } else {
+                    errorMessage = 'Trường này là bắt buộc';
+                }
+                isValid = false;
+            }
+            
+            // Additional validation rules
+            if (value && field.type === 'text') {
+                if (field.id.includes('UserName') && value.length < 3) {
+                    errorMessage = 'Tên đăng nhập phải có ít nhất 3 ký tự';
+                    isValid = false;
+                }
+                if (field.id.includes('DisplayName') && value.length < 2) {
+                    errorMessage = 'Tên hiển thị phải có ít nhất 2 ký tự';
+                    isValid = false;
+                }
+            }
+            
+            if (value && field.type === 'password' && value.length < 6) {
+                errorMessage = 'Mật khẩu phải có ít nhất 6 ký tự';
+                isValid = false;
+            }
+
+            if (value && field.type === 'email') {
+                const emailRegex = /^[^\\s@@]+@@[^\\s@@]+\\.[^\\s@@]+$/;
+                if (!emailRegex.test(value)) {
+                    errorMessage = 'Email không hợp lệ';
+                    isValid = false;
+                }
+            }
+            
+            if (!isValid) {
+                showValidationError(field, errorMessage);
+            }
+            
+            return isValid;
+        }
+        
+        function showValidationError(field, message) {
+            field.classList.add('validation-error');
+            
+            // Remove existing error message
+            let existingError = field.parentNode.querySelector('.validation-error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // Add error message
+            if (message) {
+                let errorSpan = document.createElement('span');
+                errorSpan.className = 'validation-error-message';
+                errorSpan.textContent = message;
+                field.parentNode.appendChild(errorSpan);
+            }
+        }
+        
+        function clearValidationError(field) {
+            if (!field) return;
+            
+            field.classList.remove('validation-error');
+            
+            // Remove error message
+            let errorMsg = field.parentNode.querySelector('.validation-error-message');
+            if (errorMsg) {
+                errorMsg.remove();
+            }
+        }
+        
+        function clearAllValidationErrors() {
+            document.querySelectorAll('.validation-error').forEach(field => {
+                clearValidationError(field);
+            });
+        }
+        
+        function validateForm(formId) {
+            let form = document.getElementById(formId);
+            if (!form) return false;
+            
+            let isValid = true;
+            let requiredFields = form.querySelectorAll('[required]');
+            
+            requiredFields.forEach(field => {
+                if (!validateField(field)) {
+                    isValid = false;
+                }
+            });
+            
+            // Focus on first error field
+            if (!isValid) {
+                let firstErrorField = form.querySelector('.validation-error');
+                if (firstErrorField) {
+                    firstErrorField.focus();
+                }
+            }
+            
+            return isValid;
+        }
+
+        // Override saveUser function to include validation
+        function saveUser() {
+            // Clear all validation errors first
+            clearAllValidationErrors();
+            
+            // Validate form
+            if (!validateForm('addUserForm')) {
+                return false;
+            }
+            
+            // If validation passes, proceed with existing save logic
+            const userData = {
+                userName: document.getElementById('addUserName').value.trim(),
+                displayName: document.getElementById('addDisplayName').value.trim(),
+                email: document.getElementById('addEmail').value.trim(),
+                password: document.getElementById('addPassword').value,
+                role: document.getElementById('addRole').value,
+                branchId: document.getElementById('addBranch').value,
+                isActive: document.getElementById('addIsActive').checked
+            };
+            
+            // Add your save logic here
+            console.log('Saving user:', userData);
+            
+            // For now, just close the modal
+            bootstrap.Modal.getInstance(document.getElementById('addUserModal')).hide();
+        }
+
+        // Override updateUser function to include validation  
+        function updateUser() {
+            // Clear all validation errors first
+            clearAllValidationErrors();
+            
+            // Validate form
+            if (!validateForm('editUserForm')) {
+                return false;
+            }
+            
+            // If validation passes, proceed with existing update logic
+            const userData = {
+                id: document.getElementById('editUserId').value,
+                userName: document.getElementById('editUserName').value.trim(),
+                displayName: document.getElementById('editDisplayName').value.trim(),
+                email: document.getElementById('editEmail').value.trim(),
+                role: document.getElementById('editRole').value,
+                isActive: document.getElementById('editIsActive').checked
+            };
+            
+            // Add your update logic here
+            console.log('Updating user:', userData);
+            
+            // For now, just close the modal
+            bootstrap.Modal.getInstance(document.getElementById('editUserModal')).hide();
         }
     </script>
 

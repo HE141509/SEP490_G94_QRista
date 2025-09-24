@@ -23,6 +23,15 @@
             }
             else
             {
+                @if (!string.IsNullOrEmpty(Model.CustomerPhone))
+                {
+                    <span class="customer-phone-label" style="margin-right: 8px; padding: 5px 10px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; color: #495057; white-space: nowrap; flex-shrink: 0;">
+                        📞 @Model.CustomerPhone
+                    </span>
+                    <a href="/Order/OrderHistory?phone=@Model.CustomerPhone" class="btn btn-outline-success" style="margin-right: 8px; font-size: 13px; padding: 5px 12px;">
+                        📋 Xem lịch sử đặt hàng
+                    </a>
+                }
                 <a href="/Login" class="btn btn-primary">Đăng nhập</a>
             }
         </div>
@@ -34,14 +43,14 @@
                 <option value="all">Tất cả</option>
                 @foreach (var group in Model.ProductGroups)
                 {
-                    <option value="@group.MaNhom">@group.TenNhom</option>
+                    <option value="@group.CategoryCode">@group.CategoryName</option>
                 }
             </select>
             <ul style="height:100vh;overflow-y:auto;">
                 <li class="active" data-manhom="all">Tất cả</li>
                 @foreach (var group in Model.ProductGroups)
                 {
-                    <li data-manhom="@group.MaNhom">@group.TenNhom</li>
+                    <li data-manhom="@group.CategoryCode">@group.CategoryName</li>
                 }
             </ul>
         </aside>
@@ -163,7 +172,7 @@ function renderMenuItems(items) {
     items.forEach((item, idx) => {
         const div = document.createElement('div');
         div.className = 'menu-item';
-        div.dataset.category = item.IdNhomSanPham;
+    div.dataset.category = item.IdCategory;
         div.dataset.name = item.TenSanPham;
         let typesHtml = '';
         if (Array.isArray(item.Types) && item.Types.length > 0) {
@@ -199,11 +208,11 @@ function renderMenuItems(items) {
             : '<div class="img-placeholder">Không có hình</div>';
             
         div.innerHTML = `
-            <div class="menu-item-img">
+            <div class="menu-item-img" onclick="showProductDetail('${item.ID}')">
                 ${imageHtml}
             </div>
             <div class="menu-item-info">
-                <div class="menu-item-title">${item.TenSanPham}</div>
+                <div class="menu-item-title" onclick="showProductDetail('${item.ID}')" style="cursor: pointer;">${item.TenSanPham}</div>
                 <div class="menu-item-code">Mã: ${item.MaSanPham}</div>
                 <div class="menu-item-types-container">
                     ${typesHtml}
@@ -237,7 +246,8 @@ function loadProductsByGroup(maNhom) {
                     MaSanPham: x.maSanPham,
                     TenSanPham: x.tenSanPham,
                     HinhAnh: x.hinhAnh ? arrayBufferToBase64(x.hinhAnh) : null,
-                    IdNhomSanPham: x.idNhomSanPham,
+                    IdCategory: x.IdCategory,
+                    NoiDung: x.noiDung || '',
                     Types: typeMap[x.id] || [],
                     Price: (typeMap[x.id] && typeMap[x.id].length > 0) ? Math.min(...typeMap[x.id].map(t => t.DonGia || 0)) : 0,
                     Qty: 0
@@ -255,10 +265,6 @@ function loadProductsByGroup(maNhom) {
         .catch(() => renderMenuItems([]));
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> origin/phuong2
 // Hàm tìm kiếm sản phẩm
 function searchProducts(searchTerm) {
     if (!searchTerm || searchTerm.trim() === '') {
@@ -296,11 +302,6 @@ function applyCurrentSearch() {
     }
 }
 
-<<<<<<< HEAD
-=======
->>>>>>> origin/anh0612
-=======
->>>>>>> origin/phuong2
 function arrayBufferToBase64(buffer) {
     if (!buffer) return '';
     if (typeof buffer === 'string') return buffer;
@@ -334,10 +335,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('clear-search-btn').style.display = 'none';
         loadProductsByGroup(maNhom);
     });
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> origin/phuong2
     
     // Event listeners cho search box
     const searchInput = document.getElementById('menu-search-input');
@@ -371,11 +368,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Load dữ liệu ban đầu
-<<<<<<< HEAD
-=======
->>>>>>> origin/anh0612
-=======
->>>>>>> origin/phuong2
     loadProductsByGroup('all');
 });
 </script>
@@ -406,6 +398,28 @@ document.addEventListener('DOMContentLoaded', function() {
             <span id="cart-count">0</span> món | <span id="cart-total">0</span> đ
         </div>
         <button id="cart-checkout-btn" class="cart-checkout-btn">Đặt hàng</button>
+    </div>
+
+    <!-- Modal chi tiết sản phẩm -->
+    <div id="productDetailModal" class="product-detail-modal" style="display:none;">
+        <div class="product-detail-content">
+            <div class="product-detail-header">
+                <h3 id="modalProductTitle">Tên sản phẩm</h3>
+                <button class="close-modal-btn" onclick="closeProductDetail()">&times;</button>
+            </div>
+            <div class="product-detail-body">
+                <div class="product-detail-image">
+                    <img id="modalProductImg" src="" alt="Product Image" style="max-width: 100%; height: auto; border-radius: 8px;" />
+                </div>
+                <div class="product-detail-info">
+                    <p id="modalProductCode" style="color: #666; margin-bottom: 15px;">Mã: </p>
+                    <div class="product-content-label" style="font-weight: bold; margin-bottom: 10px;">Mô tả sản phẩm:</div>
+                    <div id="modalProductContent" class="product-content" style="line-height: 1.6; color: #333;">
+                        Chưa có mô tả chi tiết cho sản phẩm này.
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="order-popup" class="order-popup" style="display:none;">
@@ -485,6 +499,62 @@ function updateCartSummary() {
     document.getElementById('cart-summary').style.display = count > 0 ? 'flex' : 'none';
     
     saveCartToServerSession();
+}
+
+// Function để cập nhật số lượng sản phẩm trong popup
+function updateCartItemInPopup(key, change) {
+    if (window.qrbMenuState.cart[key]) {
+        window.qrbMenuState.cart[key].qty += change;
+        if (window.qrbMenuState.cart[key].qty <= 0) {
+            delete window.qrbMenuState.cart[key];
+        }
+        refreshOrderPopup();
+        updateCartSummary();
+    }
+}
+
+// Function để xóa sản phẩm khỏi giỏ hàng trong popup
+function removeCartItemInPopup(key) {
+    if (window.qrbMenuState.cart[key]) {
+        delete window.qrbMenuState.cart[key];
+        refreshOrderPopup();
+        updateCartSummary();
+    }
+}
+
+// Function để làm mới popup order
+function refreshOrderPopup() {
+    const list = document.getElementById('order-items-list');
+    list.innerHTML = '';
+    let total = 0;
+    
+    for (const key in window.qrbMenuState.cart) {
+        const item = window.qrbMenuState.cart[key];
+        total += item.qty * item.price;
+        const div = document.createElement('div');
+        div.className = 'order-item';
+        div.innerHTML = `
+            <div class="order-item-info">
+                <span class="order-item-name">${item.name} (${item.maLoai || 'Không có loại'})</span>
+                <span class="order-item-price">${item.price.toLocaleString()} đ</span>
+            </div>
+            <div class="order-item-controls">
+                <button class="order-qty-btn order-qty-minus" onclick="updateCartItemInPopup('${key}', -1)">-</button>
+                <span class="order-qty-display">${item.qty}</span>
+                <button class="order-qty-btn order-qty-plus" onclick="updateCartItemInPopup('${key}', 1)">+</button>
+                <button class="order-item-delete" onclick="removeCartItemInPopup('${key}')" title="Xóa sản phẩm">🗑️</button>
+            </div>`;
+        list.appendChild(div);
+    }
+    
+    // Kiểm tra nếu giỏ hàng trống thì đóng popup
+    if (Object.keys(window.qrbMenuState.cart).length === 0) {
+        document.getElementById('order-popup').style.display = 'none';
+        return;
+    }
+    
+    window.qrbMenuState.currentOrderTotal = total;
+    updateOrderPopupTotal();
 }
 
 function saveCartToServerSession() {
@@ -656,8 +726,8 @@ function showPage() {
                 const itemCategory = item.dataset.category;
                 const itemName = item.dataset.name;
                 const belongsToFilter = window.qrbMenuState.filteredItems.some(f => {
-                    if (!f || !f.IdNhomSanPham || !f.TenSanPham) return false;
-                    return f.IdNhomSanPham == itemCategory && f.TenSanPham === itemName;
+                    if (!f || !f.IdCategory || !f.TenSanPham) return false;
+                    return f.IdCategory == itemCategory && f.TenSanPham === itemName;
                 });
                 if (belongsToFilter) filteredIndexes.push(idx);
             } catch (error) {
@@ -683,7 +753,7 @@ function filterMenu(category) {
     if (category === 'all') {
         window.qrbMenuState.filteredItems = window.qrbMenuState.allItems;
     } else {
-        window.qrbMenuState.filteredItems = window.qrbMenuState.allItems.filter(item => item.IdNhomSanPham == category);
+    window.qrbMenuState.filteredItems = window.qrbMenuState.allItems.filter(item => item.IdCategory == category);
     }
     window.qrbMenuState.currentPage = 1;
     window.qrbMenuState.totalPages = Math.ceil(window.qrbMenuState.filteredItems.length / window.qrbMenuState.itemsPerPage);
@@ -731,18 +801,9 @@ document.getElementById('cart-checkout-btn').addEventListener('click', function(
     if (document.getElementById('qr-popup').style.display !== 'none') {
         document.getElementById('qr-popup').style.display = 'none';
     }
-    const list = document.getElementById('order-items-list');
-    list.innerHTML = '';
-    let total = 0;
-    for (const key in window.qrbMenuState.cart) {
-        const item = window.qrbMenuState.cart[key];
-        total += item.qty * item.price;
-        const div = document.createElement('div');
-        div.className = 'order-item';
-        div.innerHTML = `<span>${item.name} (${item.maLoai || 'Không có loại'})</span> <span>${item.qty} x ${item.price.toLocaleString()} đ</span>`;
-        list.appendChild(div);
-    }
-    window.qrbMenuState.currentOrderTotal = total;
+    
+    // Sử dụng function refreshOrderPopup để tạo nội dung
+    refreshOrderPopup();
     
     fetch('/Menu/Menu?handler=GetPhoneNumberFromSession')
         .then(res => res.json())
@@ -811,17 +872,19 @@ document.getElementById('order-confirm-btn').addEventListener('click', function(
                 window.location.href = paymentUrl;
             } else {
                 alert('Có lỗi khi lưu thông tin đơn hàng: ' + (data.message || 'Vui lòng thử lại'));
+                // Chỉ reset UI khi có lỗi
+                document.getElementById('order-popup').style.display = 'none';
+                window.qrbMenuState.cart = {};
+                updateCartSummary();
+                updateMenuItemQtyUI();
             }
         })
         .catch(error => {
             window.location.href = `/Payment/Payment?amount=${finalPrice}`;
         })
         .finally(() => {
+            // Không reset cart khi thanh toán thành công, chỉ đóng popup
             document.getElementById('order-popup').style.display = 'none';
-            window.qrbMenuState.cart = {};
-            // KHÔNG xóa cart khỏi server session ở đây, để Payment đọc được cart
-            updateCartSummary();
-            updateMenuItemQtyUI();
         });
     } catch (error) {
         alert('Có lỗi xảy ra. Vui lòng thử lại.');
@@ -913,9 +976,155 @@ if (phoneInput) {
         }
     });
 }
+
+// Function để hiển thị chi tiết sản phẩm
+function showProductDetail(productId) {
+    const product = window.qrbMenuState.allItems.find(item => item.ID === productId);
+    if (!product) return;
+    
+    const modal = document.getElementById('productDetailModal');
+    const modalImg = document.getElementById('modalProductImg');
+    const modalTitle = document.getElementById('modalProductTitle');
+    const modalCode = document.getElementById('modalProductCode');
+    const modalContent = document.getElementById('modalProductContent');
+    
+    // Set product image
+    if (product.HinhAnh) {
+        modalImg.src = `data:image/png;base64,${product.HinhAnh}`;
+        modalImg.style.display = 'block';
+    } else {
+        modalImg.style.display = 'none';
+    }
+    
+    // Set product info
+    modalTitle.textContent = product.TenSanPham;
+    modalCode.textContent = `Mã: ${product.MaSanPham}`;
+    
+    // Set product content (NoiDung)
+    if (product.NoiDung && product.NoiDung.trim() !== '') {
+        modalContent.innerHTML = product.NoiDung.replace(/\n/g, '<br>');
+        modalContent.style.display = 'block';
+    } else {
+        modalContent.textContent = 'Chưa có mô tả chi tiết cho sản phẩm này.';
+        modalContent.style.display = 'block';
+    }
+    
+    // Show modal
+    modal.style.display = 'flex';
+}
+
+// Function để đóng modal
+function closeProductDetail() {
+    document.getElementById('productDetailModal').style.display = 'none';
+}
+
+// Đóng modal khi click outside
+window.onclick = function(event) {
+    const modal = document.getElementById('productDetailModal');
+    if (event.target === modal) {
+        closeProductDetail();
+    }
+}
 </script>
 
 @section Styles {
     <link rel="stylesheet" href="~/css/menu.css" />
     <link rel="stylesheet" href="~/css/menu-custom.css" />
+    <style>
+        /* Modal styles */
+        .product-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .product-detail-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .product-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .product-detail-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.4rem;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-modal-btn:hover {
+            color: #333;
+        }
+
+        .product-detail-body {
+            padding: 20px 25px;
+        }
+
+        .product-detail-image {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .product-detail-image img {
+            max-width: 300px;
+            max-height: 200px;
+            object-fit: cover;
+        }
+
+        .product-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #1976d2;
+        }
+
+        /* Make menu items clickable */
+        .menu-item-img {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .menu-item-img:hover {
+            transform: scale(1.05);
+        }
+
+        .menu-item-title {
+            transition: color 0.2s;
+        }
+
+        .menu-item-title:hover {
+            color: #1976d2;
+        }
+    </style>
 }

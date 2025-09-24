@@ -7,6 +7,25 @@
 <link rel="stylesheet" href="/css/dashboard.css" />
 <link rel="stylesheet" href="/css/userlist.css" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+    .required-field {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+    .error-border {
+        border: 2px solid #e74c3c !important;
+        box-shadow: 0 0 5px rgba(231, 76, 60, 0.3) !important;
+    }
+    .error-message {
+        color: #e74c3c;
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+    }
+    .userlist-add-form-group {
+        position: relative;
+    }
+</style>
 <partial name="../Shared/_Header.cshtml" />
 <div class="main-container">
     <partial name="../Shared/_Sidebar.cshtml" />
@@ -21,16 +40,19 @@
                     <div class="userlist-add-modal-title"><i class="fas fa-user"></i> Thêm khách hàng mới</div>
                     <form id="addCustomerForm" autocomplete="off">
                         <div class="userlist-add-form-group">
-                            <label for="addTenKhachHang">Tên khách hàng</label>
+                            <label for="addTenKhachHang">Tên khách hàng <span class="required-field">*</span></label>
                             <input type="text" id="addTenKhachHang" name="TenKhachHang" class="userlist-input" required maxlength="100" />
+                            <div class="error-message" id="addTenKhachHang-error">Vui lòng nhập tên khách hàng</div>
                         </div>
                         <div class="userlist-add-form-group">
-                            <label for="addSoDienThoai">Số điện thoại</label>
+                            <label for="addSoDienThoai">Số điện thoại <span class="required-field">*</span></label>
                             <input type="text" id="addSoDienThoai" name="SoDienThoai" class="userlist-input" maxlength="15" pattern="[0-9]{9,15}" />
+                            <div class="error-message" id="addSoDienThoai-error">Vui lòng nhập số điện thoại</div>
                         </div>
                         <div class="userlist-add-form-group">
                             <label for="addGiaTriDonHang">Giá trị đơn hàng</label>
                             <input type="text" id="addGiaTriDonHang" name="GiaTriDonHang" class="userlist-input" maxlength="20" />
+                            <div class="error-message" id="addGiaTriDonHang-error">Giá trị không hợp lệ</div>
                         </div>
                         <div class="userlist-add-form-group">
                             <label for="addIsDelete">Trạng thái</label>
@@ -92,7 +114,8 @@
                                     <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditCustomerModal('@c.Id', '@c.TenKhachHang', '@c.SoDienThoai', '@c.GiaTriDonHang', '@c.IsDelete')">@c.TenKhachHang</span>
                                 </td>
                                 <td>@c.SoDienThoai</td>
-                                <td>@Convert.ToDecimal(c.GiaTriDonHang).ToString("N0")</td>
+                                @{ decimal giaTri = 0; if (!string.IsNullOrWhiteSpace(c.GiaTriDonHang)) { decimal.TryParse(c.GiaTriDonHang, out giaTri); } }
+                                <td>@giaTri.ToString("N0")</td>
                                 <td class="customer-status">@status</td>
                                 <td>
                                     <button class="userlist-delete-btn btnDeleteCustomer" data-id="@c.Id" title="Xóa"><i class="fas fa-trash"></i></button>
@@ -129,16 +152,19 @@
                 <form id="editCustomerForm" autocomplete="off">
                     <input type="hidden" id="editCustomerId" name="Id" />
                     <div class="userlist-add-form-group">
-                        <label for="editTenKhachHang">Tên khách hàng</label>
+                        <label for="editTenKhachHang">Tên khách hàng <span class="required-field">*</span></label>
                         <input type="text" id="editTenKhachHang" name="TenKhachHang" class="userlist-input" required maxlength="100" />
+                        <div class="error-message" id="editTenKhachHang-error">Vui lòng nhập tên khách hàng</div>
                     </div>
                     <div class="userlist-add-form-group">
-                        <label for="editSoDienThoai">Số điện thoại</label>
+                        <label for="editSoDienThoai">Số điện thoại <span class="required-field">*</span></label>
                         <input type="text" id="editSoDienThoai" name="SoDienThoai" class="userlist-input" maxlength="15" pattern="[0-9]{9,15}" />
+                        <div class="error-message" id="editSoDienThoai-error">Vui lòng nhập số điện thoại</div>
                     </div>
                     <div class="userlist-add-form-group">
                         <label for="editGiaTriDonHang">Giá trị đơn hàng</label>
                         <input type="text" id="editGiaTriDonHang" name="GiaTriDonHang" class="userlist-input" maxlength="20" />
+                        <div class="error-message" id="editGiaTriDonHang-error">Giá trị không hợp lệ</div>
                     </div>
                     <div class="userlist-add-form-group">
                         <label for="editIsDelete">Trạng thái</label>
@@ -266,6 +292,75 @@ document.getElementById('btnAddCustomer').onclick = function() {
 function closeAddCustomerModal() {
     document.getElementById('addCustomerModal').style.display = 'none';
     document.getElementById('addCustomerForm').reset();
+    clearValidationErrors('add');
+}
+
+// Validation functions
+function validateField(fieldId, errorId, fieldName, isRequired = true) {
+    const field = document.getElementById(fieldId);
+    const error = document.getElementById(errorId);
+    const value = field.value.trim();
+    
+    if (isRequired && value === '') {
+        field.classList.add('error-border');
+        error.style.display = 'block';
+        error.textContent = `Vui lòng nhập ${fieldName}`;
+        return false;
+    } else {
+        field.classList.remove('error-border');
+        error.style.display = 'none';
+        return true;
+    }
+}
+
+function validatePhoneNumber(fieldId, errorId) {
+    const field = document.getElementById(fieldId);
+    const error = document.getElementById(errorId);
+    const value = field.value.trim();
+    
+    if (value === '') {
+        field.classList.add('error-border');
+        error.style.display = 'block';
+        error.textContent = 'Vui lòng nhập số điện thoại';
+        return false;
+    } else if (!/^[0-9]{9,15}$/.test(value)) {
+        field.classList.add('error-border');
+        error.style.display = 'block';
+        error.textContent = 'Số điện thoại phải từ 9-15 chữ số';
+        return false;
+    } else {
+        field.classList.remove('error-border');
+        error.style.display = 'none';
+        return true;
+    }
+}
+
+function clearValidationErrors(type) {
+    const prefix = type === 'add' ? 'add' : 'edit';
+    
+    // Clear error borders
+    document.getElementById(prefix + 'TenKhachHang').classList.remove('error-border');
+    document.getElementById(prefix + 'SoDienThoai').classList.remove('error-border');
+    document.getElementById(prefix + 'GiaTriDonHang').classList.remove('error-border');
+    
+    // Hide error messages
+    document.getElementById(prefix + 'TenKhachHang-error').style.display = 'none';
+    document.getElementById(prefix + 'SoDienThoai-error').style.display = 'none';
+    document.getElementById(prefix + 'GiaTriDonHang-error').style.display = 'none';
+}
+
+function validateAddCustomerForm() {
+    const tenKhachHangValid = validateField('addTenKhachHang', 'addTenKhachHang-error', 'tên khách hàng');
+    const soDienThoaiValid = validatePhoneNumber('addSoDienThoai', 'addSoDienThoai-error');
+    
+    return tenKhachHangValid && soDienThoaiValid;
+}
+
+function validateEditCustomerForm() {
+    const tenKhachHangValid = validateField('editTenKhachHang', 'editTenKhachHang-error', 'tên khách hàng');
+    const soDienThoaiValid = validatePhoneNumber('editSoDienThoai', 'editSoDienThoai-error');
+    
+    return tenKhachHangValid && soDienThoaiValid;
 }
 function formatCurrencyInput(val) {
     if (!val) return '';
@@ -284,13 +379,16 @@ function showEditCustomerModal(id, tenKhachHang, soDienThoai, giaTriDonHang, isD
     document.getElementById('editCustomerId').value = id;
     document.getElementById('editTenKhachHang').value = tenKhachHang;
     document.getElementById('editSoDienThoai').value = soDienThoai;
-    document.getElementById('editGiaTriDonHang').value = formatCurrencyInput(giaTriDonHang);
+    // Parse số từ chuỗi có thể chứa dấu phẩy hoặc ký tự khác
+    let cleanValue = giaTriDonHang ? giaTriDonHang.toString().replace(/[^\d]/g, '') : '';
+    document.getElementById('editGiaTriDonHang').value = formatCurrencyInput(cleanValue);
     document.getElementById('editIsDelete').value = (isDelete === 'True' || isDelete === 'true' || isDelete === true) ? 'true' : 'false';
     document.getElementById('editCustomerModal').style.display = 'flex';
 }
 function closeEditCustomerModal() {
     document.getElementById('editCustomerModal').style.display = 'none';
     document.getElementById('editCustomerForm').reset();
+    clearValidationErrors('edit');
 }
 let deleteCustomerId = null;
 function showDeleteCustomerConfirm(id) {
@@ -303,10 +401,16 @@ function closeDeleteCustomerModal() {
 }
 document.getElementById('addCustomerForm').onsubmit = function(e) {
     e.preventDefault();
+    
+    // Validate form trước khi submit
+    if (!validateAddCustomerForm()) {
+        return false;
+    }
+    
     var form = e.target;
     var data = {
-        TenKhachHang: form.TenKhachHang.value,
-        SoDienThoai: form.SoDienThoai.value,
+        CustomerName: form.TenKhachHang.value,
+        Phone: form.SoDienThoai.value,
         GiaTriDonHang: form.GiaTriDonHang.value.replace(/[^\d]/g, ''),
         IsDelete: form.IsDelete.value === 'true'
     };
@@ -329,14 +433,21 @@ document.getElementById('addCustomerForm').onsubmit = function(e) {
 };
 document.getElementById('editCustomerForm').onsubmit = function(e) {
     e.preventDefault();
+    
+    // Validate form trước khi submit
+    if (!validateEditCustomerForm()) {
+        return false;
+    }
+    
     var form = e.target;
     var data = {
         Id: form.Id.value,
-        TenKhachHang: form.TenKhachHang.value,
-        SoDienThoai: form.SoDienThoai.value,
+        CustomerName: form.TenKhachHang.value,
+        Phone: form.SoDienThoai.value,
         GiaTriDonHang: form.GiaTriDonHang.value.replace(/[^\d]/g, ''),
         IsDelete: form.IsDelete.value === 'true'
     };
+    console.log('Update customer data:', data);
     fetch('/Customer/UpdateCustomer', {
         method: 'POST',
         headers: {
@@ -347,11 +458,16 @@ document.getElementById('editCustomerForm').onsubmit = function(e) {
     })
     .then(res => res.json())
     .then(resp => {
+        console.log('Update response:', resp);
         if (resp.success) {
             location.reload();
         } else {
             alert(resp.message || 'Cập nhật khách hàng thất bại!');
         }
+    })
+    .catch(err => {
+        console.error('Update error:', err);
+        alert('Có lỗi xảy ra khi cập nhật khách hàng!');
     });
 };
 function confirmDeleteCustomer() {
@@ -443,6 +559,37 @@ $(document).ready(function () {
     $(document).on('click', '.userlist-add-cancel-btn[data-bs-dismiss="modal"]', function () {
         deleteCustomerId = null;
         $('#deleteCustomerModal').css('display', 'none');
+    });
+
+    // Real-time validation
+    document.getElementById('addTenKhachHang').addEventListener('input', function() {
+        if (this.value.trim() !== '') {
+            this.classList.remove('error-border');
+            document.getElementById('addTenKhachHang-error').style.display = 'none';
+        }
+    });
+    
+    document.getElementById('addSoDienThoai').addEventListener('input', function() {
+        const value = this.value.trim();
+        if (value !== '' && /^[0-9]{9,15}$/.test(value)) {
+            this.classList.remove('error-border');
+            document.getElementById('addSoDienThoai-error').style.display = 'none';
+        }
+    });
+
+    document.getElementById('editTenKhachHang').addEventListener('input', function() {
+        if (this.value.trim() !== '') {
+            this.classList.remove('error-border');
+            document.getElementById('editTenKhachHang-error').style.display = 'none';
+        }
+    });
+    
+    document.getElementById('editSoDienThoai').addEventListener('input', function() {
+        const value = this.value.trim();
+        if (value !== '' && /^[0-9]{9,15}$/.test(value)) {
+            this.classList.remove('error-border');
+            document.getElementById('editSoDienThoai-error').style.display = 'none';
+        }
     });
 });
 </script>

@@ -113,16 +113,16 @@
                     <div class="uudai-modal-title"><i class="fas fa-plus-circle"></i> Thêm mới mã ưu đãi</div>
                     <form id="addUuDaiForm" autocomplete="off" onsubmit="return submitAddUuDai(event)">
                         <div class="uudai-form-group">
-                            <label for="addKhachHang">Tên khách hàng</label>
-                            <select id="addKhachHang" name="IDKhachHang" class="uudai-select2" style="width:100%" required></select>
+                            <label for="addKhachHang">Tên khách hàng <span class="required-asterisk">*</span></label>
+                            <select id="addKhachHang" name="IDKhachHang" class="uudai-select2" style="width:100%" required oninput="clearValidationError(this)"></select>
                         </div>
                         <div class="uudai-form-group">
-                            <label for="addMaGiamGia">Mã giảm giá</label>
-                            <input id="addMaGiamGia" name="MaGiamGia" type="text" required />
+                            <label for="addMaGiamGia">Mã giảm giá <span class="required-asterisk">*</span></label>
+                            <input id="addMaGiamGia" name="MaGiamGia" type="text" required oninput="clearValidationError(this)" />
                         </div>
                         <div class="uudai-form-group">
-                            <label for="addTienGiam">Tiền giảm</label>
-                            <input id="addTienGiam" name="TienGiam" type="text" required />
+                            <label for="addTienGiam">Tiền giảm <span class="required-asterisk">*</span></label>
+                            <input id="addTienGiam" name="TienGiam" type="text" required oninput="clearValidationError(this)" />
                         </div>
                         <div class="uudai-modal-actions">
                             <button type="button" onclick="closeAddUuDaiModal()" class="uudai-cancel-btn">Hủy</button>
@@ -138,16 +138,16 @@
                     <form id="editUuDaiForm" autocomplete="off" onsubmit="return submitEditUuDai(event)">
                         <input type="hidden" id="editUuDaiId" name="ID" />
                         <div class="uudai-form-group">
-                            <label for="editTenKhachHang">Tên khách hàng</label>
-                            <input id="editTenKhachHang" name="TenKhachHang" type="text" required readonly style="background:#f5f7fa;cursor:not-allowed;" />
+                            <label for="editTenKhachHang">Tên khách hàng <span class="required-asterisk">*</span></label>
+                            <input id="editTenKhachHang" name="TenKhachHang" type="text" required readonly style="background:#f5f7fa;cursor:not-allowed;" oninput="clearValidationError(this)" />
                         </div>
                         <div class="uudai-form-group">
-                            <label for="editMaGiamGia">Mã giảm giá</label>
-                            <input id="editMaGiamGia" name="MaGiamGia" type="text" required />
+                            <label for="editMaGiamGia">Mã giảm giá <span class="required-asterisk">*</span></label>
+                            <input id="editMaGiamGia" name="MaGiamGia" type="text" required oninput="clearValidationError(this)" />
                         </div>
                         <div class="uudai-form-group">
-                            <label for="editTienGiam">Tiền giảm</label>
-                            <input id="editTienGiam" name="TienGiam" type="text" required />
+                            <label for="editTienGiam">Tiền giảm <span class="required-asterisk">*</span></label>
+                            <input id="editTienGiam" name="TienGiam" type="text" required oninput="clearValidationError(this)" />
                         </div>
                         <div class="uudai-modal-actions">
                             <button type="button" onclick="closeEditUuDaiModal()" class="uudai-cancel-btn">Hủy</button>
@@ -253,16 +253,42 @@
                 document.getElementById('editTienGiam').value = formatCurrencyInput(tienGiam);
                 document.getElementById('editUuDaiModal').style.display = 'flex';
             }
-            function closeEditUuDaiModal() {
+                        function closeEditUuDaiModal() {
+                clearAllValidationErrors();
                 document.getElementById('editUuDaiModal').style.display = 'none';
                 document.getElementById('editUuDaiForm').reset();
             }
             function submitEditUuDai(event) {
                 event.preventDefault();
-                // TODO: Gửi dữ liệu lên backend để cập nhật mã ưu đãi
-                // Lấy giá trị đúng cách từ các trường input
+                
+                // Clear all validation errors first
+                clearAllValidationErrors();
+                
+                // Validate form
+                if (!validateUuDaiForm('editUuDaiForm')) {
+                    return false;
+                }
+                
+                // Additional validation with specific error messages
+                let hasError = false;
+                const maGiamGia = document.getElementById('editMaGiamGia').value.trim();
                 const tienGiamInput = document.getElementById('editTienGiam');
                 let tienGiam = tienGiamInput.value.trim().replace(/[^\d]/g, '');
+                
+                if (!maGiamGia) {
+                    showValidationError(document.getElementById('editMaGiamGia'), 'Vui lòng nhập mã giảm giá');
+                    hasError = true;
+                }
+                
+                if (!tienGiam) {
+                    showValidationError(tienGiamInput, 'Vui lòng nhập tiền giảm');
+                    hasError = true;
+                }
+                
+                if (hasError) {
+                    return false;
+                }
+                
                 tienGiamInput.value = formatCurrencyInput(tienGiam);
                 alert('Chức năng sửa mã ưu đãi đang được phát triển!');
                 closeEditUuDaiModal();
@@ -274,12 +300,22 @@
                 setupKhachHangSelect();
             }
             function closeAddUuDaiModal() {
+                clearAllValidationErrors();
                 document.getElementById('addUuDaiModal').style.display = 'none';
                 document.getElementById('addUuDaiForm').reset();
                 resetAddKhachHangSelect();
             }
             function submitAddUuDai(event) {
                 event.preventDefault();
+                
+                // Clear all validation errors first
+                clearAllValidationErrors();
+                
+                // Validate form
+                if (!validateUuDaiForm('addUuDaiForm')) {
+                    return false;
+                }
+                
                 // Lấy giá trị đúng cách từ các trường input/select
                 const select = document.getElementById('addKhachHang');
                 let idKhachHang = '';
@@ -289,10 +325,29 @@
                 const maGiamGia = document.getElementById('addMaGiamGia').value.trim();
                 let tienGiam = document.getElementById('addTienGiam').value.trim();
                 tienGiam = tienGiam.replace(/[^\d]/g, '');
-                if (!idKhachHang || !maGiamGia || !tienGiam) {
-                    alert('Vui lòng nhập đầy đủ thông tin!');
+                
+                // Additional validation with specific error messages
+                let hasError = false;
+                
+                if (!idKhachHang) {
+                    showValidationError(select, 'Vui lòng chọn khách hàng');
+                    hasError = true;
+                }
+                
+                if (!maGiamGia) {
+                    showValidationError(document.getElementById('addMaGiamGia'), 'Vui lòng nhập mã giảm giá');
+                    hasError = true;
+                }
+                
+                if (!tienGiam) {
+                    showValidationError(document.getElementById('addTienGiam'), 'Vui lòng nhập tiền giảm');
+                    hasError = true;
+                }
+                
+                if (hasError) {
                     return false;
                 }
+                
                 fetch('/UuDai/AddUuDai', {
                     method: 'POST',
                     headers: {
@@ -438,6 +493,86 @@
                 uudaiCurrentPage = 1;
                 updateUuDaiPagination();
             }
+
+            // VALIDATION FUNCTIONS
+            function validateField(field) {
+                if (!field) return false;
+                
+                let value = field.value ? field.value.trim() : '';
+                let isValid = true;
+                
+                // Clear existing validation errors
+                clearValidationError(field);
+                
+                // Check if field is required and empty
+                if (field.hasAttribute('required') && !value) {
+                    showValidationError(field, 'Trường này là bắt buộc');
+                    isValid = false;
+                }
+                
+                // Special validation for select dropdown
+                if (field.tagName === 'SELECT' && field.hasAttribute('required')) {
+                    if (!value || value === '') {
+                        showValidationError(field, 'Vui lòng chọn khách hàng');
+                        isValid = false;
+                    }
+                }
+                
+                return isValid;
+            }
+            
+            function showValidationError(field, message) {
+                field.classList.add('validation-error');
+                
+                // Remove existing error message
+                let existingError = field.parentNode.querySelector('.validation-error-message');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                // Add error message
+                if (message) {
+                    let errorSpan = document.createElement('span');
+                    errorSpan.className = 'validation-error-message';
+                    errorSpan.textContent = message;
+                    field.parentNode.appendChild(errorSpan);
+                }
+            }
+            
+            function clearValidationError(field) {
+                if (!field) return;
+                
+                field.classList.remove('validation-error');
+                
+                // Remove error message
+                let errorMsg = field.parentNode.querySelector('.validation-error-message');
+                if (errorMsg) {
+                    errorMsg.remove();
+                }
+            }
+            
+            function clearAllValidationErrors() {
+                document.querySelectorAll('.validation-error').forEach(field => {
+                    clearValidationError(field);
+                });
+            }
+            
+            function validateUuDaiForm(formId) {
+                let form = document.getElementById(formId);
+                if (!form) return false;
+                
+                let isValid = true;
+                let requiredFields = form.querySelectorAll('[required]');
+                
+                requiredFields.forEach(field => {
+                    if (!validateField(field)) {
+                        isValid = false;
+                    }
+                });
+                
+                return isValid;
+            }
+
             window.addEventListener('DOMContentLoaded', function() {
                 uudaiPageSize = parseInt(document.getElementById('uudaiPageSize').value) || 10;
                 setTimeout(updateUuDaiPagination, 0);
@@ -454,10 +589,23 @@
             document.getElementById('addTienGiam').addEventListener('input', function(e) {
                 let val = e.target.value.replace(/[^\d]/g, '');
                 e.target.value = formatCurrencyInput(val);
+                clearValidationError(e.target); // Clear validation on input
             });
             document.getElementById('editTienGiam').addEventListener('input', function(e) {
                 let val = e.target.value.replace(/[^\d]/g, '');
                 e.target.value = formatCurrencyInput(val);
+                clearValidationError(e.target); // Clear validation on input
+            });
+            
+            // Add real-time validation for other fields
+            document.getElementById('addMaGiamGia').addEventListener('blur', function(e) {
+                validateField(e.target);
+            });
+            document.getElementById('editMaGiamGia').addEventListener('blur', function(e) {
+                validateField(e.target);
+            });
+            document.getElementById('addKhachHang').addEventListener('change', function(e) {
+                validateField(e.target);
             });
             </script>
         </main>

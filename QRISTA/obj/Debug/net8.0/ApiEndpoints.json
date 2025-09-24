@@ -1,0 +1,376 @@
+[
+  {
+    "ContainingType": "QRB.Controllers.Authorization.PermissionsController",
+    "Method": "GetPermissions",
+    "RelativePath": "api/authorization/permissions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.PermissionsController",
+    "Method": "CreatePermission",
+    "RelativePath": "api/authorization/permissions",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "QRB.Models.Authorization.CreatePermissionRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.PermissionsController",
+    "Method": "GetPermission",
+    "RelativePath": "api/authorization/permissions/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.PermissionsController",
+    "Method": "UpdatePermission",
+    "RelativePath": "api/authorization/permissions/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "QRB.Models.Authorization.UpdatePermissionRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.PermissionsController",
+    "Method": "DeletePermission",
+    "RelativePath": "api/authorization/permissions/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.PermissionsController",
+    "Method": "GetPermissionMatrix",
+    "RelativePath": "api/authorization/permissions/matrix",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.PermissionsController",
+    "Method": "UpdatePermissionMatrix",
+    "RelativePath": "api/authorization/permissions/update-matrix",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "changes",
+        "Type": "System.Collections.Generic.List\u00601[[QRB.Models.Authorization.PermissionChangeRequest, QRB, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.RolesController",
+    "Method": "GetRoles",
+    "RelativePath": "api/authorization/roles",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.RolesController",
+    "Method": "CreateRole",
+    "RelativePath": "api/authorization/roles",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "QRB.Models.Authorization.CreateRoleRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.RolesController",
+    "Method": "GetRole",
+    "RelativePath": "api/authorization/roles/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.RolesController",
+    "Method": "UpdateRole",
+    "RelativePath": "api/authorization/roles/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "QRB.Models.Authorization.UpdateRoleRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.RolesController",
+    "Method": "DeleteRole",
+    "RelativePath": "api/authorization/roles/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.RolesController",
+    "Method": "ToggleRoleStatus",
+    "RelativePath": "api/authorization/roles/{id}/toggle-status",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.UsersController",
+    "Method": "CreateUser",
+    "RelativePath": "api/authorization/users",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "QRB.Models.Authorization.CreateUserRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.UsersController",
+    "Method": "GetUser",
+    "RelativePath": "api/authorization/users/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.UsersController",
+    "Method": "UpdateUser",
+    "RelativePath": "api/authorization/users/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "QRB.Models.Authorization.UpdateUserRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.UsersController",
+    "Method": "DeleteUser",
+    "RelativePath": "api/authorization/users/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.UsersController",
+    "Method": "ToggleUserStatus",
+    "RelativePath": "api/authorization/users/{id}/toggle-status",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.UsersController",
+    "Method": "ToggleUserStatus",
+    "RelativePath": "api/authorization/users/{id}/toggle-status",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.Authorization.UsersController",
+    "Method": "GetAvailableRoles",
+    "RelativePath": "api/authorization/users/roles",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.BranchesController",
+    "Method": "GetBranches",
+    "RelativePath": "api/Branches",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.UserBranchesController",
+    "Method": "GetUserBranches",
+    "RelativePath": "api/user-branches/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.UserBranchesController",
+    "Method": "RemoveBranchAssignment",
+    "RelativePath": "api/user-branches/{userId}/branch/{branchId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "branchId",
+        "Type": "System.Guid",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "QRB.Controllers.UserBranchesController",
+    "Method": "AssignBranches",
+    "RelativePath": "api/user-branches/assign",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "QRB.Controllers.AssignBranchRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]

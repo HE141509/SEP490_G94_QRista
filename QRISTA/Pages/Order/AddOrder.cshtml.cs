@@ -4,6 +4,7 @@ using QRB.Data;
 using QRB.Models;
 using System;
 using System.IO;
+using OrderModel = QRB.Models.Order;
 
 namespace QRB.Pages.Order
 {
@@ -60,25 +61,26 @@ namespace QRB.Pages.Order
                     if (HttpContext.Session != null && HttpContext.Session.GetInt32("TableNumber") != null)
                         tableNumber = HttpContext.Session.GetInt32("TableNumber");
 
-                    var newOrder = new DonHang
+                    var newOrder = new OrderModel
                     {
                         ID = Guid.NewGuid(),
-                        MaDonHang = input.MaDonHang,
-                        IDKhachHang = input.IDKhachHang,
-                        IDNhanVien = input.IDNhanVien,
-                        IDChiNhanh = input.IDChiNhanh,
-                        MaUuDai = input.MaUuDai,
-                        TienUuDai = input.TienUuDai,
-                        TongTien = input.TongTien,
-                        DonGia = donGia.ToString(),
-                        TrangThaiThanhToan = input.TrangThai,
+                        OrderCode = input.MaDonHang,
+                        IDCustomer = input.IDKhachHang,
+                        IDEmployee = input.IDNhanVien,
+                        IDDepartment = input.IDChiNhanh,
+                        VoucherCode = input.MaUuDai,
+                        VoucherPrice = input.TienUuDai,
+                        Amount = input.TongTien,
+                        Price = donGia.ToString(),
+                        PaymentStatus = input.TrangThai,
+                        PaymentMethod = "Tiền mặt",
                         IsDelete = false,
                         CreateTime = DateTime.Now,
-                        NgayThanhToan = DateTime.Now,
-                        SoBan = tableNumber
+                        PaymentDate = DateTime.Now,
+                        Table = tableNumber
                     };
 
-                    _context.DonHangs.Add(newOrder);
+                    _context.Orders.Add(newOrder);
                     _context.SaveChanges();
 
                     // Lưu chi tiết đơn hàng
@@ -86,19 +88,19 @@ namespace QRB.Pages.Order
                     {
                         foreach (var sp in input.SanPhamList)
                         {
-                            var chiTiet = new ChiTietDonHang
+                            var chiTiet = new OrderDetail
                             {
                                 ID = Guid.NewGuid(),
-                                IDDonHang = newOrder.ID,
-                                IDSanPham = sp.IDSanPham,
-                                IDLoaiSanPham = sp.IDLoaiSanPham,
-                                SoLuong = sp.SoLuong > 0 ? sp.SoLuong : 1,
-                                DonGia = sp.DonGia.ToString(),
-                                ThanhTien = (sp.DonGia * (sp.SoLuong > 0 ? sp.SoLuong : 1)).ToString(),
+                                IDOrder = newOrder.ID,
+                                IDProduct = sp.IDSanPham,
+                                IDProductType = sp.IDLoaiSanPham,
+                                Quantity = sp.SoLuong > 0 ? sp.SoLuong : 1,
+                                Price = sp.DonGia.ToString(),
+                                Total = (sp.DonGia * (sp.SoLuong > 0 ? sp.SoLuong : 1)).ToString(),
                                 IsDelete = false,
                                 CreateTime = DateTime.Now
                             };
-                            _context.ChiTietDonHangs.Add(chiTiet);
+                            _context.OrderDetails.Add(chiTiet);
                         }
                         _context.SaveChanges();
                     }
@@ -106,27 +108,30 @@ namespace QRB.Pages.Order
                     // Đánh dấu mã ưu đãi đã sử dụng
                     if (!string.IsNullOrWhiteSpace(input.MaUuDai))
                     {
-                        var maUuDai = _context.MaUuDais.FirstOrDefault(m => m.MaGiamGia == input.MaUuDai && !m.IsDelete);
-                        if (maUuDai != null)
+                        var voucher = _context.Vouchers.FirstOrDefault(v => v.VoucherCode == input.MaUuDai && !v.IsDelete);
+                        if (voucher != null)
                         {
-                            maUuDai.IsDelete = true;
+                            voucher.IsDelete = true;
                             _context.SaveChanges();
                         }
                     }
 
-                    // Cập nhật GiaTriDonHang trong bảng KhachHang
-                    var khachHang = _context.KhachHangs.FirstOrDefault(k => k.ID == input.IDKhachHang);
-                    if (khachHang != null)
+                    // Cập nhật GiaTriDonHang trong bảng Customer chỉ khi hóa đơn đã thanh toán
+                    if (input.TrangThai) // Chỉ cập nhật khi hóa đơn đã được thanh toán
                     {
-                        if (decimal.TryParse(khachHang.GiaTriDonHang, out decimal currentGiaTri))
+                        var customer = _context.Customers.FirstOrDefault(c => c.ID == input.IDKhachHang);
+                        if (customer != null)
                         {
-                            khachHang.GiaTriDonHang = (currentGiaTri + tongTien).ToString();
+                            if (decimal.TryParse(customer.GiaTriDonHang, out decimal currentGiaTri))
+                            {
+                                customer.GiaTriDonHang = (currentGiaTri + tongTien).ToString();
+                            }
+                            else
+                            {
+                                customer.GiaTriDonHang = tongTien.ToString(); // Nếu không parse được, gán trực tiếp bằng TongTien
+                            }
+                            _context.SaveChanges();
                         }
-                        else
-                        {
-                            khachHang.GiaTriDonHang = tongTien.ToString(); // Nếu không parse được, gán trực tiếp bằng TongTien
-                        }
-                        _context.SaveChanges();
                     }
 
                     return new JsonResult(new { success = true });

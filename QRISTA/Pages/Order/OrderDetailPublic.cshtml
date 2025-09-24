@@ -1,0 +1,225 @@
+@page "/Order/OrderDetailPublic"
+@model QRB.Pages.Order.OrderDetailPublicModel
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    @if (Model.OrderFound && Model.Order != null)
+    {
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h3 class="mb-0">
+                            <i class="fas fa-receipt me-2"></i>
+                            Chi tiết đơn hàng #@Model.Order.OrderCode
+                        </h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Thông tin đơn hàng -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Thông tin đơn hàng
+                                </h5>
+                                <p class="mb-2"><strong>Mã đơn hàng:</strong> @Model.Order.OrderCode</p>
+                                <p class="mb-2"><strong>Ngày tạo:</strong> @Model.Order.CreateTime.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                                <p class="mb-2"><strong>Bàn số:</strong> @(Model.Order.Table?.ToString() ?? "Mang về")</p>
+                                <p class="mb-2"><strong>Chi nhánh:</strong> @(Model.DepartmentName ?? "Không xác định")</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-credit-card me-2"></i>Trạng thái
+                                </h5>
+                                <p class="mb-2">
+                                    <strong>Thanh toán:</strong> 
+                                    <span class="badge @((Model.Order.PaymentStatus ?? false) ? "bg-success" : "bg-warning") fs-6">
+                                        @((Model.Order.PaymentStatus ?? false) ? "Đã thanh toán" : "Chưa thanh toán")
+                                    </span>
+                                </p>
+                                <p class="mb-2">
+                                    <strong>Phục vụ:</strong> 
+                                    <span class="badge @((Model.Order.Served ?? false) ? "bg-success" : "bg-info") fs-6">
+                                        @((Model.Order.Served ?? false) ? "Đã phục vụ" : "Chưa phục vụ")
+                                    </span>
+                                </p>
+                                @if (Model.Order.PaymentDate.HasValue)
+                                {
+                                    <p class="mb-2"><strong>Ngày thanh toán:</strong> @Model.Order.PaymentDate.Value.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Thông tin khách hàng -->
+                        @if (!string.IsNullOrEmpty(Model.CustomerName))
+                        {
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-user me-2"></i>Thông tin khách hàng
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-2"><strong>Tên khách hàng:</strong> @Model.CustomerName</p>
+                                        <p class="mb-2"><strong>Số điện thoại:</strong> @(Model.CustomerPhone ?? "Không có")</p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Chi tiết sản phẩm -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-list me-2"></i>Chi tiết sản phẩm
+                            </h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="text-center">STT</th>
+                                            <th>Sản phẩm</th>
+                                            <th>Loại</th>
+                                            <th class="text-center">Số lượng</th>
+                                            <th class="text-end">Đơn giá</th>
+                                            <th class="text-end">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.OrderDetails != null && Model.OrderDetails.Count > 0)
+                                        {
+                                            int stt = 1;
+                                            foreach (var item in Model.OrderDetails)
+                                            {
+                                                <tr>
+                                                    <td class="text-center">@stt</td>
+                                                    <td>@(item.Product?.TenSanPham ?? "Không xác định")</td>
+                                                    <td>@(item.ProductType?.TenLoai ?? "Không xác định")</td>
+                                                    <td class="text-center">@item.Quantity</td>
+                                                    <td class="text-end">@decimal.Parse(item.Price ?? "0").ToString("N0") VNĐ</td>
+                                                    <td class="text-end">@decimal.Parse(item.Total ?? "0").ToString("N0") VNĐ</td>
+                                                </tr>
+                                                stt++;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="6" class="text-center text-muted">Không có sản phẩm nào</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot class="table-light">
+                                        <tr>
+                                            <th colspan="5" class="text-end">Tổng tiền hàng:</th>
+                                            <th class="text-end">@decimal.Parse(Model.Order.Price ?? "0").ToString("N0") VNĐ</th>
+                                        </tr>
+                                        @if (decimal.Parse(Model.Order.VoucherPrice ?? "0") > 0)
+                                        {
+                                            <tr>
+                                                <th colspan="5" class="text-end">Giảm giá:</th>
+                                                <th class="text-end text-danger">-@decimal.Parse(Model.Order.VoucherPrice ?? "0").ToString("N0") VNĐ</th>
+                                            </tr>
+                                        }
+                                        <tr class="table-success">
+                                            <th colspan="5" class="text-end fs-5">Tổng thanh toán:</th>
+                                            <th class="text-end fs-5">@decimal.Parse(Model.Order.Amount ?? "0").ToString("N0") VNĐ</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Nút hành động -->
+                        <div class="text-center mt-4">
+                            <a href="/Menu/Menu" class="btn btn-primary btn-lg px-4 me-3">
+                                <i class="fas fa-utensils me-2"></i>
+                                Quay lại menu
+                            </a>
+                            <button class="btn btn-outline-primary btn-lg px-4" onclick="window.print()">
+                                <i class="fas fa-print me-2"></i>
+                                In hóa đơn
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card border-danger shadow">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-exclamation-triangle text-danger mb-3" style="font-size: 4rem;"></i>
+                        <h3 class="text-danger mb-3">Không tìm thấy đơn hàng</h3>
+                        <p class="text-muted mb-4">Đơn hàng không tồn tại hoặc đã bị xóa.</p>
+                        <a href="/Menu/Menu" class="btn btn-primary btn-lg px-4">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Quay lại menu
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .card {
+        border-radius: 15px;
+    }
+    
+    .btn-lg {
+        border-radius: 25px;
+    }
+    
+    .badge {
+        font-size: 0.875rem;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+    }
+    
+    .table-success th {
+        background-color: #d1e7dd !important;
+        color: #0a3622 !important;
+        font-weight: bold;
+    }
+
+    @@media print {
+        .btn, .card-header {
+            display: none !important;
+        }
+        
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        .container {
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .card-body {
+            padding: 0 !important;
+        }
+        
+        body {
+            font-size: 12pt;
+        }
+        
+        .table {
+            font-size: 11pt;
+        }
+        
+        .table th, .table td {
+            padding: 0.5rem !important;
+        }
+    }
+</style>

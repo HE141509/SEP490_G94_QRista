@@ -1,0 +1,324 @@
+@page
+@model QRB.Pages.Order.OrderHistoryModel
+@{
+    ViewData["Title"] = "Lịch sử đặt hàng";
+}
+
+<!-- Add antiforgery token for AJAX requests -->
+@Html.AntiForgeryToken()
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-history"></i> Lịch sử đặt hàng</h2>
+                    @if (!string.IsNullOrEmpty(Model.CustomerName))
+                    {
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-user"></i> @Model.CustomerName 
+                            <span class="ms-2"><i class="fas fa-phone"></i> @Model.Phone</span>
+                        </p>
+                    }
+                </div>
+                <a href="/Menu/Menu" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Quay lại Menu
+                </a>
+            </div>
+
+            @if (Model.Orders.Any())
+            {
+                <!-- Danh sách đơn hàng -->
+                <div class="row">
+                    @foreach (var order in Model.Orders)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header bg-primary text-white">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0">
+                                            <i class="fas fa-receipt"></i> @order.OrderCode
+                                        </h6>
+                                        @if (order.Served)
+                                        {
+                                            <span class="badge bg-success">Đã phục vụ</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning">Chưa phục vụ</span>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar"></i> @order.CreateTime.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+                                        <br />
+                                        <small class="text-muted">
+                                            <i class="fas fa-store"></i> @order.BranchName
+                                        </small>
+                                    </div>
+
+                                    <!-- Chi tiết sản phẩm -->
+                                    <div class="order-items">
+                                        @foreach (var item in order.Items.Take(3))
+                                        {
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="item-name" style="font-size: 0.9rem;">@item.ProductName</span>
+                                                <span class="text-muted" style="font-size: 0.85rem;">@item.Quantity</span>
+                                            </div>
+                                        }
+                                        @if (order.Items.Count > 3)
+                                        {
+                                            <small class="text-muted">... và @(order.Items.Count - 3) sản phẩm khác</small>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="card-footer d-flex justify-content-between align-items-center">
+                                    <strong class="text-primary">
+                                        @order.TotalAmount.ToString("N0") ₫
+                                    </strong>
+                                    <button class="btn btn-sm btn-outline-info" onclick="showOrderDetail('@order.OrderId')">
+                                        <i class="fas fa-eye"></i> Chi tiết
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <!-- Trống -->
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Chưa có đơn hàng nào</h4>
+                    <p class="text-muted">Bạn chưa có đơn hàng nào được ghi nhận.</p>
+                    <a href="/Menu/Menu" class="btn btn-primary">
+                        <i class="fas fa-utensils"></i> Đặt hàng ngay
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal chi tiết đơn hàng -->
+<div class="modal fade" id="orderDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-receipt"></i> Chi tiết đơn hàng
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="orderDetailContent">
+                <!-- Nội dung chi tiết sẽ được load bằng JavaScript -->
+                <div class="text-center py-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="reorderBtn" onclick="reorderItems()">
+                    <i class="fas fa-redo"></i> Đặt lại
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-2px);
+}
+.order-items {
+    max-height: 120px;
+    overflow-y: auto;
+}
+.item-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+</style>
+
+<script>
+function showOrderDetail(orderId) {
+    const modal = new bootstrap.Modal(document.getElementById('orderDetailModal'));
+    modal.show();
+    
+    // Load chi tiết đơn hàng
+    fetch(`/Order/OrderHistory?handler=GetOrderDetail&id=${orderId}`)
+        .then(res => res.json())
+        .then(response => {
+            if (response.success && response.data) {
+                const order = response.data;
+                
+                // Lưu dữ liệu đơn hàng vào biến global
+                currentOrderData = order;
+                
+                document.getElementById('orderDetailContent').innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-info-circle"></i> Thông tin đơn hàng</h6>
+                            <table class="table table-sm">
+                                <tr><td><strong>Mã đơn:</strong></td><td>${order.maDonHang}</td></tr>
+                                <tr><td><strong>Ngày tạo:</strong></td><td>${order.createTime}</td></tr>
+                                <tr><td><strong>Chi nhánh:</strong></td><td>${order.tenChiNhanh}</td></tr>
+                                <tr><td><strong>Khách hàng:</strong></td><td>${order.tenKhachHang}</td></tr>
+                                <tr><td><strong>SĐT:</strong></td><td>${order.sdtKhachHang}</td></tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-list"></i> Chi tiết sản phẩm</h6>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th>SL</th>
+                                        <th>Đơn giá</th>
+                                        <th>Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${order.orderDetails.map(item => `
+                                        <tr>
+                                            <td>${item.tenSanPham}</td>
+                                            <td>${item.soLuong}</td>
+                                            <td>${parseInt(item.donGia).toLocaleString()} ₫</td>
+                                            <td>${parseInt(item.thanhTien).toLocaleString()} ₫</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-warning">
+                                        <th colspan="3">Tổng cộng:</th>
+                                        <th>${parseInt(order.tongTien).toLocaleString()} ₫</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('orderDetailContent').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> Không thể tải thông tin đơn hàng.
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('orderDetailContent').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Có lỗi xảy ra khi tải dữ liệu.
+                </div>
+            `;
+        });
+}
+
+// Biến global để lưu thông tin đơn hàng hiện tại
+let currentOrderData = null;
+
+// Function đặt lại đơn hàng
+function reorderItems() {
+    if (!currentOrderData || !currentOrderData.orderDetails) {
+        alert('Không có thông tin đơn hàng để đặt lại!');
+        return;
+    }
+    
+    // Tạo object giỏ hàng từ đơn hàng cũ
+    const cartData = {};
+    let totalItems = 0;
+    
+    currentOrderData.orderDetails.forEach(item => {
+        // Tạo key theo format của giỏ hàng (cần productId và typeId)
+        // Vì chúng ta chỉ có tên sản phẩm, sẽ cần API để map ngược lại
+        const itemKey = `${item.tenSanPham}_reorder_${Date.now()}_${Math.random()}`;
+        cartData[itemKey] = {
+            productName: item.tenSanPham,
+            quantity: item.soLuong,
+            price: parseInt(item.donGia),
+            total: parseInt(item.thanhTien)
+        };
+        totalItems += item.soLuong;
+    });
+    
+    // Hiển thị thông báo xác nhận
+    const confirmed = confirm(`Bạn muốn đặt lại đơn hàng này với ${totalItems} sản phẩm?\n\nSau khi xác nhận, bạn sẽ được chuyển đến trang thanh toán.`);
+    
+    if (confirmed) {
+        // Đóng modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('orderDetailModal'));
+        modal.hide();
+        
+        // Chuyển đến trang thanh toán với dữ liệu đơn hàng
+        reorderToPayment(currentOrderData);
+    }
+}
+
+// Function chuyển đến trang thanh toán với đơn hàng cũ
+function reorderToPayment(orderData) {
+    // Tạo cart data theo format của session
+    const cartData = {};
+    
+    orderData.orderDetails.forEach((item, index) => {
+        // Tạo key unique cho mỗi item
+        const itemKey = `reorder_${item.tenSanPham}_${index}_${Date.now()}`;
+        cartData[itemKey] = {
+            name: item.tenSanPham,
+            qty: parseInt(item.soLuong),
+            price: parseInt(item.donGia),
+            maLoai: item.maLoai || '', // Nếu có mã loại
+            total: parseInt(item.thanhTien)
+        };
+    });
+    
+    // Lấy antiforgery token
+    const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+    const token = tokenElement ? tokenElement.value : '';
+    
+    // Lưu cart data vào session thông qua AJAX
+    fetch('/Order/OrderHistory?handler=SetCartSession', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'RequestVerificationToken': token
+        },
+        body: JSON.stringify({
+            cartData: JSON.stringify(cartData),
+            phone: '@Model.Phone'
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            // Sau khi lưu session thành công, chuyển đến Payment
+            const params = new URLSearchParams({
+                Amount: parseInt(orderData.tongTien),
+                Phone: '@Model.Phone' || '',
+                Table: ''
+            });
+            
+            window.location.href = `/Payment/Payment?${params.toString()}`;
+        } else {
+            alert('Có lỗi xảy ra khi chuẩn bị đơn hàng. Vui lòng thử lại.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi chuẩn bị đơn hàng. Vui lòng thử lại.');
+    });
+}
+</script>

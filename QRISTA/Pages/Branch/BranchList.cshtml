@@ -14,6 +14,25 @@
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="/css/userlist.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .required-field {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .error-border {
+            border: 2px solid #e74c3c !important;
+            box-shadow: 0 0 5px rgba(231, 76, 60, 0.3) !important;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        .userlist-add-form-group {
+            position: relative;
+        }
+    </style>
 </head>
 <body>
     @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
@@ -30,12 +49,14 @@
                         <div class="userlist-add-modal-title"><i class="fas fa-store"></i> Thêm chi nhánh mới</div>
                         <form id="addBranchForm" autocomplete="off">
                             <div class="userlist-add-form-group">
-                                <label for="addMaChiNhanh">Mã chi nhánh</label>
+                                <label for="addMaChiNhanh">Mã chi nhánh <span class="required-field">*</span></label>
                                 <input type="text" id="addMaChiNhanh" name="MaChiNhanh" class="userlist-input" required />
+                                <div class="error-message" id="addMaChiNhanh-error">Vui lòng nhập mã chi nhánh</div>
                             </div>
                             <div class="userlist-add-form-group">
-                                <label for="addTenChiNhanh">Tên chi nhánh</label>
+                                <label for="addTenChiNhanh">Tên chi nhánh <span class="required-field">*</span></label>
                                 <input type="text" id="addTenChiNhanh" name="TenChiNhanh" class="userlist-input" required />
+                                <div class="error-message" id="addTenChiNhanh-error">Vui lòng nhập tên chi nhánh</div>
                             </div>
                             <div class="userlist-add-form-group">
                                 <label for="addIsDelete">Trạng thái</label>
@@ -69,7 +90,7 @@
                             <option value="50">50</option>
                             <option value="100">100</option>
                         </select>
-                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterBranchList()" style="margin-left:12px;" />
+                        <input type="text" class="userlist-search" placeholder="Tìm kiếm mã hoặc tên chi nhánh..." onkeyup="filterBranchList()" style="margin-left:12px;" />
                     </div>
                 </div>
                 <div class="userlist-table-wrapper">
@@ -139,8 +160,9 @@
                 });
                 if (branchCurrentSearch) {
                     rows = rows.filter(function(row) {
-                        var name = row.querySelector('td:nth-child(2) span')?.textContent.toLowerCase() || '';
-                        return name.includes(branchCurrentSearch);
+                        var code = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+                        var name = row.querySelector('td:nth-child(3) span')?.textContent.toLowerCase() || '';
+                        return code.includes(branchCurrentSearch) || name.includes(branchCurrentSearch);
                     });
                 }
                 return rows;
@@ -232,12 +254,14 @@
                     <form id="editBranchForm" autocomplete="off">
                         <input type="hidden" id="editBranchId" name="ID" />
                         <div class="userlist-add-form-group">
-                            <label for="editMaChiNhanh">Mã chi nhánh</label>
+                            <label for="editMaChiNhanh">Mã chi nhánh <span class="required-field">*</span></label>
                             <input type="text" id="editMaChiNhanh" name="MaChiNhanh" class="userlist-input" required readonly style="background:#f5f7fa;cursor:not-allowed;" />
+                            <div class="error-message" id="editMaChiNhanh-error">Vui lòng nhập mã chi nhánh</div>
                         </div>
                         <div class="userlist-add-form-group">
-                            <label for="editTenChiNhanh">Tên chi nhánh</label>
+                            <label for="editTenChiNhanh">Tên chi nhánh <span class="required-field">*</span></label>
                             <input type="text" id="editTenChiNhanh" name="TenChiNhanh" class="userlist-input" required />
+                            <div class="error-message" id="editTenChiNhanh-error">Vui lòng nhập tên chi nhánh</div>
                         </div>
                         <div class="userlist-add-form-group">
                             <label for="editIsDelete">Trạng thái</label>
@@ -268,6 +292,51 @@
         function closeAddBranchModal() {
             document.getElementById('addBranchModal').style.display = 'none';
             document.getElementById('addBranchForm').reset();
+            clearValidationErrors('add');
+        }
+
+        // Validation functions
+        function validateField(fieldId, errorId, fieldName) {
+            const field = document.getElementById(fieldId);
+            const error = document.getElementById(errorId);
+            const value = field.value.trim();
+            
+            if (value === '') {
+                field.classList.add('error-border');
+                error.style.display = 'block';
+                error.textContent = `Vui lòng nhập ${fieldName}`;
+                return false;
+            } else {
+                field.classList.remove('error-border');
+                error.style.display = 'none';
+                return true;
+            }
+        }
+
+        function clearValidationErrors(type) {
+            const prefix = type === 'add' ? 'add' : 'edit';
+            
+            // Clear error borders
+            document.getElementById(prefix + 'MaChiNhanh').classList.remove('error-border');
+            document.getElementById(prefix + 'TenChiNhanh').classList.remove('error-border');
+            
+            // Hide error messages
+            document.getElementById(prefix + 'MaChiNhanh-error').style.display = 'none';
+            document.getElementById(prefix + 'TenChiNhanh-error').style.display = 'none';
+        }
+
+        function validateAddForm() {
+            const maChiNhanhValid = validateField('addMaChiNhanh', 'addMaChiNhanh-error', 'mã chi nhánh');
+            const tenChiNhanhValid = validateField('addTenChiNhanh', 'addTenChiNhanh-error', 'tên chi nhánh');
+            
+            return maChiNhanhValid && tenChiNhanhValid;
+        }
+
+        function validateEditForm() {
+            // Mã chi nhánh readonly nên không cần validate
+            const tenChiNhanhValid = validateField('editTenChiNhanh', 'editTenChiNhanh-error', 'tên chi nhánh');
+            
+            return tenChiNhanhValid;
         }
 
         // Hiển thị popup Sửa chi nhánh
@@ -281,6 +350,7 @@
         function closeEditBranchModal() {
             document.getElementById('editBranchModal').style.display = 'none';
             document.getElementById('editBranchForm').reset();
+            clearValidationErrors('edit');
         }
 
         // Hiển thị popup Xóa chi nhánh
@@ -297,6 +367,12 @@
         // Thêm chi nhánh (AJAX)
         document.getElementById('addBranchForm').onsubmit = function(e) {
             e.preventDefault();
+            
+            // Validate form trước khi submit
+            if (!validateAddForm()) {
+                return false;
+            }
+            
             var form = e.target;
             var data = {
                 MaChiNhanh: form.MaChiNhanh.value,
@@ -324,6 +400,12 @@
         // Sửa chi nhánh (AJAX)
         document.getElementById('editBranchForm').onsubmit = function(e) {
             e.preventDefault();
+            
+            // Validate form trước khi submit
+            if (!validateEditForm()) {
+                return false;
+            }
+            
             var form = e.target;
             var data = {
                 ID: form.ID.value,
@@ -369,6 +451,32 @@
                 }
             });
         }
+
+        // Real-time validation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add form validation
+            document.getElementById('addMaChiNhanh').addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.classList.remove('error-border');
+                    document.getElementById('addMaChiNhanh-error').style.display = 'none';
+                }
+            });
+            
+            document.getElementById('addTenChiNhanh').addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.classList.remove('error-border');
+                    document.getElementById('addTenChiNhanh-error').style.display = 'none';
+                }
+            });
+
+            // Edit form validation
+            document.getElementById('editTenChiNhanh').addEventListener('input', function() {
+                if (this.value.trim() !== '') {
+                    this.classList.remove('error-border');
+                    document.getElementById('editTenChiNhanh-error').style.display = 'none';
+                }
+            });
+        });
     </script>
 </body>
 </html>

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Data;
 using QRB.Models;
+using QRB.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,12 @@ namespace QRB.Pages.NguyenLieu
     public class NguyenLieuListModel : PageModel
     {
         private readonly QRBDbContext _context;
+        private readonly IIngredientService _ingredientService;
 
-        public NguyenLieuListModel(QRBDbContext context)
+        public NguyenLieuListModel(QRBDbContext context, IIngredientService ingredientService)
         {
             _context = context;
+            _ingredientService = ingredientService;
         }
         private bool HasPermission(string permissionName)
         {
@@ -37,7 +40,7 @@ namespace QRB.Pages.NguyenLieu
 
         public List<QRB.Models.NguyenLieu> NguyenLieuList { get; set; } = new List<QRB.Models.NguyenLieu>();
 
-        public IActionResult OnGet(string? status)
+        public async Task<IActionResult> OnGetAsync(string? status)
         {
             // Kiểm tra đăng nhập - bắt buộc phải đăng nhập mới được truy cập
             var userId = HttpContext.Session.GetString("UserId");
@@ -46,42 +49,35 @@ namespace QRB.Pages.NguyenLieu
                 // Chưa đăng nhập, redirect về trang login
                 return RedirectToPage("/Login");
             }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> origin/phuong2
             if (!HasPermission("Full Raw Materials"))
             {
                 return Redirect($"/AccessDenied?permission=Full Raw Materials&module=RawMaterials");
             }
 
-<<<<<<< HEAD
-=======
->>>>>>> origin/anh0612
-=======
->>>>>>> origin/phuong2
-
             if (string.IsNullOrEmpty(status) || status == "active")
             {
-                NguyenLieuList = _context.NguyenLieus.Where(nl => !nl.IsDelete).ToList();
+                NguyenLieuList = await _ingredientService.GetAllIngredientsAsNguyenLieuAsync();
+                NguyenLieuList = NguyenLieuList.Where(nl => !nl.IsDelete).ToList();
             }
             else if (status == "inactive")
             {
-                NguyenLieuList = _context.NguyenLieus.Where(nl => nl.IsDelete).ToList();
+                NguyenLieuList = await _ingredientService.GetAllIngredientsAsNguyenLieuAsync();
+                NguyenLieuList = NguyenLieuList.Where(nl => nl.IsDelete).ToList();
             }
             else
             {
-                NguyenLieuList = _context.NguyenLieus.ToList();
+                NguyenLieuList = await _ingredientService.GetAllIngredientsAsNguyenLieuAsync();
             }
 
             return Page();
         }
 
-        public IActionResult OnGetActiveNguyenLieu()
+        public async Task<IActionResult> OnGetActiveNguyenLieuAsync()
         {
             try
             {
-                var activeNguyenLieu = _context.NguyenLieus
+                var activeNguyenLieu = await _ingredientService.GetAllIngredientsAsNguyenLieuAsync();
+                var activeList = activeNguyenLieu
                     .Where(nl => !nl.IsDelete)
                     .Select(nl => new {
                         id = nl.ID.ToString(),
@@ -92,7 +88,7 @@ namespace QRB.Pages.NguyenLieu
                     .OrderBy(nl => nl.tenNguyenLieu)
                     .ToList();
 
-                return new JsonResult(activeNguyenLieu);
+                return new JsonResult(activeList);
             }
             catch (Exception ex)
             {

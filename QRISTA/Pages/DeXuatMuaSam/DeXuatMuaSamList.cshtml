@@ -1,7 +1,7 @@
 @page
 @model QRB.Pages.DeXuatMuaSam.DeXuatMuaSamListModel
 @{
-    ViewData["Title"] = "Danh sách đề xuất mua sắm";
+    ViewData["Title"] = "Danh sách phiếu yêu cầu";
     Layout = null;
 }
 
@@ -243,9 +243,9 @@
         @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml", Model)
         <main class="main-content">
             <div class="dashboard-header userlist-header-flex">
-                <h1 class="page-title">Danh sách đề xuất mua sắm</h1>
+                <h1 class="page-title">Danh sách phiếu yêu cầu</h1>
                 <button type="button" class="userlist-add-btn" onclick="showAddDeXuatMuaSamModal()">
-                    <i class="fas fa-plus"></i> Thêm đề xuất mới
+                    <i class="fas fa-plus"></i> Thêm yêu cầu mới
                 </button>
             </div>
 
@@ -470,7 +470,7 @@
                 <!-- Modal thêm mới -->
                 <div id="addDeXuatMuaSamModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
                     <div class="modal-content userlist-add-modal-content">
-                        <div class="userlist-add-modal-title"><i class="fas fa-file-invoice"></i> Thêm đề xuất mua sắm mới</div>
+                        <div class="userlist-add-modal-title"><i class="fas fa-file-invoice"></i> Thêm đề phiếu yêu cầu mới</div>
                         <form id="addDeXuatMuaSamForm" autocomplete="off">
                             <!-- Hàng đầu tiên: Mã đề xuất, Người gửi, Chi nhánh gửi -->
                             <div style="display: flex; gap: 15px; margin-bottom: 20px;">
@@ -614,11 +614,10 @@
         </div>
     </div>
 
-    <!-- Modal xác nhận xóa Đề xuất Mua sắm -->
     <div id="deleteDeXuatMuaSamModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
         <div class="modal-content" style="background:#fff;padding:32px 28px 24px 28px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.12);min-width:320px;max-width:90vw;text-align:center;">
-            <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa đề xuất mua sắm</div>
-            <div style="font-size:16px;color:#333;margin-bottom:24px;">Bạn có chắc chắn muốn xóa đề xuất mua sắm này không?</div>
+            <div style="font-size:20px;font-weight:600;color:#ea4335;margin-bottom:18px;"><i class="fas fa-exclamation-triangle"></i> Xác nhận xóa phiếu yêu cầu</div>
+            <div style="font-size:16px;color:#333;margin-bottom:24px;">Bạn có chắc chắn muốn xóa phiếu yêu cầu này không?</div>
             <div style="display:flex;justify-content:center;gap:18px;">
                 <button onclick="deleteDeXuatMuaSam()" style="background:#ea4335;color:#fff;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Xác nhận</button>
                 <button onclick="closeDeleteDeXuatMuaSamModal()" style="background:#f5f7fa;color:#333;border:none;padding:8px 22px;border-radius:6px;font-size:15px;font-weight:500;cursor:pointer;">Hủy</button>
@@ -626,10 +625,9 @@
         </div>
     </div>
 
-    <!-- Modal cập nhật Đề xuất Mua sắm -->
     <div id="updateDeXuatMuaSamModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
         <div class="modal-content userlist-add-modal-content">
-            <div class="userlist-add-modal-title"><i class="fas fa-edit"></i> Cập nhật đề xuất mua sắm</div>
+            <div class="userlist-add-modal-title"><i class="fas fa-edit"></i> Cập nhật phiếu yêu cầu</div>
             <form id="updateDeXuatMuaSamForm" autocomplete="off">
                 <input type="hidden" id="updateDeXuatId" />
                 <!-- Hàng đầu tiên: Mã đề xuất, Người gửi, Chi nhánh gửi -->
@@ -758,10 +756,9 @@
         </div>
     </div>
 
-    <!-- Modal xem chi tiết Đề xuất Mua sắm -->
     <div id="viewDeXuatMuaSamModal" class="modal" style="display:none;position:fixed;z-index:3000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.18);justify-content:center;align-items:center;">
         <div class="modal-content userlist-add-modal-content" style="max-width: 800px;">
-            <div class="userlist-add-modal-title"><i class="fas fa-eye"></i> Chi tiết đề xuất mua sắm</div>
+            <div class="userlist-add-modal-title"><i class="fas fa-eye"></i> Chi tiết phiếu yêu cầu</div>
             <div id="viewDeXuatMuaSamContent">
                 <!-- Hàng đầu tiên: Mã đề xuất, Người gửi, Chi nhánh gửi -->
                 <div style="display: flex; gap: 15px; margin-bottom: 20px;">
@@ -889,6 +886,18 @@
                             <button type="button" onclick="closeViewDeXuatMuaSamModal()" class="userlist-add-cancel-btn">
                                 <i class="fas fa-times-circle"></i> Đóng
                             </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Inline popup for server-side messages (e.g., insufficient stock) -->
+                <!-- Backdrop overlay -->
+                <div id="viewErrorPopupBackdrop" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:3400;" onclick="hideViewErrorPopup()"></div>
+                <!-- Popup content -->
+                <div id="viewErrorPopup" style="display:none; position: fixed; z-index:3500; left:50%; top:50%; transform: translate(-50%, -50%); min-width:500px; max-width:600px; width:90%;">
+                    <div style="background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border-left: 8px solid #dc3545; padding: 24px;">
+                        <div id="viewErrorPopupMessage" style="color:#333; font-weight:600; margin-bottom:16px; font-size:16px; line-height:1.5;"></div>
+                        <div style="text-align:right;">
+                            <button type="button" onclick="hideViewErrorPopup()" class="userlist-add-cancel-btn" style="padding:10px 20px; font-size:14px;">Đóng</button>
                         </div>
                     </div>
                 </div>
@@ -1391,7 +1400,6 @@
             });
         }
 
-        // Xử lý form thêm mới đề xuất mua sắm
         document.getElementById('addDeXuatMuaSamForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -1455,7 +1463,6 @@
             });
         });
 
-        // Hiển thị modal thêm đề xuất mua sắm
         function showAddDeXuatMuaSamModal() {
             // Tự động sinh mã đề xuất
             document.getElementById('addMaDeXuat').value = generateDeXuatCode();
@@ -1486,7 +1493,6 @@
             setupChiNhanhNhanListener();
         }
 
-        // Đóng modal thêm đề xuất mua sắm
         function closeAddDeXuatMuaSamModal() {
             document.getElementById('addDeXuatMuaSamModal').style.display = 'none';
             document.getElementById('addDeXuatMuaSamForm').reset();
@@ -1498,19 +1504,16 @@
             updateNguyenLieuTable();
         }
 
-        // Hiển thị modal xóa đề xuất mua sắm
         function showDeleteDeXuatMuaSamModal(id) {
             currentDeleteId = id;
             document.getElementById('deleteDeXuatMuaSamModal').style.display = 'flex';
         }
 
-        // Đóng modal xóa đề xuất mua sắm
         function closeDeleteDeXuatMuaSamModal() {
             document.getElementById('deleteDeXuatMuaSamModal').style.display = 'none';
             currentDeleteId = null;
         }
 
-        // Xóa đề xuất mua sắm
         function deleteDeXuatMuaSam() {
             if (!currentDeleteId) return;
             
@@ -1541,9 +1544,7 @@
             });
         }
 
-        // Hiển thị modal xem chi tiết đề xuất mua sắm
         function showViewDeXuatMuaSamModal(id) {
-            // Gọi API để lấy thông tin đề xuất mua sắm
             fetch(`/DeXuatMuaSam/DeXuatMuaSamList?handler=GetDeXuatDetail&id=${id}`)
                 .then(response => {
                     if (!response.ok) {
@@ -1634,6 +1635,27 @@
         // Đóng modal xem chi tiết
         function closeViewDeXuatMuaSamModal() {
             document.getElementById('viewDeXuatMuaSamModal').style.display = 'none';
+        }
+
+        // Show inline error popup inside the modal
+        function showViewErrorPopup(message) {
+            const popup = document.getElementById('viewErrorPopup');
+            const backdrop = document.getElementById('viewErrorPopupBackdrop');
+            const msg = document.getElementById('viewErrorPopupMessage');
+            if (!popup || !msg || !backdrop) {
+                alert(message);
+                return;
+            }
+            msg.textContent = message;
+            backdrop.style.display = 'block';
+            popup.style.display = 'block';
+        }
+
+        function hideViewErrorPopup() {
+            const popup = document.getElementById('viewErrorPopup');
+            const backdrop = document.getElementById('viewErrorPopupBackdrop');
+            if (popup) popup.style.display = 'none';
+            if (backdrop) backdrop.style.display = 'none';
         }
 
         // Phê duyệt đề xuất
@@ -1756,12 +1778,12 @@
                     closeViewDeXuatMuaSamModal();
                     window.location.reload();
                 } else {
-                    alert('Lỗi: ' + data.message);
+                    showViewErrorPopup('Lỗi: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Có lỗi xảy ra: ' + error.message);
+                showViewErrorPopup('Có lỗi xảy ra: ' + error.message);
             });
         }
 
@@ -1802,7 +1824,7 @@
             })
             .then(data => {
                 console.log('Response data:', data);
-                
+
                 if (data.success) {
                     console.log('Success! Message:', data.message);
                     alert(successMessage);
@@ -1810,18 +1832,16 @@
                     window.location.reload();
                 } else {
                     console.log('Error from server:', data.message);
-                    alert('Lỗi: ' + data.message);
+                    showViewErrorPopup('Lỗi: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Có lỗi xảy ra: ' + error.message);
+                showViewErrorPopup('Có lỗi xảy ra: ' + error.message);
             });
         }
 
-        // Hiển thị modal cập nhật đề xuất mua sắm
         function showUpdateDeXuatMuaSamModal(id) {
-            // Gọi API để lấy thông tin đề xuất mua sắm
             fetch(`/DeXuatMuaSam/DeXuatMuaSamList?handler=GetDeXuatDetail&id=${id}`)
                 .then(response => {
                     if (!response.ok) {
@@ -1974,7 +1994,6 @@
                 });
         }
 
-        // Đóng modal cập nhật đề xuất mua sắm
         function closeUpdateDeXuatMuaSamModal() {
             document.getElementById('updateDeXuatMuaSamModal').style.display = 'none';
             document.getElementById('updateDeXuatMuaSamForm').reset();
@@ -1993,7 +2012,6 @@
             }
         }
 
-        // Xử lý form cập nhật đề xuất mua sắm
         document.getElementById('updateDeXuatMuaSamForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -2069,7 +2087,7 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Cập nhật đề xuất mua sắm thành công!');
+                    alert('Cập nhật phiếu yêu cầu thành công!');
                     window.location.reload();
                 } else {
                     alert('Lỗi cập nhật nguyên liệu: ' + (data.message || 'Không xác định'));

@@ -20,8 +20,8 @@ public class UpdateCustomerModel : PageModel
     public class UpdateCustomerInput
     {
         public Guid Id { get; set; }
-        public string TenKhachHang { get; set; } = string.Empty;
-        public string SoDienThoai { get; set; } = string.Empty;
+        public string CustomerName { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
         public string? GiaTriDonHang { get; set; }
         public bool IsDelete { get; set; }
     }
@@ -36,7 +36,7 @@ public class UpdateCustomerModel : PageModel
             var body = reader.ReadToEndAsync().Result;
             input = JsonSerializer.Deserialize<UpdateCustomerInput>(body);
         }
-        if (input == null || input.Id == Guid.Empty || string.IsNullOrWhiteSpace(input.TenKhachHang) || string.IsNullOrWhiteSpace(input.SoDienThoai))
+        if (input == null || input.Id == Guid.Empty || string.IsNullOrWhiteSpace(input.CustomerName) || string.IsNullOrWhiteSpace(input.Phone))
         {
             return new JsonResult(new { success = false, message = "Thiếu thông tin khách hàng." });
         }
@@ -44,12 +44,12 @@ public class UpdateCustomerModel : PageModel
         using (var connection = new SqlConnection(connectionString))
         {
             connection.Open();
-            string sql = "UPDATE KhachHang SET TenKhachHang=@TenKhachHang, SDT=@SDT, GiaTriDonHang=@GiaTriDonHang, IsDelete=@IsDelete, UpdateTime=@UpdateTime WHERE ID=@ID";
+            string sql = "UPDATE Customer SET CustomerName=@CustomerName, Phone=@Phone, GiaTriDonHang=@GiaTriDonHang, IsDelete=@IsDelete, UpdateTime=@UpdateTime WHERE ID=@ID";
             using (var command = new SqlCommand(sql, connection))
             {
                 command.Parameters.AddWithValue("@ID", input.Id);
-                command.Parameters.AddWithValue("@TenKhachHang", input.TenKhachHang.Trim());
-                command.Parameters.AddWithValue("@SDT", input.SoDienThoai.Trim());
+                command.Parameters.AddWithValue("@CustomerName", input.CustomerName.Trim());
+                command.Parameters.AddWithValue("@Phone", input.Phone.Trim());
                 command.Parameters.AddWithValue("@GiaTriDonHang", (object?)input.GiaTriDonHang ?? DBNull.Value);
                 command.Parameters.AddWithValue("@IsDelete", input.IsDelete);
                 command.Parameters.AddWithValue("@UpdateTime", DateTime.Now);

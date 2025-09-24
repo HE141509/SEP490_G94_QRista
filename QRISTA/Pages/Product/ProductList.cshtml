@@ -14,6 +14,37 @@
     <link rel="stylesheet" href="/css/dashboard.css" />
     <link rel="stylesheet" href="/css/userlist.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Validation Error Styles */
+        .validation-error {
+            border: 2px solid #e74c3c !important;
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.3) !important;
+            background-color: #fdf2f2 !important;
+        }
+        
+        .validation-error:focus {
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 12px rgba(231, 76, 60, 0.4) !important;
+            outline: none !important;
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 4px;
+            display: block;
+            font-weight: 500;
+        }
+        
+        .userlist-add-form-group {
+            position: relative;
+        }
+        
+        /* Smooth transitions for validation states */
+        .userlist-input {
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+        }
+    </style>
 </head>
 <body>
     @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
@@ -30,29 +61,36 @@
                         <div class="userlist-add-modal-title"><i class="fas fa-box"></i> Thêm sản phẩm mới</div>
                         <form id="addProductForm" autocomplete="off">
                             <div class="userlist-add-form-group">
-                                <label for="addMaSanPham">Mã sản phẩm</label>
+                                <label for="addMaSanPham">Mã sản phẩm <span style="color: #e74c3c;">*</span></label>
                                 <input type="text" id="addMaSanPham" name="MaSanPham" class="userlist-input" required />
                             </div>
                             <div class="userlist-add-form-group">
-                                <label for="addTenSanPham">Tên sản phẩm</label>
+                                <label for="addTenSanPham">Tên sản phẩm <span style="color: #e74c3c;">*</span></label>
                                 <input type="text" id="addTenSanPham" name="TenSanPham" class="userlist-input" required />
                             </div>
                             <div class="userlist-add-form-group">
                                 <label for="addHinhAnh">Hình ảnh</label>
-                                <input type="file" id="addHinhAnh" name="HinhAnh" class="userlist-input" accept="image/*" />
+                                <input type="file" id="addHinhAnh" name="HinhAnh" class="userlist-input" accept=".jpg,.jpeg,.png,.gif,.bmp,.webp" />
+                                <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">
+                                    Chỉ chấp nhận file hình ảnh: JPG, JPEG, PNG, GIF, BMP, WebP
+                                </small>
                             </div>
                             <div class="userlist-add-form-group">
-                                <label for="addIdNhomSanPham">Nhóm sản phẩm</label>
-                                <select id="addIdNhomSanPham" name="IdNhomSanPham" class="userlist-input" required>
+                                <label for="addNoiDung">Nội dung mô tả</label>
+                                <textarea id="addNoiDung" name="NoiDung" class="userlist-input" rows="4" placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
+                            </div>
+                            <div class="userlist-add-form-group">
+                                <label for="addIdCategory">Nhóm sản phẩm <span style="color: #e74c3c;">*</span></label>
+                                <select id="addIdCategory" name="IdCategory" class="userlist-input" required>
                                     <option value="">-- Chọn nhóm sản phẩm --</option>
-                                    @foreach (var nhom in Model.NhomSanPhams)
+                                    @foreach (var c in Model.Categories)
                                     {
-                                        <option value="@nhom.ID">@nhom.TenNhom</option>
+                                        <option value="@c.ID">@c.CategoryName</option>
                                     }
                                 </select>
                             </div>
                             <div class="userlist-add-form-group">
-                                <label for="addIDChiNhanh">Chi nhánh</label>
+                                <label for="addIDChiNhanh">Chi nhánh <span style="color: #e74c3c;">*</span></label>
                                 <select id="addIDChiNhanh" name="IDChiNhanh" class="userlist-input" required>
                                     <option value="">-- Chọn chi nhánh --</option>
                                     @foreach (var cn in Model.ChiNhanhs)
@@ -93,7 +131,12 @@
                             <option value="50">50</option>
                             <option value="100">100</option>
                         </select>
-                        <input type="text" class="userlist-search" placeholder="Tìm kiếm..." onkeyup="filterProductList()" style="margin-left:12px;" />
+                        <div style="display:inline-block;position:relative;margin-left:12px;">
+                            <input type="text" id="productSearchInput" class="userlist-search" placeholder="Tìm theo tên hoặc mã sản phẩm..." onkeyup="filterProductList()" style="width:250px;padding-right:30px;" />
+                            <button type="button" onclick="clearProductSearch()" id="clearSearchBtn" style="position:absolute;right:5px;top:50%;transform:translateY(-50%);border:none;background:none;color:#999;cursor:pointer;display:none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="userlist-table-wrapper">
@@ -123,7 +166,18 @@
                                     <td>@stt</td>
                                     <td>@sp.MaSanPham</td>
                                     <td>
-                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" onclick="showEditProductModal('@sp.ID', '@sp.MaSanPham', '@sp.TenSanPham', '@sp.IdNhomSanPham', '@sp.IDChiNhanh', '@sp.IsDelete', '@sp.TenNhom', '@sp.TenChiNhanh', '@(sp.HinhAnh != null && sp.HinhAnh.Length > 0 ? ("data:image/jpeg;base64," + Convert.ToBase64String(sp.HinhAnh)) : "")')">@sp.TenSanPham</span>
+                                        <span style="cursor:pointer;color:#4285f4;text-decoration:underline;" 
+                                              onclick="showEditProductModal(this)"
+                                              data-id="@sp.ID"
+                                              data-ma-san-pham="@sp.MaSanPham"
+                                              data-ten-san-pham="@sp.TenSanPham"
+                                              data-category-id="@sp.IdCategory"
+                                              data-id-chi-nhanh="@sp.IDChiNhanh"
+                                              data-is-delete="@sp.IsDelete"
+                                              data-category-name="@sp.CategoryName"
+                                              data-ten-chi-nhanh="@sp.TenChiNhanh"
+                                              data-hinh-anh="@(sp.HinhAnh != null && sp.HinhAnh.Length > 0 ? ("data:image/jpeg;base64," + Convert.ToBase64String(sp.HinhAnh)) : "")"
+                                              data-noi-dung="@(sp.NoiDung ?? "")">@sp.TenSanPham</span>
                                     </td>
                                     <td style="text-align:center;">
                                         @if (sp.HinhAnh != null && sp.HinhAnh.Length > 0)
@@ -135,7 +189,7 @@
                                             <span style="color:#999;font-style:italic;">Không có ảnh</span>
                                         }
                                     </td>
-                                    <td>@sp.TenNhom</td>
+                                    <td>@sp.CategoryName</td>
                                     <td>@sp.TenChiNhanh</td>
                                     <td class="product-status">@status</td>
                                     <td>@sp.CreateTime.ToString("dd/MM/yyyy HH:mm")</td>
@@ -180,11 +234,12 @@
                     if (productCurrentFilter === 'active') return isActive;
                     if (productCurrentFilter === 'inactive') return !isActive;
                 });
-                // Lọc theo search
+                // Lọc theo search (tìm kiếm cả tên và mã sản phẩm)
                 if (productCurrentSearch) {
                     rows = rows.filter(function(row) {
-                        var name = row.querySelector('td:nth-child(3) span')?.textContent.toLowerCase() || '';
-                        return name.includes(productCurrentSearch);
+                        var productCode = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+                        var productName = row.querySelector('td:nth-child(3) span')?.textContent.toLowerCase() || '';
+                        return productCode.includes(productCurrentSearch) || productName.includes(productCurrentSearch);
                     });
                 }
                 return rows;
@@ -226,12 +281,39 @@
                         row.style.display = 'none';
                     }
                 });
+                
+                // Hiển thị thông báo số kết quả tìm kiếm
+                updateProductSearchInfo(total, allRows.length);
+                
                 let pag = document.getElementById('productlist-pagination');
                 if (rows.length === 0) {
                     if (pag) pag.innerHTML = '';
                     return;
                 }
                 renderProductPagination();
+            }
+            
+            function updateProductSearchInfo(filteredCount, totalCount) {
+                let infoDiv = document.getElementById('productSearchInfo');
+                if (!infoDiv) {
+                    infoDiv = document.createElement('div');
+                    infoDiv.id = 'productSearchInfo';
+                    infoDiv.style.cssText = 'margin: 10px 0; color: #666; font-size: 14px;';
+                    document.querySelector('.userlist-table-wrapper').insertBefore(infoDiv, document.getElementById('productListTable'));
+                }
+                
+                if (productCurrentSearch || productCurrentFilter !== 'active') {
+                    if (filteredCount === 0) {
+                        infoDiv.innerHTML = `<i class="fas fa-search"></i> Không tìm thấy sản phẩm nào${productCurrentSearch ? ` cho từ khóa "<strong>${productCurrentSearch}</strong>"` : ''}`;
+                        infoDiv.style.color = '#ea4335';
+                    } else {
+                        infoDiv.innerHTML = `<i class="fas fa-info-circle"></i> Tìm thấy <strong>${filteredCount}</strong> sản phẩm${productCurrentSearch ? ` cho từ khóa "<strong>${productCurrentSearch}</strong>"` : ''} (tổng ${totalCount} sản phẩm)`;
+                        infoDiv.style.color = '#1a73e8';
+                    }
+                } else {
+                    infoDiv.innerHTML = `<i class="fas fa-list"></i> Hiển thị <strong>${filteredCount}</strong> sản phẩm`;
+                    infoDiv.style.color = '#666';
+                }
             }
             function gotoProductPage(page) {
                 productCurrentPage = page;
@@ -243,7 +325,24 @@
                 updateProductPagination();
             }
             function filterProductList() {
-                productCurrentSearch = document.querySelector('.userlist-search').value.toLowerCase();
+                productCurrentSearch = document.getElementById('productSearchInput').value.toLowerCase();
+                productCurrentPage = 1;
+                
+                // Show/hide clear button
+                let clearBtn = document.getElementById('clearSearchBtn');
+                if (productCurrentSearch) {
+                    clearBtn.style.display = 'block';
+                } else {
+                    clearBtn.style.display = 'none';
+                }
+                
+                updateProductPagination();
+            }
+            
+            function clearProductSearch() {
+                document.getElementById('productSearchInput').value = '';
+                document.getElementById('clearSearchBtn').style.display = 'none';
+                productCurrentSearch = '';
                 productCurrentPage = 1;
                 updateProductPagination();
             }
@@ -255,6 +354,86 @@
             window.addEventListener('DOMContentLoaded', function() {
                 productPageSize = parseInt(document.getElementById('productPageSize').value) || 10;
                 setTimeout(updateProductPagination, 0);
+                
+                // Add real-time validation for Add form
+                const addMaSanPham = document.getElementById('addMaSanPham');
+                const addTenSanPham = document.getElementById('addTenSanPham');
+                const addIdCategory = document.getElementById('addIdCategory');
+                const addIDChiNhanh = document.getElementById('addIDChiNhanh');
+                
+                if (addMaSanPham) {
+                    addMaSanPham.addEventListener('blur', function() {
+                        validateField(this, 'Mã sản phẩm không được để trống');
+                    });
+                    addMaSanPham.addEventListener('input', function() {
+                        if (this.value.trim()) {
+                            clearValidationErrors(this);
+                        }
+                    });
+                }
+                
+                if (addTenSanPham) {
+                    addTenSanPham.addEventListener('blur', function() {
+                        validateField(this, 'Tên sản phẩm không được để trống');
+                    });
+                    addTenSanPham.addEventListener('input', function() {
+                        if (this.value.trim()) {
+                            clearValidationErrors(this);
+                        }
+                    });
+                }
+                
+                if (addIdCategory) {
+                    addIdCategory.addEventListener('blur', function() {
+                        validateField(this, 'Vui lòng chọn nhóm sản phẩm');
+                    });
+                    addIdCategory.addEventListener('change', function() {
+                        if (this.value.trim()) {
+                            clearValidationErrors(this);
+                        }
+                    });
+                }
+                
+                if (addIDChiNhanh) {
+                    addIDChiNhanh.addEventListener('blur', function() {
+                        validateField(this, 'Vui lòng chọn chi nhánh');
+                    });
+                    addIDChiNhanh.addEventListener('change', function() {
+                        if (this.value.trim()) {
+                            clearValidationErrors(this);
+                        }
+                    });
+                }
+                
+                // Add real-time validation for Edit form
+                const editTenSanPham = document.getElementById('editTenSanPham');
+                
+                if (editTenSanPham) {
+                    editTenSanPham.addEventListener('blur', function() {
+                        validateField(this, 'Tên sản phẩm không được để trống');
+                    });
+                    editTenSanPham.addEventListener('input', function() {
+                        if (this.value.trim()) {
+                            clearValidationErrors(this);
+                        }
+                    });
+                }
+                
+                // Add file validation for image inputs
+                const addHinhAnh = document.getElementById('addHinhAnh');
+                const editHinhAnh = document.getElementById('editHinhAnh');
+                
+                if (addHinhAnh) {
+                    addHinhAnh.addEventListener('change', function() {
+                        validateImageFile(this);
+                    });
+                }
+                
+                if (editHinhAnh) {
+                    editHinhAnh.addEventListener('change', function() {
+                        validateImageFile(this);
+                    });
+                }
             });
             </script>
             <form id="antiForgeryForm" style="display:none;">
@@ -280,7 +459,7 @@
                             <input type="text" id="editMaSanPham" name="MaSanPham" class="userlist-input" required readonly style="background:#f5f7fa;cursor:not-allowed;" />
                         </div>
                         <div class="userlist-add-form-group">
-                            <label for="editTenSanPham">Tên sản phẩm</label>
+                            <label for="editTenSanPham">Tên sản phẩm <span style="color: #e74c3c;">*</span></label>
                             <input type="text" id="editTenSanPham" name="TenSanPham" class="userlist-input" required />
                         </div>
                         <div class="userlist-add-form-group">
@@ -289,11 +468,18 @@
                                 <span style="color:#999;">Không có ảnh</span>
                             </div>
                             <label for="editHinhAnh" style="margin-top:8px;">Chọn ảnh mới (tùy chọn)</label>
-                            <input type="file" id="editHinhAnh" name="HinhAnh" class="userlist-input" accept="image/*" />
+                            <input type="file" id="editHinhAnh" name="HinhAnh" class="userlist-input" accept=".jpg,.jpeg,.png,.gif,.bmp,.webp" />
+                            <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">
+                                Chỉ chấp nhận file hình ảnh: JPG, JPEG, PNG, GIF, BMP, WebP
+                            </small>
                         </div>
                         <div class="userlist-add-form-group">
-                            <label for="editIdNhomSanPham">Nhóm sản phẩm</label>
-                            <input type="text" id="editIdNhomSanPham" name="IdNhomSanPham" class="userlist-input" readonly style="background:#f5f7fa;cursor:not-allowed;" />
+                            <label for="editNoiDung">Nội dung mô tả</label>
+                            <textarea id="editNoiDung" name="NoiDung" class="userlist-input" rows="4" placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
+                        </div>
+                            <div class="userlist-add-form-group">
+                            <label for="editIdCategory">Nhóm sản phẩm</label>
+                            <input type="text" id="editIdCategory" name="IdCategory" class="userlist-input" readonly style="background:#f5f7fa;cursor:not-allowed;" />
                         </div>
                         <div class="userlist-add-form-group">
                             <label for="editIDChiNhanh">Chi nhánh</label>
@@ -328,22 +514,41 @@
         function closeAddProductModal() {
             document.getElementById('addProductModal').style.display = 'none';
             document.getElementById('addProductForm').reset();
+            
+            // Clear all validation errors
+            const form = document.getElementById('addProductForm');
+            const inputs = form.querySelectorAll('.userlist-input');
+            inputs.forEach(input => {
+                clearValidationErrors(input);
+            });
         }
 
         // Hiển thị popup Sửa sản phẩm
-        let currentEditIdNhomSanPham = '';
+    let currentEditIdCategory = '';
         let currentEditIDChiNhanh = '';
-        function showEditProductModal(id, maSanPham, tenSanPham, idNhomSanPham, idChiNhanh, isDelete, tenNhom, tenChiNhanh, hinhAnhBase64) {
+        function showEditProductModal(element) {
+            var id = element.getAttribute('data-id');
+            var maSanPham = element.getAttribute('data-ma-san-pham');
+            var tenSanPham = element.getAttribute('data-ten-san-pham');
+            var idNhomSanPham = element.getAttribute('data-category-id');
+            var idChiNhanh = element.getAttribute('data-id-chi-nhanh');
+            var isDelete = element.getAttribute('data-is-delete');
+            var tenNhom = element.getAttribute('data-category-name');
+            var tenChiNhanh = element.getAttribute('data-ten-chi-nhanh');
+            var hinhAnhBase64 = element.getAttribute('data-hinh-anh');
+            var noiDung = element.getAttribute('data-noi-dung');
+            
             document.getElementById('editProductId').value = id;
             document.getElementById('editMaSanPham').value = maSanPham;
             document.getElementById('editTenSanPham').value = tenSanPham;
+            document.getElementById('editNoiDung').value = noiDung || '';
             
             // Lưu ID thực để gửi khi submit
-            currentEditIdNhomSanPham = idNhomSanPham;
+            currentEditIdCategory = idNhomSanPham;
             currentEditIDChiNhanh = idChiNhanh;
             
             // Hiển thị tên trực tiếp (không cần tra cứu)
-            document.getElementById('editIdNhomSanPham').value = tenNhom || '';
+            document.getElementById('editIdCategory').value = tenNhom || '';
             document.getElementById('editIDChiNhanh').value = tenChiNhanh || '';
             
             document.getElementById('editIsDelete').value = (isDelete === 'True' || isDelete === 'true' || isDelete === true) ? 'true' : 'false';
@@ -359,6 +564,13 @@
         function closeEditProductModal() {
             document.getElementById('editProductModal').style.display = 'none';
             document.getElementById('editProductForm').reset();
+            
+            // Clear all validation errors
+            const form = document.getElementById('editProductForm');
+            const inputs = form.querySelectorAll('.userlist-input');
+            inputs.forEach(input => {
+                clearValidationErrors(input);
+            });
         }
 
         // Hiển thị popup Xóa sản phẩm
@@ -375,12 +587,19 @@
         // Thêm sản phẩm (AJAX)
         document.getElementById('addProductForm').onsubmit = function(e) {
             e.preventDefault();
+            
+            // Validate form before submission
+            if (!validateAddForm()) {
+                return false;
+            }
+            
             var form = e.target;
             var formData = new FormData();
             
             formData.append('maSanPham', form.MaSanPham.value);
             formData.append('tenSanPham', form.TenSanPham.value);
-            formData.append('nhomSanPhamID', form.IdNhomSanPham.value);
+            formData.append('noiDung', form.NoiDung.value);
+            formData.append('nhomSanPhamID', form.IdCategory.value);
             formData.append('chiNhanhID', form.IDChiNhanh.value);
             formData.append('isDelete', form.IsDelete.value);
             
@@ -409,13 +628,20 @@
         // Sửa sản phẩm (AJAX)
         document.getElementById('editProductForm').onsubmit = function(e) {
             e.preventDefault();
+            
+            // Validate form before submission
+            if (!validateEditForm()) {
+                return false;
+            }
+            
             var form = e.target;
             var formData = new FormData();
             
             formData.append('idSanPham', form.ID.value);
             formData.append('maSanPham', form.MaSanPham.value);
             formData.append('tenSanPham', form.TenSanPham.value);
-            formData.append('nhomSanPhamID', currentEditIdNhomSanPham);
+            formData.append('noiDung', form.NoiDung.value);
+            formData.append('nhomSanPhamID', currentEditIdCategory);
             formData.append('chiNhanhID', currentEditIDChiNhanh);
             formData.append('isDelete', form.IsDelete.value);
             
@@ -460,6 +686,137 @@
                     alert(resp.message || 'Xóa sản phẩm thất bại!');
                 }
             });
+        }
+
+        // Validation Functions
+        function validateField(field, errorMessage) {
+            const value = field.value.trim();
+            const isValid = value !== '';
+            
+            // Remove existing error styling and messages
+            clearValidationErrors(field);
+            
+            if (!isValid) {
+                // Add error styling
+                field.classList.add('validation-error');
+                
+                // Add error message
+                const errorElement = document.createElement('span');
+                errorElement.className = 'error-message';
+                errorElement.textContent = errorMessage;
+                field.parentNode.appendChild(errorElement);
+                
+                return false;
+            }
+            
+            return true;
+        }
+
+        function clearValidationErrors(field) {
+            // Remove error styling
+            field.classList.remove('validation-error');
+            
+            // Remove error message
+            const errorMessage = field.parentNode.querySelector('.error-message');
+            if (errorMessage) {
+                errorMessage.remove();
+            }
+        }
+
+        // Image File Validation Function
+        function validateImageFile(fileInput) {
+            const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp'];
+            const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp'];
+            const maxFileSize = 5 * 1024 * 1024; // 5MB
+            
+            if (fileInput.files.length === 0) {
+                return true; // File is optional
+            }
+            
+            const file = fileInput.files[0];
+            const fileName = file.name.toLowerCase();
+            const fileExtension = fileName.substring(fileName.lastIndexOf('.'));
+            
+            // Check file extension
+            if (!allowedExtensions.includes(fileExtension)) {
+                clearValidationErrors(fileInput);
+                fileInput.classList.add('validation-error');
+                const errorElement = document.createElement('span');
+                errorElement.className = 'error-message';
+                errorElement.textContent = 'Chỉ chấp nhận file hình ảnh: JPG, JPEG, PNG, GIF, BMP, WebP';
+                fileInput.parentNode.appendChild(errorElement);
+                fileInput.value = ''; // Clear the invalid file
+                return false;
+            }
+            
+            // Check MIME type
+            if (!allowedMimeTypes.includes(file.type)) {
+                clearValidationErrors(fileInput);
+                fileInput.classList.add('validation-error');
+                const errorElement = document.createElement('span');
+                errorElement.className = 'error-message';
+                errorElement.textContent = 'File không đúng định dạng hình ảnh';
+                fileInput.parentNode.appendChild(errorElement);
+                fileInput.value = ''; // Clear the invalid file
+                return false;
+            }
+            
+            // Check file size
+            if (file.size > maxFileSize) {
+                clearValidationErrors(fileInput);
+                fileInput.classList.add('validation-error');
+                const errorElement = document.createElement('span');
+                errorElement.className = 'error-message';
+                errorElement.textContent = 'Kích thước file không được vượt quá 5MB';
+                fileInput.parentNode.appendChild(errorElement);
+                fileInput.value = ''; // Clear the invalid file
+                return false;
+            }
+            
+            // If validation passes, clear any existing errors
+            clearValidationErrors(fileInput);
+            return true;
+        }
+
+        function validateAddForm() {
+            let isValid = true;
+            
+            // Validate required fields
+            const maSanPham = document.getElementById('addMaSanPham');
+            const tenSanPham = document.getElementById('addTenSanPham');
+            const idCategory = document.getElementById('addIdCategory');
+            const idChiNhanh = document.getElementById('addIDChiNhanh');
+            
+            if (!validateField(maSanPham, 'Mã sản phẩm không được để trống')) {
+                isValid = false;
+            }
+            
+            if (!validateField(tenSanPham, 'Tên sản phẩm không được để trống')) {
+                isValid = false;
+            }
+            
+            if (!validateField(idCategory, 'Vui lòng chọn nhóm sản phẩm')) {
+                isValid = false;
+            }
+            
+            if (!validateField(idChiNhanh, 'Vui lòng chọn chi nhánh')) {
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+
+        function validateEditForm() {
+            let isValid = true;
+            
+            // Validate required fields (MaSanPham is readonly, so skip it)
+            const tenSanPham = document.getElementById('editTenSanPham');
+            
+            if (!validateField(tenSanPham, 'Tên sản phẩm không được để trống')) {
+                isValid = false;
+            }
+            
+            return isValid;
         }
     </script>
 </body>

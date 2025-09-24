@@ -27,7 +27,7 @@ namespace QRB.Pages.User
                 using (var connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
-                    var command = new SqlCommand("UPDATE NguoiDung SET IsDelete = 1 WHERE ID = @ID", connection);
+                    var command = new SqlCommand("UPDATE [User] SET IsDelete = 1 WHERE ID = @ID", connection);
                     command.Parameters.AddWithValue("@ID", id);
                     int rows = await command.ExecuteNonQueryAsync();
                     if (rows > 0)

@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\New folder (2)\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj": {}
+    "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj": {}
   },
   "projects": {
-    "D:\\New folder (2)\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj": {
+    "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\New folder (2)\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj",
+        "projectUniqueName": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj",
         "projectName": "QRISTA",
-        "projectPath": "D:\\New folder (2)\\SEP490_G94_QRista\\QRISTA\\QRISTA.csproj",
-        "packagesPath": "C:\\Users\\jokA\\.nuget\\packages\\",
-        "outputPath": "D:\\New folder (2)\\SEP490_G94_QRista\\QRISTA\\obj\\",
+        "projectPath": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\QRISTA.csproj",
+        "packagesPath": "C:\\Users\\salam\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\jokA\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\salam\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

@@ -1,0 +1,256 @@
+@page "/Order/OrderDetail"
+@model QRB.Pages.Order.OrderDetailModel
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="/css/dashboard.css" />
+    <link rel="stylesheet" href="/css/userlist.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    @await Html.PartialAsync("~/Pages/Shared/_Header.cshtml", Model)
+    <div class="main-container">
+        @await Html.PartialAsync("~/Pages/Shared/_Sidebar.cshtml", Model)
+        <main class="main-content">
+            @if (Model.OrderFound && Model.Order != null)
+            {
+                <div class="dashboard-header">
+                    <h1 class="page-title">Chi tiết đơn hàng #@Model.Order.OrderCode</h1>
+                    <a href="/Order/OrderList" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Quay lại danh sách
+                    </a>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="userlist-card userlist-modern">
+                            <!-- Thông tin đơn hàng -->
+                            <div class="order-info-section">
+                                <h3><i class="fas fa-info-circle"></i> Thông tin đơn hàng</h3>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Mã đơn hàng:</strong> @Model.Order.OrderCode</p>
+                                        <p><strong>Ngày tạo:</strong> @Model.Order.CreateTime.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                                        <p><strong>Bàn số:</strong> @(Model.Order.Table?.ToString() ?? "Không xác định")</p>
+                                        <p><strong>Chi nhánh:</strong> @(Model.DepartmentName ?? "Không xác định")</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Trạng thái thanh toán:</strong> 
+                                            <span class="badge @((Model.Order.PaymentStatus ?? false) ? "bg-success" : "bg-warning")">
+                                                @((Model.Order.PaymentStatus ?? false) ? "Đã thanh toán" : "Chưa thanh toán")
+                                            </span>
+                                        </p>
+                                        <p><strong>Trạng thái phục vụ:</strong> 
+                                            <span class="badge @((Model.Order.Served ?? false) ? "bg-success" : "bg-info")">
+                                                @((Model.Order.Served ?? false) ? "Đã phục vụ" : "Chưa phục vụ")
+                                            </span>
+                                        </p>
+                                        @if (Model.Order.PaymentDate.HasValue)
+                                        {
+                                            <p><strong>Ngày thanh toán:</strong> @Model.Order.PaymentDate.Value.ToString("dd/MM/yyyy HH:mm:ss")</p>
+                                        }
+                                        @if (!string.IsNullOrEmpty(Model.Order.VoucherCode))
+                                        {
+                                            <p><strong>Mã giảm giá:</strong> @Model.Order.VoucherCode</p>
+                                            <p><strong>Giá trị giảm:</strong> @decimal.Parse(Model.Order.VoucherPrice ?? "0").ToString("N0") VNĐ</p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thông tin khách hàng -->
+                            @if (!string.IsNullOrEmpty(Model.CustomerName))
+                            {
+                                <div class="customer-info-section">
+                                    <h3><i class="fas fa-user"></i> Thông tin khách hàng</h3>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Tên khách hàng:</strong> @Model.CustomerName</p>
+                                            <p><strong>Số điện thoại:</strong> @(Model.CustomerPhone ?? "Không có")</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Chi tiết sản phẩm -->
+                            <div class="order-details-section">
+                                <h3><i class="fas fa-list"></i> Chi tiết sản phẩm</h3>
+                                <div class="userlist-table-wrapper">
+                                    <table class="userlist-table userlist-table-modern">
+                                        <thead>
+                                            <tr>
+                                                <th>STT</th>
+                                                <th>Sản phẩm</th>
+                                                <th>Loại sản phẩm</th>
+                                                <th>Số lượng</th>
+                                                <th>Đơn giá</th>
+                                                <th>Thành tiền</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (Model.OrderDetails != null && Model.OrderDetails.Count > 0)
+                                            {
+                                                int stt = 1;
+                                                foreach (var item in Model.OrderDetails)
+                                                {
+                                                    <tr>
+                                                        <td>@stt</td>
+                                                        <td>@(item.Product?.TenSanPham ?? "Không xác định")</td>
+                                                        <td>@(item.ProductType?.TenLoai ?? "Không xác định")</td>
+                                                        <td class="text-center">@item.Quantity</td>
+                                                        <td class="text-end">@decimal.Parse(item.Price ?? "0").ToString("N0") VNĐ</td>
+                                                        <td class="text-end">@decimal.Parse(item.Total ?? "0").ToString("N0") VNĐ</td>
+                                                    </tr>
+                                                    stt++;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td colspan="6" class="text-center">Không có sản phẩm nào</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-summary">
+                                                <th colspan="5" class="text-end">Tổng tiền hàng:</th>
+                                                <th class="text-end">@decimal.Parse(Model.Order.Price ?? "0").ToString("N0") VNĐ</th>
+                                            </tr>
+                                            @if (decimal.Parse(Model.Order.VoucherPrice ?? "0") > 0)
+                                            {
+                                                <tr class="table-summary">
+                                                    <th colspan="5" class="text-end">Giảm giá:</th>
+                                                    <th class="text-end text-danger">-@decimal.Parse(Model.Order.VoucherPrice ?? "0").ToString("N0") VNĐ</th>
+                                                </tr>
+                                            }
+                                            <tr class="table-total">
+                                                <th colspan="5" class="text-end">Tổng thanh toán:</th>
+                                                <th class="text-end">@decimal.Parse(Model.Order.Amount ?? "0").ToString("N0") VNĐ</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Nút hành động -->
+                            <div class="order-actions">
+                                <button class="btn btn-outline-primary" onclick="window.print()">
+                                    <i class="fas fa-print me-2"></i>
+                                    In hóa đơn
+                                </button>
+                                <a href="/Order/OrderList" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Quay lại danh sách
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="dashboard-header">
+                    <h1 class="page-title">Không tìm thấy đơn hàng</h1>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="userlist-card userlist-modern text-center">
+                            <i class="fas fa-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+                            <h4 class="text-warning mt-3">Không tìm thấy đơn hàng</h4>
+                            <p class="text-muted">Đơn hàng không tồn tại hoặc đã bị xóa.</p>
+                            <a href="/Order/OrderList" class="btn btn-primary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Quay lại danh sách đơn hàng
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </main>
+    </div>
+    <footer class="footer">
+        <div class="footer-content">
+            <span>© 2025 QRB - Hệ thống quán cafe thông minh. All rights reserved.</span>
+        </div>
+    </footer>
+</body>
+</html>
+
+<style>
+    .order-info-section,
+    .customer-info-section,
+    .order-details-section {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+
+    .order-info-section h3,
+    .customer-info-section h3,
+    .order-details-section h3 {
+        color: #495057;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 0.5rem;
+    }
+
+    .table-summary th,
+    .table-total th {
+        background-color: #e9ecef;
+        font-weight: 600;
+    }
+
+    .table-total th {
+        background-color: #007bff;
+        color: white;
+        font-size: 1.1rem;
+    }
+
+    .order-actions {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .order-actions .btn {
+        margin: 0 0.5rem;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    @@media print {
+        .btn, .footer, .dashboard-header a, .order-actions {
+            display: none !important;
+        }
+        
+        .main-container {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .main-content {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .userlist-card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+    }
+</style>

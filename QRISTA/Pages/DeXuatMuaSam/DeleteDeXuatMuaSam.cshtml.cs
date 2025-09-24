@@ -33,12 +33,12 @@ namespace QRB.Pages.DeXuatMuaSam
 
                 var deXuat = await _context.DeXuatMuaSams.FindAsync(input.id);
                 if (deXuat == null)
-                    return new JsonResult(new { success = false, message = $"Không tìm thấy đề xuất mua sắm với id: {input.id}" });
+                    return new JsonResult(new { success = false, message = $"Không tìm thấy phiếu yêu cầu với id: {input.id}" });
 
                 // Kiểm tra trạng thái trước khi xóa
                 if (deXuat.Status == "accepted" || deXuat.Status == "received")
                 {
-                    return new JsonResult(new { success = false, message = "Không thể xóa đề xuất đã được duyệt hoặc đã nhận." });
+                    return new JsonResult(new { success = false, message = "Không thể xóa phiếu yêu cầu đã được duyệt hoặc đã nhận." });
                 }
 
                 deXuat.IsDelete = true;

@@ -25,8 +25,8 @@ namespace QRB.Pages.User
             using (var conn = new SqlConnection(connectionString))
             {
                 await conn.OpenAsync();
-                // Đổi tên bảng thành NguoiDung
-                var cmd = new SqlCommand("SELECT TOP 1 ID, TenHienThi, TenNguoiDung, IDChiNhanh, IsDelete FROM NguoiDung WHERE ID = @id", conn);
+                // Đổi tên bảng thành User
+                var cmd = new SqlCommand("SELECT TOP 1 ID, UserName, Account, IDDepartment, IsDelete FROM [User] WHERE ID = @id", conn);
                 cmd.Parameters.AddWithValue("@id", id);
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
@@ -35,9 +35,9 @@ namespace QRB.Pages.User
                         return new JsonResult(new
                         {
                             id = reader["ID"].ToString(),
-                            tenHienThi = reader["TenHienThi"].ToString(),
-                            tenNguoiDung = reader["TenNguoiDung"].ToString(),
-                            idChiNhanh = reader["IDChiNhanh"].ToString(),
+                            tenHienThi = reader["UserName"].ToString(),
+                            tenNguoiDung = reader["Account"].ToString(),
+                            idChiNhanh = reader["IDDepartment"].ToString(),
                             isDelete = Convert.ToBoolean(reader["IsDelete"])
                         });
                     }

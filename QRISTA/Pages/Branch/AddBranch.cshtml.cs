@@ -5,6 +5,7 @@ using System.Text.Json;
 
 namespace QRB.Pages.Branch
 {
+    [IgnoreAntiforgeryToken]
     public class AddBranchModel : PageModel
     {
         private readonly IConfiguration _configuration;
@@ -34,10 +35,21 @@ namespace QRB.Pages.Branch
                     using (var connection = new SqlConnection(connectionString))
                     {
                         connection.Open();
-                        var cmd = new SqlCommand("INSERT INTO ChiNhanh (ID, MaChiNhanh, TenChiNhanh, IsDelete, CreateTime) VALUES (@ID, @MaChiNhanh, @TenChiNhanh, @IsDelete, @CreateTime)", connection);
+                        
+                        // Kiểm tra mã chi nhánh đã tồn tại chưa
+                        var checkCmd = new SqlCommand("SELECT COUNT(*) FROM Department WHERE DepartmentCode = @DepartmentCode", connection);
+                        checkCmd.Parameters.AddWithValue("@DepartmentCode", input.MaChiNhanh.Trim());
+                        var count = (int)checkCmd.ExecuteScalar();
+                        
+                        if (count > 0)
+                        {
+                            return new JsonResult(new { success = false, message = "Mã chi nhánh đã tồn tại!" });
+                        }
+                        
+                        var cmd = new SqlCommand("INSERT INTO Department (ID, DepartmentCode, DepartmentName, IsDelete, CreateTime) VALUES (@ID, @DepartmentCode, @DepartmentName, @IsDelete, @CreateTime)", connection);
                         cmd.Parameters.AddWithValue("@ID", Guid.NewGuid());
-                        cmd.Parameters.AddWithValue("@MaChiNhanh", input.MaChiNhanh.Trim());
-                        cmd.Parameters.AddWithValue("@TenChiNhanh", input.TenChiNhanh.Trim());
+                        cmd.Parameters.AddWithValue("@DepartmentCode", input.MaChiNhanh.Trim());
+                        cmd.Parameters.AddWithValue("@DepartmentName", input.TenChiNhanh.Trim());
                         cmd.Parameters.AddWithValue("@IsDelete", input.IsDelete);
                         cmd.Parameters.AddWithValue("@CreateTime", DateTime.Now);
                         int rows = cmd.ExecuteNonQuery();

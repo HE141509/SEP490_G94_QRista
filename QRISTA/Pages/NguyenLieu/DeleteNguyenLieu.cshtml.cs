@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using QRB.Models;
 using QRB.Data;
+using QRB.Services;
 using System.Threading.Tasks;
 
 namespace QRB.Pages.NguyenLieu
@@ -9,9 +10,12 @@ namespace QRB.Pages.NguyenLieu
     public class DeleteNguyenLieuModel : PageModel
     {
         private readonly QRBDbContext _context;
-        public DeleteNguyenLieuModel(QRBDbContext context)
+        private readonly IIngredientService _ingredientService;
+        
+        public DeleteNguyenLieuModel(QRBDbContext context, IIngredientService ingredientService)
         {
             _context = context;
+            _ingredientService = ingredientService;
         }
 
         [BindProperty]
@@ -27,7 +31,7 @@ namespace QRB.Pages.NguyenLieu
                 ErrorMessage = "Không tìm thấy nguyên liệu.";
                 return Page();
             }
-            NguyenLieu = await _context.NguyenLieus.FindAsync(id);
+            NguyenLieu = await _ingredientService.GetIngredientByIdAsNguyenLieuAsync(id.Value);
             if (NguyenLieu == null)
             {
                 ErrorMessage = "Không tìm thấy nguyên liệu.";
@@ -39,14 +43,12 @@ namespace QRB.Pages.NguyenLieu
 
         public async Task<IActionResult> OnPostAsync()
         {
-            var nguyenLieu = await _context.NguyenLieus.FindAsync(NguyenLieuId);
-            if (nguyenLieu == null)
+            var success = await _ingredientService.DeleteIngredientAsync(NguyenLieuId);
+            if (!success)
             {
                 ErrorMessage = "Không tìm thấy nguyên liệu.";
                 return Page();
             }
-            nguyenLieu.IsDelete = true;
-            await _context.SaveChangesAsync();
             SuccessMessage = "Xóa nguyên liệu thành công.";
             return RedirectToPage("NguyenLieuList");
         }
