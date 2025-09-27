@@ -59,10 +59,20 @@ public class AddCustomerModel : PageModel
                 {
                     command.ExecuteNonQuery();
                 }
-                catch (Exception ex)
-                {
-                    return new JsonResult(new { success = false, message = "Lỗi khi thêm khách hàng: " + ex.Message });
-                }
+                catch (SqlException ex)
+                    {
+                        string message;
+                        if (ex.Message.Contains("UQ_Customer_Phone")) // constraint name
+                        {
+                            message = "Số điện thoại đã tồn tại";
+                        }
+                        else
+                        {
+                            message = "Có lỗi xảy ra: " + ex.Message;
+                        }
+
+                        return new JsonResult(new { success = false, message });
+                    }
             }
         }
         return new JsonResult(new { success = true });

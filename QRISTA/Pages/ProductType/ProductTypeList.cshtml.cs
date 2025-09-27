@@ -85,7 +85,7 @@ namespace QRB.Pages.ProductType
                 return Redirect($"/AccessDenied?permission=Full Product Types&module=ProductType");
             }
 
-            string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+            string connectionString = "Server=DESKTOP-40FQ8AL\\SQLEXPRESS;Database=QRB;User Id=sa;Password=sa;MultipleActiveResultSets=True;TrustServerCertificate=True";
             using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
@@ -151,7 +151,7 @@ namespace QRB.Pages.ProductType
         {
             try
             {
-                string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+                string connectionString = "Server=DESKTOP-40FQ8AL\\SQLEXPRESS;Database=QRB;User Id=sa;Password=sa;MultipleActiveResultSets=True;TrustServerCertificate=True";
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();

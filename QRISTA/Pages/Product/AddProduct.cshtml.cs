@@ -62,9 +62,19 @@ namespace QRB.Pages.Product
                         return new JsonResult(new { success = false, message = "Thêm sản phẩm thất bại!" });
                 }
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
-                return new JsonResult(new { success = false, message = ex.Message });
+                string message;
+                if (ex.Message.Contains("UQ_Product_ProductCode")) // constraint name
+                {
+                    message = "Mã sản phẩm đã tồn tại";
+                }
+                else
+                {
+                    message = "Có lỗi xảy ra: " + ex.Message;
+                }
+
+                return new JsonResult(new { success = false, message });
             }
         }
 

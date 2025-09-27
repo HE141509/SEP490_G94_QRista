@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using QRB.Data;
 using QRB.Services;
 using QRB.Services.Authorization;
+using QRB.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,8 +29,19 @@ builder.Services.AddDbContext<QRBDbContext>(options =>
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<AuthorizationSeeder>();
 builder.Services.AddScoped<AuthorizationService>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<DepartmentService>();
+builder.Services.AddScoped<IVoucherService, VoucherService>();
+builder.Services.AddScoped<IIngredientService, IngredientService>();
+builder.Services.AddScoped<IVnpaySecurityService, VnpaySecurityService>();
+
+// Add memory cache for security service
+builder.Services.AddMemoryCache();
 
 var app = builder.Build();
+
+// Initialize VnpayHelper with configuration
+VnpayHelper.Initialize(app.Configuration);
 
 // Seed authorization data - Tạm thời disable để chạy thủ công script SQL
 // using (var scope = app.Services.CreateScope())

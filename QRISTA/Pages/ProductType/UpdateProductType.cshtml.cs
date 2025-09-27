@@ -40,7 +40,7 @@ namespace QRB.Pages.ProductType
 
         public async Task<IActionResult> OnGetAsync(Guid id)
         {
-            string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+            string connectionString = "Server=DESKTOP-40FQ8AL\\SQLEXPRESS;Database=QRB;User Id=sa;Password=sa;MultipleActiveResultSets=True;TrustServerCertificate=True";
             using (var connection = new SqlConnection(connectionString))
             {
                 await connection.OpenAsync();
@@ -78,7 +78,7 @@ namespace QRB.Pages.ProductType
                 {
                     return new JsonResult(new { success = false, message = "Đơn giá không hợp lệ!" });
                 }
-                string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+                string connectionString = "Server=DESKTOP-40FQ8AL\\SQLEXPRESS;Database=QRB;User Id=sa;Password=sa;MultipleActiveResultSets=True;TrustServerCertificate=True";
                 using (var connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();

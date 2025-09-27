@@ -9,313 +9,313 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = QRB
 build_property.RootNamespace = QRB
-build_property.ProjectDir = C:\Users\jokA\Downloads\qrb\C#\
+build_property.ProjectDir = C:\Users\salam\source\repos\QRISTA\QRISTA\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\jokA\Downloads\qrb\C#
+build_property.MSBuildProjectDirectory = C:\Users\salam\source\repos\QRISTA\QRISTA
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/AccessDenied.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/AccessDenied.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjZXNzRGVuaWVkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Authorization/Index.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Authorization/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aG9yaXphdGlvblxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Authorization/Permissions.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Authorization/Permissions.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aG9yaXphdGlvblxQZXJtaXNzaW9ucy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Authorization/Roles.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Authorization/Roles.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aG9yaXphdGlvblxSb2xlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Authorization/Users.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Authorization/Users.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQXV0aG9yaXphdGlvblxVc2Vycy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Branch/AddBranch.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Branch/AddBranch.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQnJhbmNoXEFkZEJyYW5jaC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Branch/BranchList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Branch/BranchList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQnJhbmNoXEJyYW5jaExpc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Branch/DeleteBranch.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Branch/DeleteBranch.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQnJhbmNoXERlbGV0ZUJyYW5jaC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Branch/UpdateBranch.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Branch/UpdateBranch.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQnJhbmNoXFVwZGF0ZUJyYW5jaC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Customer/AddCustomer.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Customer/AddCustomer.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJcQWRkQ3VzdG9tZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Customer/CustomerList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Customer/CustomerList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJcQ3VzdG9tZXJMaXN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Customer/DeleteCustomer.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Customer/DeleteCustomer.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJcRGVsZXRlQ3VzdG9tZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Customer/UpdateCustomer.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Customer/UpdateCustomer.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ3VzdG9tZXJcVXBkYXRlQ3VzdG9tZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Dashboard.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/DeXuatMuaSam/AddDeXuatMuaSam.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/DeXuatMuaSam/AddDeXuatMuaSam.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXEFkZERlWHVhdE11YVNhbS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/DeXuatMuaSam/DeleteDeXuatMuaSam.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/DeXuatMuaSam/DeleteDeXuatMuaSam.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXERlbGV0ZURlWHVhdE11YVNhbS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/DeXuatMuaSam/DeXuatMuaSamList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/DeXuatMuaSam/DeXuatMuaSamList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXERlWHVhdE11YVNhbUxpc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/DeXuatMuaSam/UpdateDeXuatMuaSam.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/DeXuatMuaSam/UpdateDeXuatMuaSam.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVYdWF0TXVhU2FtXFVwZGF0ZURlWHVhdE11YVNhbS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Error.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Index.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/KhoSanPham/AddKhoSanPham.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/KhoSanPham/AddKhoSanPham.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxBZGRLaG9TYW5QaGFtLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/KhoSanPham/DeleteKhoSanPham.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/KhoSanPham/DeleteKhoSanPham.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxEZWxldGVLaG9TYW5QaGFtLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/KhoSanPham/KhoSanPhamList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/KhoSanPham/KhoSanPhamList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxLaG9TYW5QaGFtTGlzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/KhoSanPham/UpdateKhoSanPham.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/KhoSanPham/UpdateKhoSanPham.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcS2hvU2FuUGhhbVxVcGRhdGVLaG9TYW5QaGFtLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Login.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Logout.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Logout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9nb3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Menu/GetPhoneNumberFromSession.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Menu/GetPhoneNumberFromSession.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVudVxHZXRQaG9uZU51bWJlckZyb21TZXNzaW9uLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Menu/Menu.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Menu/Menu.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVudVxNZW51LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/NguyenLieu/AddNguyenLieu.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/NguyenLieu/AddNguyenLieu.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmd1eWVuTGlldVxBZGROZ3V5ZW5MaWV1LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/NguyenLieu/DeleteNguyenLieu.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/NguyenLieu/DeleteNguyenLieu.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmd1eWVuTGlldVxEZWxldGVOZ3V5ZW5MaWV1LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/NguyenLieu/NguyenLieuList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/NguyenLieu/NguyenLieuList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmd1eWVuTGlldVxOZ3V5ZW5MaWV1TGlzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/NguyenLieu/UpdateNguyenLieu.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/NguyenLieu/UpdateNguyenLieu.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTmd1eWVuTGlldVxVcGRhdGVOZ3V5ZW5MaWV1LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Order/AddOrder.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Order/AddOrder.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JkZXJcQWRkT3JkZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Order/CancelOrder.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Order/CancelOrder.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JkZXJcQ2FuY2VsT3JkZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Order/DeleteOrder.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Order/DeleteOrder.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JkZXJcRGVsZXRlT3JkZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Order/OrderDetail.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Order/OrderDetail.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JkZXJcT3JkZXJEZXRhaWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Order/OrderDetailPublic.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Order/OrderDetailPublic.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JkZXJcT3JkZXJEZXRhaWxQdWJsaWMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Order/OrderHistory.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Order/OrderHistory.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JkZXJcT3JkZXJIaXN0b3J5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Order/OrderList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Order/OrderList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcT3JkZXJcT3JkZXJMaXN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Payment/Payment.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Payment/Payment.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxQYXltZW50LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Payment/PaymentRedirect.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Payment/PaymentRedirect.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUGF5bWVudFxQYXltZW50UmVkaXJlY3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Privacy.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/ProductGroup/AddGroup.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductGroup/AddGroup.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdEdyb3VwXEFkZEdyb3VwLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/ProductGroup/DeleteGroup.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductGroup/DeleteGroup.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdEdyb3VwXERlbGV0ZUdyb3VwLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/ProductGroup/ProductGroupList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductGroup/ProductGroupList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdEdyb3VwXFByb2R1Y3RHcm91cExpc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/ProductGroup/UpdateGroup.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductGroup/UpdateGroup.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdEdyb3VwXFVwZGF0ZUdyb3VwLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/ProductType/AddProductType.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductType/AddProductType.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcQWRkUHJvZHVjdFR5cGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/ProductType/DeleteProductType.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductType/DeleteProductType.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcRGVsZXRlUHJvZHVjdFR5cGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/ProductType/ProductTypeList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductType/ProductTypeList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcUHJvZHVjdFR5cGVMaXN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/ProductType/UpdateProductType.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ProductType/UpdateProductType.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFR5cGVcVXBkYXRlUHJvZHVjdFR5cGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Product/AddProduct.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Product/AddProduct.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFxBZGRQcm9kdWN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Product/DeleteProduct.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Product/DeleteProduct.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFxEZWxldGVQcm9kdWN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Product/ProductList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Product/ProductList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFxQcm9kdWN0TGlzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Product/UpdateProduct.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Product/UpdateProduct.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdFxVcGRhdGVQcm9kdWN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/ReturnUrl.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/ReturnUrl.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmV0dXJuVXJsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Shared/_Header.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Shared/_Header.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9IZWFkZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Shared/_Sidebar.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Shared/_Sidebar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9TaWRlYmFyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Statistics/EmployeeSales.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Statistics/EmployeeSales.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3RhdGlzdGljc1xFbXBsb3llZVNhbGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Tests/OrderTest.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Tests/OrderTest.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVGVzdHNcT3JkZXJUZXN0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/UserManagement.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UserManagement.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck1hbmFnZW1lbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/User/AddUser.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/User/AddUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxBZGRVc2VyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/User/DeleteUser.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/User/DeleteUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxEZWxldGVVc2VyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/User/GetUserById.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/User/GetUserById.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxHZXRVc2VyQnlJZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/User/UpdateUser.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/User/UpdateUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxVcGRhdGVVc2VyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/User/UserList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/User/UserList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclxVc2VyTGlzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/UuDai/AddUuDai.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/AddUuDai.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcQWRkVXVEYWkuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/UuDai/Delete.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/UuDai/GetKhachHang.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/GetKhachHang.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcR2V0S2hhY2hIYW5nLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/UuDai/GetMaUuDaiBySDT.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/GetMaUuDaiBySDT.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcR2V0TWFVdURhaUJ5U0RULmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/UuDai/MaUuDaiList.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/UuDai/MaUuDaiList.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXVEYWlcTWFVdURhaUxpc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Vnpay/VnpayReturn.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Vnpay/VnpayReturn.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVm5wYXlcVm5wYXlSZXR1cm4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/_ViewImports.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/_ViewStart.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/jokA/Downloads/qrb/C\#/Pages/Shared/_Layout.cshtml]
+[C:/Users/salam/source/repos/QRISTA/QRISTA/Pages/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-tgwxyltdop

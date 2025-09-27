@@ -142,19 +142,23 @@ namespace QRB.Pages.Statistics
                     .CountAsync();
                 Console.WriteLine($"[EmployeeSales] Total orders in date range: {totalOrdersInRange}");
 
-                var paidOrdersInRange = await _context.Orders
-                    .Where(o => o.CreateTime >= fromDate && o.CreateTime <= toDateEnd && o.PaymentStatus == true && !o.IsDelete)
+                var validOrdersInRange = await _context.Orders
+                    .Where(o => o.CreateTime >= fromDate && o.CreateTime <= toDateEnd && 
+                               o.PaymentStatus == true && o.Served == true && !o.IsDelete &&
+                               o.IsCancelled != true && o.IsRefunded != true)
                     .CountAsync();
-                Console.WriteLine($"[EmployeeSales] Paid orders in date range: {paidOrdersInRange}");
+                Console.WriteLine($"[EmployeeSales] Valid orders (paid + served + not cancelled/refunded) in date range: {validOrdersInRange}");
 
                 // DEBUG: Kiểm tra Orders có IDEmployee gì
                 var sampleOrders = await _context.Orders
-                    .Where(o => o.CreateTime >= fromDate && o.CreateTime <= toDateEnd && o.PaymentStatus == true && !o.IsDelete)
+                    .Where(o => o.CreateTime >= fromDate && o.CreateTime <= toDateEnd && 
+                               o.PaymentStatus == true && o.Served == true && !o.IsDelete &&
+                               o.IsCancelled != true && o.IsRefunded != true)
                     .Select(o => new { o.ID, o.IDEmployee, o.IDDepartment, o.Amount })
                     .Take(5)
                     .ToListAsync();
                     
-                Console.WriteLine($"[EmployeeSales] Sample paid orders:");
+                Console.WriteLine($"[EmployeeSales] Sample valid orders (paid + served + not cancelled/refunded):");
                 foreach (var order in sampleOrders)
                 {
                     Console.WriteLine($"[EmployeeSales]   Order {order.ID}: Employee={order.IDEmployee}, Dept={order.IDDepartment}, Amount={order.Amount}");
@@ -179,6 +183,9 @@ namespace QRB.Pages.Statistics
                                            where order.CreateTime >= fromDate 
                                                  && order.CreateTime <= toDateEnd
                                                  && order.PaymentStatus == true
+                                                 && order.Served == true
+                                                 && order.IsCancelled != true
+                                                 && order.IsRefunded != true
                                                  && !order.IsDelete
                                                  && !employee.IsDelete
                                            select new { 
@@ -202,13 +209,16 @@ namespace QRB.Pages.Statistics
                 Console.WriteLine($"[EmployeeSales] User branch IDs: [{string.Join(", ", userBranchIds)}]");
                 Console.WriteLine($"[EmployeeSales] Branch filtering will exclude all orders - using no branch filter!");
 
-                // Query để lấy doanh số nhân viên - BỎ BRANCH FILTERING để test
+                // Query để lấy doanh số nhân viên - chỉ tính đơn đã trả hàng
                 var rawSalesData = await (from order in _context.Orders
                                         join employee in _context.NguoiDungs on order.IDEmployee equals employee.ID
                                         join department in _context.Departments on order.IDDepartment equals department.ID
                                         where order.CreateTime >= fromDate 
                                               && order.CreateTime <= toDateEnd
-                                              && order.PaymentStatus == true
+                                              && order.PaymentStatus == true     // Đã thanh toán
+                                              && order.Served == true            // Đã trả hàng
+                                              && order.IsCancelled != true       // Không bị hủy
+                                              && order.IsRefunded != true        // Không bị hoàn tiền
                                               && !order.IsDelete
                                               && !employee.IsDelete
                                               && !department.IsDelete
@@ -219,7 +229,8 @@ namespace QRB.Pages.Statistics
                                             EmployeeId = employee.ID,
                                             EmployeeName = employee.TenHienThi,
                                             DepartmentName = department.DepartmentName,
-                                            AmountString = order.Amount
+                                            AmountString = order.Amount,
+                                            OrderId = order.ID
                                         })
                                         .ToListAsync();
 

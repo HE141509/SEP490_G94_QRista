@@ -34,7 +34,7 @@ namespace QRB.Pages.ProductType
                 {
                     return new JsonResult(new { success = false, message = "Thiếu thông tin sản phẩm hoặc chi nhánh." });
                 }
-                string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+                string connectionString = "Server=DESKTOP-40FQ8AL\\SQLEXPRESS;Database=QRB;User Id=sa;Password=sa;MultipleActiveResultSets=True;TrustServerCertificate=True";
                 using (var connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
@@ -56,9 +56,19 @@ namespace QRB.Pages.ProductType
                         return new JsonResult(new { success = false, message = "Thêm loại sản phẩm thất bại!" });
                 }
             }
-            catch (Exception ex)
+            catch (SqlException ex)
             {
-                return new JsonResult(new { success = false, message = ex.Message });
+                string message;
+                if (ex.Message.Contains("UQ_TypeProduct_TypeProductCode")) // constraint name
+                {
+                    message = "Mã loại sản phẩm đã tồn tại";
+                }
+                else
+                {
+                    message = "Có lỗi xảy ra: " + ex.Message;
+                }
+
+                return new JsonResult(new { success = false, message });
             }
         }
     }

@@ -21,7 +21,7 @@ namespace QRB.Pages.ProductType
                 if (input == null || input.id == Guid.Empty)
                     return new JsonResult(new { success = false, message = "ID không hợp lệ!" });
 
-                string connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=QRB;Trusted_Connection=True;";
+                string connectionString = "Server=DESKTOP-40FQ8AL\\SQLEXPRESS;Database=QRB;User Id=sa;Password=sa;MultipleActiveResultSets=True;TrustServerCertificate=True";
                 using (var connection = new SqlConnection(connectionString))
                 {
                     connection.Open();

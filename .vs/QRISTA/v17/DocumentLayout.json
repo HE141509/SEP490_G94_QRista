@@ -3,16 +3,36 @@
   "WorkspaceRootPath": "C:\\Users\\salam\\source\\repos\\QRISTA\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\services\\menuservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\services\\menuservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\pages\\branch\\getbranchbyid.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\pages\\branch\\getbranchbyid.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\pages\\branch\\deletebranch.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\pages\\branch\\deletebranch.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\pages\\branch\\branchlist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\pages\\branch\\branchlist.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\pages\\branch\\addbranch.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\pages\\branch\\addbranch.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\pages\\dashboard.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\pages\\dashboard.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|solutionrelative:qrista\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{34FEA19D-E69C-4BC2-B5E8-ED11B1E23F9C}|QRISTA\\QRISTA.csproj|c:\\users\\salam\\source\\repos\\qrista\\qrista\\pages\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -54,7 +74,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 12,
+          "SelectedChildIndex": 11,
           "Children": [
             {
               "$type": "Bookmark",
@@ -79,6 +99,55 @@
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "MenuService.cs",
+              "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Services\\MenuService.cs",
+              "RelativeDocumentMoniker": "QRISTA\\Services\\MenuService.cs",
+              "ToolTip": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Services\\MenuService.cs",
+              "RelativeToolTip": "QRISTA\\Services\\MenuService.cs",
+              "ViewState": "AQIAAAkAAAAAAAAAAAAuwA4AAAAvAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T17:04:23.413Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "DeleteBranch.cshtml",
+              "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Branch\\DeleteBranch.cshtml",
+              "RelativeDocumentMoniker": "QRISTA\\Pages\\Branch\\DeleteBranch.cshtml",
+              "ToolTip": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Branch\\DeleteBranch.cshtml",
+              "RelativeToolTip": "QRISTA\\Pages\\Branch\\DeleteBranch.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-24T17:01:15.801Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "BranchList.cshtml",
+              "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Branch\\BranchList.cshtml",
+              "RelativeDocumentMoniker": "QRISTA\\Pages\\Branch\\BranchList.cshtml",
+              "ToolTip": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Branch\\BranchList.cshtml",
+              "RelativeToolTip": "QRISTA\\Pages\\Branch\\BranchList.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-24T17:01:12.239Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "AddBranch.cshtml",
+              "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Branch\\AddBranch.cshtml",
+              "RelativeDocumentMoniker": "QRISTA\\Pages\\Branch\\AddBranch.cshtml",
+              "ToolTip": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Branch\\AddBranch.cshtml",
+              "RelativeToolTip": "QRISTA\\Pages\\Branch\\AddBranch.cshtml",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-24T17:01:03.777Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "Dashboard.cshtml.cs",
               "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Dashboard.cshtml.cs",
               "RelativeDocumentMoniker": "QRISTA\\Pages\\Dashboard.cshtml.cs",
@@ -86,12 +155,11 @@
               "RelativeToolTip": "QRISTA\\Pages\\Dashboard.cshtml.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-24T14:48:06.886Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-24T14:48:06.886Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 9,
               "Title": "Menu.cshtml",
               "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Menu.cshtml",
               "RelativeDocumentMoniker": "QRISTA\\Pages\\Menu.cshtml",
@@ -103,7 +171,32 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\appsettings.json",
+              "RelativeDocumentMoniker": "QRISTA\\appsettings.json",
+              "ToolTip": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\appsettings.json",
+              "RelativeToolTip": "QRISTA\\appsettings.json",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAfAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-07-24T14:48:06.944Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GetBranchById.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Branch\\GetBranchById.cshtml.cs",
+              "RelativeDocumentMoniker": "QRISTA\\Pages\\Branch\\GetBranchById.cshtml.cs",
+              "ToolTip": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Branch\\GetBranchById.cshtml.cs",
+              "RelativeToolTip": "QRISTA\\Pages\\Branch\\GetBranchById.cshtml.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABEAAABIAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T17:01:17.732Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
               "Title": "Logout.cshtml",
               "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Logout.cshtml",
               "RelativeDocumentMoniker": "QRISTA\\Pages\\Logout.cshtml",
@@ -115,7 +208,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 11,
               "Title": "Login.cshtml",
               "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Login.cshtml",
               "RelativeDocumentMoniker": "QRISTA\\Pages\\Login.cshtml",
@@ -127,7 +220,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 12,
               "Title": "Error.cshtml",
               "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Error.cshtml",
               "RelativeDocumentMoniker": "QRISTA\\Pages\\Error.cshtml",
@@ -139,7 +232,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 13,
               "Title": "Dashboard.cshtml",
               "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Dashboard.cshtml",
               "RelativeDocumentMoniker": "QRISTA\\Pages\\Dashboard.cshtml",
@@ -151,7 +244,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 14,
               "Title": "MenuItem.cs",
               "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Models\\MenuItem.cs",
               "RelativeDocumentMoniker": "QRISTA\\Models\\MenuItem.cs",
@@ -163,7 +256,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 6,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Program.cs",
               "RelativeDocumentMoniker": "QRISTA\\Program.cs",
@@ -171,12 +264,11 @@
               "RelativeToolTip": "QRISTA\\Program.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAACkAAAAKAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-24T14:48:06.949Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-24T14:48:06.949Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 8,
               "Title": "Privacy.cshtml",
               "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Pages\\Privacy.cshtml",
               "RelativeDocumentMoniker": "QRISTA\\Pages\\Privacy.cshtml",
@@ -188,19 +280,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "appsettings.json",
-              "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\appsettings.json",
-              "RelativeDocumentMoniker": "QRISTA\\appsettings.json",
-              "ToolTip": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\appsettings.json",
-              "RelativeToolTip": "QRISTA\\appsettings.json",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-07-24T14:48:06.944Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 15,
               "Title": "QRBDbContext.cs",
               "DocumentMoniker": "C:\\Users\\salam\\source\\repos\\QRISTA\\QRISTA\\Data\\QRBDbContext.cs",
               "RelativeDocumentMoniker": "QRISTA\\Data\\QRBDbContext.cs",
